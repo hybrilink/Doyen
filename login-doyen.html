@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Connexion Doyen - Faculté Agronomique</title>
+    <meta name="application-name" content="hybrilink Doyen">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="hybrilink Doyen">
+    <meta name="description" content="Dashboard Doyen - Consultation">
+    <meta name="theme-color" content="#003366">
+    
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon-192x192.png">
+    <link rel="icon" type="image/png" href="icon-96x96.png">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #003366 0%, #002244 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+        }
+        
+        /* Effet de fond décoratif */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="10" cy="10" r="2" fill="rgba(255,255,255,0.05)"/><circle cx="90" cy="20" r="3" fill="rgba(255,255,255,0.05)"/><circle cx="50" cy="85" r="2" fill="rgba(255,255,255,0.05)"/><circle cx="30" cy="50" r="1.5" fill="rgba(255,255,255,0.05)"/><circle cx="80" cy="70" r="2.5" fill="rgba(255,255,255,0.05)"/></svg>');
+            background-repeat: repeat;
+            opacity: 0.3;
+            pointer-events: none;
+        }
+        
+        .login-container {
+            max-width: 450px;
+            width: 100%;
+            position: relative;
+            z-index: 1;
+            animation: fadeInUp 0.6s ease-out;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .login-card {
+            background: white;
+            border-radius: 30px;
+            padding: 45px 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35);
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+        
+        .login-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #003366, #ffb347, #003366);
+        }
+        
+        .login-card::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #003366, #ffb347, #003366);
+        }
+        
+        .logo {
+            text-align: center;
+            margin-bottom: 35px;
+        }
+        
+        .logo-icon {
+            width: 85px;
+            height: 85px;
+            background: linear-gradient(135deg, #003366, #002244);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 18px;
+            box-shadow: 0 10px 25px -5px rgba(0, 51, 102, 0.4);
+            transition: transform 0.3s;
+        }
+        
+        .logo-icon:hover {
+            transform: scale(1.05);
+        }
+        
+        .logo-icon i {
+            font-size: 48px;
+            color: #ffb347;
+        }
+        
+        .logo h2 {
+            font-size: 26px;
+            font-weight: 700;
+            color: #1a1a2e;
+            margin-bottom: 8px;
+        }
+        
+        .logo p {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 0;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        .input-group-custom {
+            position: relative;
+        }
+        
+        .input-group-custom i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #003366;
+            font-size: 18px;
+            z-index: 1;
+        }
+        
+        .input-group-custom input {
+            width: 100%;
+            padding: 15px 15px 15px 48px;
+            border: 2px solid #e0e0e0;
+            border-radius: 15px;
+            font-size: 15px;
+            transition: all 0.3s;
+            background: #f8f9fa;
+        }
+        
+        .input-group-custom input:focus {
+            outline: none;
+            border-color: #003366;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(0, 51, 102, 0.1);
+        }
+        
+        .input-group-custom input::placeholder {
+            color: #aaa;
+            font-size: 14px;
+        }
+        
+        .password-toggle {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #999;
+            z-index: 1;
+            background: transparent;
+            border: none;
+            font-size: 18px;
+            padding: 5px;
+        }
+        
+        .password-toggle:hover {
+            color: #003366;
+        }
+        
+        .btn-login {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #003366, #002244);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(0, 51, 102, 0.5);
+        }
+        
+        .btn-login:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .alert-custom {
+            background: #f8d7da;
+            color: #721c24;
+            border-radius: 12px;
+            padding: 12px 15px;
+            font-size: 14px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-left: 4px solid #dc3545;
+        }
+        
+        .alert-success-custom {
+            background: #d4edda;
+            color: #155724;
+            border-left-color: #28a745;
+        }
+        
+        .info-text {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+            font-size: 12px;
+            color: #888;
+        }
+        
+        .info-text i {
+            color: #003366;
+        }
+        
+        .info-text img {
+            border-radius: 30px;
+            margin-top: 8px;
+            width: 45px;
+        }
+        
+        .info-text a {
+            color: #003366;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        
+        .info-text a:hover {
+            text-decoration: underline;
+        }
+        
+        .badge-offline {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+        
+        .toast-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            min-width: 300px;
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+        
+        .shake {
+            animation: shake 0.3s ease-in-out;
+        }
+        
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        .notification-toast {
+            animation: slideInRight 0.3s ease-out;
+        }
+        
+        @media (max-width: 480px) {
+            .login-card {
+                padding: 30px 25px;
+            }
+            .logo h2 {
+                font-size: 22px;
+            }
+            .logo-icon {
+                width: 70px;
+                height: 70px;
+            }
+            .logo-icon i {
+                font-size: 38px;
+            }
+        }
+        
+        .demo-credentials {
+            background: linear-gradient(135deg, #f0f8ff, #e8f4fd);
+            border-radius: 12px;
+            padding: 12px 15px;
+            margin-top: 20px;
+            font-size: 12px;
+            text-align: center;
+            border: 1px solid rgba(0, 51, 102, 0.2);
+        }
+        
+        .demo-credentials p {
+            margin: 5px 0;
+            color: #003366;
+        }
+        
+        .demo-credentials code {
+            background: white;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-weight: bold;
+            color: #003366;
+            font-size: 12px;
+        }
+        
+        .demo-credentials i {
+            color: #ffb347;
+        }
+    </style>
+</head>
+<body>
+    <div class="badge-offline" id="offlineIndicator" style="display: none;">
+        <span class="badge bg-warning text-dark">
+            <i class="bi bi-wifi-off"></i> Mode hors-ligne
+        </span>
+    </div>
+    
+    <div id="toastContainer" class="toast-notification"></div>
+    
+    <div class="login-container">
+        <div class="login-card">
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="bi bi-tree-fill"></i>
+                </div>
+                <h2>Espace Doyen</h2>
+                <p>Faculté Agronomique</p>
+            </div>
+            
+            <div id="alertMessage" style="display: none;"></div>
+            
+            <form id="loginForm">
+                <div class="form-group">
+                    <div class="input-group-custom">
+                        <i class="bi bi-person-badge"></i>
+                        <input type="text" id="matricule" name="matricule" placeholder="Matricule" autocomplete="off" required>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <div class="input-group-custom">
+                        <i class="bi bi-lock"></i>
+                        <input type="password" id="password" name="password" placeholder="Mot de passe" required>
+                        <button type="button" class="password-toggle" onclick="togglePassword()">
+                            <i class="bi bi-eye-slash" id="toggleIcon"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn-login" id="loginBtn">
+                    <i class="bi bi-box-arrow-in-right"></i> Se connecter
+                </button>
+            </form>
+            
+            <div class="demo-credentials">
+                <p><i class="bi bi-info-circle-fill"></i> <strong>Identifiants de securité</strong></p>
+             
+            </div>
+            
+            <div class="info-text">
+                <i class="bi bi-shield-check"></i> HYBRILINK-TECH votre partenaire de A à Z<br>
+                <img src="t.png" alt="HYBRILINK" onerror="this.src='https://via.placeholder.com/45x45?text=HT'">
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyBb82N2-5ns7qKjQBAj5UvDW87s2PZ27F0",
+            authDomain: "fsa-unilu.firebaseapp.com",
+            projectId: "fsa-unilu",
+            storageBucket: "fsa-unilu.firebasestorage.app",
+            messagingSenderId: "36551990738",
+            appId: "1:36551990738:web:e91fdcb53f8aab5d1b7c0b"
+        };
+        
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        
+        let isOnline = navigator.onLine;
+        let loginInProgress = false;
+        
+        window.addEventListener('online', () => {
+            isOnline = true;
+            document.getElementById('offlineIndicator').style.display = 'none';
+            showToast('🟢 Connexion rétablie', 'success');
+        });
+        
+        window.addEventListener('offline', () => {
+            isOnline = false;
+            document.getElementById('offlineIndicator').style.display = 'block';
+            showToast('🔴 Mode hors-ligne - Vérifiez votre connexion', 'warning');
+        });
+        
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const bgColor = type === 'success' ? '#28a745' : (type === 'warning' ? '#ffc107' : '#dc3545');
+            const textColor = type === 'warning' ? '#333' : 'white';
+            const icon = type === 'success' ? 'check-circle-fill' : (type === 'warning' ? 'exclamation-triangle-fill' : 'x-circle-fill');
+            
+            const toastHtml = `
+                <div class="toast notification-toast" role="alert" style="background: ${bgColor}; color: ${textColor}; border-radius: 10px; margin-bottom: 10px;">
+                    <div class="toast-body">
+                        <i class="bi bi-${icon} me-2"></i>
+                        ${message}
+                    </div>
+                </div>
+            `;
+            container.insertAdjacentHTML('afterbegin', toastHtml);
+            const toastElement = container.firstElementChild;
+            setTimeout(() => toastElement.remove(), 4000);
+        }
+        
+        function togglePassword() {
+            const passwordInput = document.getElementById('password');
+            const toggleIcon = document.getElementById('toggleIcon');
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleIcon.classList.remove('bi-eye-slash');
+                toggleIcon.classList.add('bi-eye');
+            } else {
+                passwordInput.type = 'password';
+                toggleIcon.classList.remove('bi-eye');
+                toggleIcon.classList.add('bi-eye-slash');
+            }
+        }
+        
+        function showAlert(message, isError = true) {
+            const alertDiv = document.getElementById('alertMessage');
+            alertDiv.innerHTML = `
+                <div class="alert-custom ${!isError ? 'alert-success-custom' : ''}">
+                    <i class="bi ${isError ? 'bi-exclamation-triangle-fill' : 'bi-check-circle-fill'}"></i>
+                    ${message}
+                </div>
+            `;
+            alertDiv.style.display = 'block';
+            
+            if (isError) {
+                const loginCard = document.querySelector('.login-card');
+                loginCard.classList.add('shake');
+                setTimeout(() => loginCard.classList.remove('shake'), 300);
+            }
+            
+            if (!isError) {
+                setTimeout(() => {
+                    alertDiv.style.display = 'none';
+                }, 3000);
+            }
+        }
+        
+        async function login(event) {
+            event.preventDefault();
+            
+            if (loginInProgress) return;
+            
+            const matricule = document.getElementById('matricule').value.trim();
+            const password = document.getElementById('password').value;
+            
+            if (!matricule || !password) {
+                showAlert('Veuillez remplir tous les champs');
+                return;
+            }
+            
+            loginInProgress = true;
+            const loginBtn = document.getElementById('loginBtn');
+            const originalText = loginBtn.innerHTML;
+            loginBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Connexion en cours...';
+            loginBtn.disabled = true;
+            
+            try {
+                if (!isOnline) {
+                    showAlert('Mode hors-ligne. Vérifiez votre connexion internet.', true);
+                    loginInProgress = false;
+                    loginBtn.innerHTML = originalText;
+                    loginBtn.disabled = false;
+                    return;
+                }
+                
+                const userDoc = await db.collection('utilisateurs').doc(matricule).get();
+                
+                if (!userDoc.exists) {
+                    showAlert('Matricule ou mot de passe incorrect');
+                    loginInProgress = false;
+                    loginBtn.innerHTML = originalText;
+                    loginBtn.disabled = false;
+                    return;
+                }
+                
+                const userData = userDoc.data();
+                
+                if (userData.role !== 'doyen') {
+                    showAlert('Accès non autorisé. Ce compte n\'a pas les droits Doyen.');
+                    loginInProgress = false;
+                    loginBtn.innerHTML = originalText;
+                    loginBtn.disabled = false;
+                    return;
+                }
+                
+                if (userData.motDePasse !== password) {
+                    showAlert('Matricule ou mot de passe incorrect');
+                    loginInProgress = false;
+                    loginBtn.innerHTML = originalText;
+                    loginBtn.disabled = false;
+                    return;
+                }
+                
+                if (userData.actif === false) {
+                    showAlert('Ce compte a été désactivé. Veuillez contacter l\'administrateur.');
+                    loginInProgress = false;
+                    loginBtn.innerHTML = originalText;
+                    loginBtn.disabled = false;
+                    return;
+                }
+                
+                const sessionData = {
+                    matricule: matricule,
+                    nomComplet: userData.nomComplet,
+                    email: userData.email,
+                    role: userData.role,
+                    expires: Date.now() + (8 * 60 * 60 * 1000)
+                };
+                
+                localStorage.setItem('session_doyen', JSON.stringify(sessionData));
+                
+                showAlert('Connexion réussie ! Redirection...', false);
+                
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 1500);
+                
+            } catch (error) {
+                console.error('Erreur de connexion:', error);
+                showAlert('Erreur de connexion. Veuillez réessayer.');
+                loginInProgress = false;
+                loginBtn.innerHTML = originalText;
+                loginBtn.disabled = false;
+            }
+        }
+        
+        function checkExistingSession() {
+            const session = localStorage.getItem('session_doyen');
+            if (session) {
+                try {
+                    const sessionData = JSON.parse(session);
+                    if (Date.now() < sessionData.expires) {
+                        window.location.href = 'index.html';
+                        return true;
+                    } else {
+                        localStorage.removeItem('session_doyen');
+                    }
+                } catch (e) {
+                    localStorage.removeItem('session_doyen');
+                }
+            }
+            return false;
+        }
+        
+        document.getElementById('loginForm').addEventListener('submit', login);
+        
+        if (!checkExistingSession()) {
+            document.getElementById('matricule').focus();
+        }
+        
+        const inputs = document.querySelectorAll('.input-group-custom input');
+        inputs.forEach(input => {
+            input.addEventListener('focus', function() {
+                this.parentElement.style.transform = 'scale(1.01)';
+            });
+            input.addEventListener('blur', function() {
+                this.parentElement.style.transform = 'scale(1)';
+            });
+        });
+        
+        document.getElementById('password').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                document.getElementById('loginForm').dispatchEvent(new Event('submit'));
+            }
+        });
+        
+        console.log('Page de connexion Doyen - Prête');
+
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js').then(reg => {
+                    console.log('Service Worker enregistré:', reg.scope);
+                }).catch(err => {
+                    console.log('Erreur Service Worker:', err);
+                });
+            });
+        }
+    </script>
+</body>
+</html>
