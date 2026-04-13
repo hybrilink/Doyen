@@ -1642,16 +1642,85 @@
             } catch(e) {}
         }
         
-        function showRealTimeNotification(transaction) {
-            const montant = (transaction.montantTotal || 0).toLocaleString();
-            const etudiant = transaction.etudiantNom || 'Un étudiant';
-            const message = `💰 ${etudiant} a payé ${montant} FC`;
-            showToast(message, 'success');
-            if (Notification.permission === 'granted') {
-                new Notification('Nouveau paiement', { body: message, icon: '/icon-192x192.png', vibrate: [200,100,200] });
-            }
-            if (notificationSound) notificationSound.play().catch(e => console.log('Son non joué'));
+        // Version alternative avec un toast plus détaillé
+function showRealTimeNotification(transaction) {
+    const montant = (transaction.montantTotal || 0).toLocaleString();
+    const etudiant = transaction.etudiantNom || 'Un étudiant';
+    const matricule = transaction.etudiantMatricule || '';
+    const numeroRecu = transaction.numeroRecu || transaction.id.substring(0, 12);
+    
+    // Récupérer les noms des fiches payées
+    let fichesHtml = '';
+    if (transaction.fiches && Array.isArray(transaction.fiches) && transaction.fiches.length > 0) {
+        const fichesNoms = transaction.fiches.map(f => f.nom || 'Fiche');
+        fichesHtml = `<br><small><i class="bi bi-file-text"></i> ${fichesNoms.join(', ')}</small>`;
+    }
+    
+    // Créer un toast personnalisé avec plus de détails
+    const container = document.getElementById('toastContainer');
+    const toastHtml = `
+        <div class="toast notification-toast show" style="background: linear-gradient(135deg, #003366, #002244); color: white; border-radius: 15px; margin-bottom: 10px; min-width: 320px; box-shadow: 0 5px 20px rgba(0,0,0,0.3);">
+            <div class="toast-header" style="background: transparent; color: white; border-bottom: 1px solid rgba(255,255,255,0.2);">
+                <i class="bi bi-bell-fill me-2" style="color: #ffb347;"></i>
+                <strong class="me-auto">Nouveau paiement reçu</strong>
+                <small>${new Date().toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'})}</small>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" style="font-size: 12px;"></button>
+            </div>
+            <div class="toast-body">
+                <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                    <i class="bi bi-person-circle me-2" style="font-size: 24px;"></i>
+                    <div>
+                        <strong style="font-size: 16px;">${escapeHtml(etudiant)}</strong>
+                        ${matricule ? `<br><small style="opacity: 0.8;">Matricule: ${escapeHtml(matricule)}</small>` : ''}
+                    </div>
+                </div>
+                <div style="background: rgba(255,255,255,0.1); padding: 10px; border-radius: 10px; margin: 10px 0;">
+                    <div style="display: flex; justify-content: space-between;">
+                        <span><i class="bi bi-cash-stack"></i> Montant:</span>
+                        <strong style="color: #ffb347; font-size: 18px;">${montant} FC</strong>
+                    </div>
+                    ${transaction.fiches && transaction.fiches.length > 0 ? `
+                    <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.2);">
+                        <i class="bi bi-file-text"></i> Fiches payées:<br>
+                        <small>${transaction.fiches.map(f => escapeHtml(f.nom || 'Fiche')).join(' • ')}</small>
+                    </div>
+                    ` : ''}
+                </div>
+                <div style="font-family: monospace; font-size: 12px; opacity: 0.8;">
+                    <i class="bi bi-upc-scan"></i> Reçu N° ${escapeHtml(numeroRecu)}
+                </div>
+            </div>
+        </div>
+    `;
+    
+    container.insertAdjacentHTML('afterbegin', toastHtml);
+    
+    // Auto-suppression après 8 secondes (plus long pour lire les détails)
+    setTimeout(() => {
+        const toast = container.firstElementChild;
+        if (toast) {
+            toast.style.transition = 'opacity 0.3s';
+            toast.style.opacity = '0';
+            setTimeout(() => toast.remove(), 300);
         }
+    }, 8000);
+    
+    // Notification système
+    if (Notification.permission === 'granted') {
+        let fichesText = '';
+        if (transaction.fiches && Array.isArray(transaction.fiches)) {
+            fichesText = ' - ' + transaction.fiches.map(f => f.nom || 'Fiche').join(', ');
+        }
+        new Notification('💰 Nouveau paiement', { 
+            body: `${etudiant} a payé ${montant} FC${fichesText}`, 
+            icon: '/icon-192x192.png', 
+            vibrate: [200, 100, 200],
+            tag: transaction.id || 'paiement'
+        });
+    }
+    
+    if (notificationSound) notificationSound.play().catch(e => console.log('Son non joué'));
+}
         
         function requestNotificationPermission() {
             if ('Notification' in window && Notification.permission === 'default') {
