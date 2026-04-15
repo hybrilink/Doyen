@@ -27,6 +27,58 @@
         .profile-photo { width: 50px; height: 50px; border-radius: 50%; background: var(--accent-yellow); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s; }
         .profile-photo i { font-size: 30px; color: var(--primary-blue); }
 
+        /* Écran de démarrage */
+        .splash-screen { 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            background: linear-gradient(135deg, var(--primary-blue), var(--dark-blue));
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+            align-items: center; 
+            z-index: 10000;
+            color: white;
+        }
+        .splash-logo { 
+            width: 150px; 
+            height: 150px; 
+            margin-bottom: 2rem;
+            background: white;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        .splash-logo i { 
+            font-size: 4rem; 
+            color: var(--primary-blue);
+        }
+        .splash-text { 
+            text-align: center; 
+            margin-bottom: 2rem;
+        }
+        .splash-text h1 { 
+            font-size: 2.5rem; 
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(255,255,255,0.3);
+            border-top: 5px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
         .notification-permission-banner {
             position: fixed;
             bottom: 80px;
@@ -126,8 +178,6 @@
         .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
         .today-stats-bar { background: linear-gradient(135deg, var(--accent-yellow), #ff9800); padding: 8px 20px; border-radius: 30px; display: inline-flex; align-items: center; gap: 15px; font-size: 13px; font-weight: bold; color: var(--primary-blue); box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
         .navbar-right { display: flex; align-items: center; gap: 15px; flex-wrap: wrap; }
-        .loading-spinner { display: inline-block; width: 20px; height: 20px; border: 3px solid #f3f3f3; border-top: 3px solid var(--primary-blue); border-radius: 50%; animation: spin 1s linear infinite; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         .badge-offline { position: fixed; bottom: 20px; right: 20px; z-index: 1000; }
         .notification-toast { animation: slideInRight 0.3s ease-out; }
         @keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
@@ -531,6 +581,11 @@
             background: #dc3545;
         }
         
+        .sync-status.syncing {
+            background: #ffc107;
+            color: #333;
+        }
+        
         .statut-paye { color: #28a745; font-weight: bold; }
         .statut-impaye { color: #dc3545; font-weight: bold; }
         
@@ -573,9 +628,47 @@
             border-radius: 10px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
+
+        .update-toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            border-left: 4px solid #3498db;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            padding: 15px 20px;
+            min-width: 300px;
+            max-width: 400px;
+            z-index: 9999;
+            transform: translateX(120%);
+            transition: transform 0.3s ease;
+        }
+
+        .update-toast.show {
+            transform: translateX(0);
+        }
+
+        .update-toast.success {
+            border-left-color: #28a745;
+        }
+
+        .update-toast.warning {
+            border-left-color: #ffc107;
+        }
+
+        .update-toast.danger {
+            border-left-color: #dc3545;
+        }
+
+        .update-toast.info {
+            border-left-color: #3498db;
+        }
     </style>
 </head>
 <body>
+    
+
     <nav class="navbar navbar-custom">
         <div class="container">
             <a class="navbar-brand text-white" href="#" id="homeBrand"><i class="bi bi-tree-fill"></i> Faculté Agronomique - Doyen</a>
@@ -830,6 +923,10 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     <script>
+        // ============================================
+        // SYSTÈME DE CACHE HYBRIDE AVEC INDEXEDDB
+        // ============================================
+        
         // Configuration Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyBb82N2-5ns7qKjQBAj5UvDW87s2PZ27F0",
@@ -844,9 +941,312 @@
         
         const db = firebase.firestore();
         
+        // Configuration du cache
+        const DB_NAME = 'hybrilink_doyen_cache';
+        const DB_VERSION = 1;
+        
+        let cacheDB = null;
+        let isOnline = navigator.onLine;
+        let syncInProgress = false;
+        
+        // Initialiser IndexedDB
+        async function initCacheDB() {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open(DB_NAME, DB_VERSION);
+                
+                request.onerror = () => reject(request.error);
+                request.onsuccess = () => {
+                    cacheDB = request.result;
+                    console.log('✅ Cache IndexedDB initialisé pour Doyen');
+                    resolve(cacheDB);
+                };
+                
+                request.onupgradeneeded = (event) => {
+                    const db = event.target.result;
+                    
+                    // Stores pour les différentes collections
+                    const stores = [
+                        'anneesAcademiques', 'promotions', 'fiches', 
+                        'etudiants', 'utilisateurs', 'transactions'
+                    ];
+                    
+                    stores.forEach(storeName => {
+                        if (!db.objectStoreNames.contains(storeName)) {
+                            const store = db.createObjectStore(storeName, { keyPath: 'id' });
+                            
+                            // Créer des index pour les recherches fréquentes
+                            if (storeName === 'etudiants') {
+                                store.createIndex('promotion', 'promotion', { unique: false });
+                                store.createIndex('nom', 'nom', { unique: false });
+                            }
+                            if (storeName === 'transactions') {
+                                store.createIndex('date', 'date', { unique: false });
+                                store.createIndex('anneeAcademiqueId', 'anneeAcademiqueId', { unique: false });
+                                store.createIndex('etudiantId', 'etudiantId', { unique: false });
+                            }
+                            if (storeName === 'utilisateurs') {
+                                store.createIndex('role', 'role', { unique: false });
+                                store.createIndex('email', 'email', { unique: false });
+                            }
+                            if (storeName === 'fiches') {
+                                store.createIndex('promotions', 'promotions', { unique: false });
+                            }
+                        }
+                    });
+                    
+                    // File d'attente hors ligne
+                    if (!db.objectStoreNames.contains('offline_queue')) {
+                        const queueStore = db.createObjectStore('offline_queue', { keyPath: 'id', autoIncrement: true });
+                        queueStore.createIndex('synced', 'synced', { unique: false });
+                        queueStore.createIndex('timestamp', 'timestamp', { unique: false });
+                        queueStore.createIndex('collection', 'collection', { unique: false });
+                    }
+                    
+                    // Métadonnées de synchronisation
+                    if (!db.objectStoreNames.contains('sync_metadata')) {
+                        db.createObjectStore('sync_metadata', { keyPath: 'collection' });
+                    }
+                };
+            });
+        }
+        
+        // Fonctions de cache
+        async function cacheData(collectionName, data) {
+            if (!cacheDB) await initCacheDB();
+            
+            return new Promise((resolve, reject) => {
+                const transaction = cacheDB.transaction([collectionName], 'readwrite');
+                const store = transaction.objectStore(collectionName);
+                
+                const id = data.id;
+                const dataWithId = { ...data, id };
+                
+                const request = store.put(dataWithId);
+                
+                request.onsuccess = () => resolve(dataWithId);
+                request.onerror = () => reject(request.error);
+            });
+        }
+        
+        async function cacheMultipleData(collectionName, dataArray) {
+            if (!cacheDB) await initCacheDB();
+            if (!dataArray || !dataArray.length) return [];
+            
+            return new Promise((resolve, reject) => {
+                const transaction = cacheDB.transaction([collectionName], 'readwrite');
+                const store = transaction.objectStore(collectionName);
+                
+                let completed = 0;
+                let results = [];
+                
+                dataArray.forEach(data => {
+                    const id = data.id;
+                    const dataWithId = { ...data, id };
+                    
+                    const request = store.put(dataWithId);
+                    
+                    request.onsuccess = () => {
+                        results.push(dataWithId);
+                        completed++;
+                        if (completed === dataArray.length) resolve(results);
+                    };
+                    request.onerror = () => {
+                        completed++;
+                        if (completed === dataArray.length) resolve(results);
+                    };
+                });
+            });
+        }
+        
+        async function getCachedData(collectionName, filters = null) {
+            if (!cacheDB) await initCacheDB();
+            
+            return new Promise((resolve, reject) => {
+                const transaction = cacheDB.transaction([collectionName], 'readonly');
+                const store = transaction.objectStore(collectionName);
+                const request = store.getAll();
+                
+                request.onsuccess = () => {
+                    let results = request.result;
+                    
+                    if (filters && typeof filters === 'object') {
+                        Object.keys(filters).forEach(key => {
+                            if (filters[key] !== undefined && filters[key] !== null) {
+                                results = results.filter(item => item[key] === filters[key]);
+                            }
+                        });
+                    }
+                    
+                    resolve(results);
+                };
+                request.onerror = () => reject(request.error);
+            });
+        }
+        
+        async function getCachedDataByIndex(collectionName, indexName, value) {
+            if (!cacheDB) await initCacheDB();
+            
+            return new Promise((resolve, reject) => {
+                const transaction = cacheDB.transaction([collectionName], 'readonly');
+                const store = transaction.objectStore(collectionName);
+                
+                if (!store.indexNames.contains(indexName)) {
+                    resolve([]);
+                    return;
+                }
+                
+                const index = store.index(indexName);
+                const request = index.getAll(value);
+                
+                request.onsuccess = () => resolve(request.result);
+                request.onerror = () => reject(request.error);
+            });
+        }
+        
+        async function clearCollectionCache(collectionName) {
+            if (!cacheDB) await initCacheDB();
+            
+            return new Promise((resolve, reject) => {
+                const transaction = cacheDB.transaction([collectionName], 'readwrite');
+                const store = transaction.objectStore(collectionName);
+                const request = store.clear();
+                
+                request.onsuccess = () => resolve();
+                request.onerror = () => reject(request.error);
+            });
+        }
+        
+        // Gestion de la file d'attente hors ligne
+        async function addToOfflineQueue(action, collection, data, documentId = null) {
+            if (!cacheDB) await initCacheDB();
+            
+            const queueItem = {
+                action,
+                collection,
+                data,
+                documentId,
+                timestamp: Date.now(),
+                synced: false
+            };
+            
+            return new Promise((resolve, reject) => {
+                const transaction = cacheDB.transaction(['offline_queue'], 'readwrite');
+                const store = transaction.objectStore('offline_queue');
+                const request = store.add(queueItem);
+                
+                request.onsuccess = () => resolve(queueItem);
+                request.onerror = () => reject(request.error);
+            });
+        }
+        
+        async function getOfflineQueue() {
+            if (!cacheDB) await initCacheDB();
+            
+            return new Promise((resolve, reject) => {
+                const transaction = cacheDB.transaction(['offline_queue'], 'readonly');
+                const store = transaction.objectStore('offline_queue');
+                const index = store.index('synced');
+                const request = index.getAll(false);
+                
+                request.onsuccess = () => resolve(request.result || []);
+                request.onerror = () => reject(request.error);
+            });
+        }
+        
+        async function markQueueItemSynced(id) {
+            if (!cacheDB) await initCacheDB();
+            
+            return new Promise((resolve, reject) => {
+                const transaction = cacheDB.transaction(['offline_queue'], 'readwrite');
+                const store = transaction.objectStore('offline_queue');
+                const request = store.get(id);
+                
+                request.onsuccess = () => {
+                    const item = request.result;
+                    if (item) {
+                        item.synced = true;
+                        store.put(item);
+                    }
+                    resolve();
+                };
+                request.onerror = () => reject(request.error);
+            });
+        }
+        
+        // Synchronisation avec Firebase
+        async function syncOfflineData() {
+            if (!isOnline || syncInProgress) return;
+            
+            syncInProgress = true;
+            updateSyncStatus('Synchro...');
+            
+            try {
+                const queue = await getOfflineQueue();
+                
+                if (queue.length === 0) {
+                    syncInProgress = false;
+                    updateSyncStatus(true);
+                    return;
+                }
+                
+                console.log(`🔄 Synchronisation de ${queue.length} éléments...`);
+                
+                for (const item of queue) {
+                    try {
+                        let docRef;
+                        
+                        switch (item.action) {
+                            case 'add':
+                                if (item.documentId) {
+                                    docRef = db.collection(item.collection).doc(item.documentId);
+                                    await docRef.set(item.data);
+                                } else {
+                                    docRef = await db.collection(item.collection).add(item.data);
+                                }
+                                break;
+                                
+                            case 'update':
+                                if (item.documentId) {
+                                    docRef = db.collection(item.collection).doc(item.documentId);
+                                    await docRef.update(item.data);
+                                }
+                                break;
+                                
+                            case 'delete':
+                                if (item.documentId) {
+                                    docRef = db.collection(item.collection).doc(item.documentId);
+                                    await docRef.delete();
+                                }
+                                break;
+                        }
+                        
+                        await markQueueItemSynced(item.id);
+                        
+                    } catch (error) {
+                        console.error(`Erreur synchronisation item ${item.id}:`, error);
+                    }
+                }
+                
+                console.log('✅ Synchronisation terminée');
+                showToast('Synchronisation terminée avec succès', 'success');
+                
+            } catch (error) {
+                console.error('Erreur synchronisation:', error);
+            } finally {
+                syncInProgress = false;
+                updateSyncStatus(true);
+            }
+        }
+        
+        // Configuration de la persistance Firestore
         db.enablePersistence({ synchronizeTabs: true })
             .then(() => console.log('✅ Persistance Firestore activée'))
-            .catch((err) => console.warn('Persistance non activée:', err));
+            .catch((err) => {
+                console.warn('Persistance non activée:', err);
+                if (err.code === 'failed-precondition') {
+                    console.log('Multiple tabs open, persistence can only be enabled in one tab at a time.');
+                }
+            });
         
         // Variables globales
         let allAnnees = [];
@@ -857,7 +1257,6 @@
         let allTransactions = [];
         let currentSelectedPromotion = null;
         let currentSearchTerm = '';
-        let isOnline = navigator.onLine;
         
         // Variables pour la recherche dans chaque panel
         let anneeSearchTerm = '';
@@ -865,32 +1264,24 @@
         let promotionSearchTerm = '';
         let ficheSearchTerm = '';
         
-        function updateSyncStatus(online) {
+        // Mettre à jour le statut de synchronisation
+        function updateSyncStatus(onlineOrMessage) {
             const statusEl = document.getElementById('syncStatus');
             if (!statusEl) return;
-            if (!online) {
-                statusEl.innerHTML = '<i class="bi bi-cloud-off"></i> Hors-ligne';
-                statusEl.className = 'sync-status offline';
-            } else {
+            
+            if (typeof onlineOrMessage === 'string') {
+                statusEl.innerHTML = `<i class="bi bi-arrow-repeat"></i> ${onlineOrMessage}`;
+                statusEl.className = 'sync-status syncing';
+            } else if (onlineOrMessage === true) {
                 statusEl.innerHTML = '<i class="bi bi-cloud-check"></i> Synchro';
                 statusEl.className = 'sync-status';
+            } else if (onlineOrMessage === false) {
+                statusEl.innerHTML = '<i class="bi bi-cloud-off"></i> Hors-ligne';
+                statusEl.className = 'sync-status offline';
             }
         }
         
-        window.addEventListener('online', () => {
-            isOnline = true;
-            updateSyncStatus(true);
-            document.getElementById('offlineIndicator').style.display = 'none';
-            showToast('🟢 Connecté - Synchronisation en cours', 'success');
-        });
-        
-        window.addEventListener('offline', () => {
-            isOnline = false;
-            updateSyncStatus(false);
-            document.getElementById('offlineIndicator').style.display = 'block';
-            showToast('🔴 Mode hors-ligne - Données en cache', 'warning');
-        });
-        
+        // Afficher un toast
         function showToast(message, type = 'success') {
             const container = document.getElementById('toastContainer');
             const bgColor = type === 'success' ? '#28a745' : (type === 'warning' ? '#ffc107' : '#dc3545');
@@ -921,7 +1312,7 @@
             document.getElementById('homePage').style.display = 'block'; 
         }
         
-        // ========== FONCTIONS D'AFFICHAGE AVEC RECHERCHE ==========
+        // ========== FONCTIONS D'AFFICHAGE AVEC CACHE ==========
         
         function chargerAnneesListe() {
             const container = document.getElementById('anneesListe');
@@ -987,11 +1378,6 @@
                 filtrees = filtrees.filter(p => (p.nom || '').toLowerCase().includes(term));
             }
             
-            if(allEtudiants.length === 0) {
-                container.innerHTML = '<div class="text-center"><div class="loading-spinner"></div> Calcul des effectifs...</div>';
-                return;
-            }
-            
             let html = '<div class="table-responsive"><table class="table table-bordered" id="promotionsTable"><thead><tr><th>Nom promotion</th><th>Capacité</th><th>Nombre d\'étudiants</th></tr></thead><tbody>';
             
             filtrees.forEach(p => {
@@ -1004,17 +1390,6 @@
             const totalEtudiants = allEtudiants.length;
             html += `<div class="alert alert-info mt-3"><i class="bi bi-people-fill"></i> <strong>Total général:</strong> ${totalEtudiants} étudiant(s) réparti(s) dans ${allPromotions.length} promotion(s)</div>`;
             
-            container.innerHTML = html;
-        }
-        
-        function chargerPromotionsListeSansEtudiants() {
-            const container = document.getElementById('promotionsListe');
-            if(!container) return;
-            let html = '<div class="table-responsive"><table class="table table-bordered"><thead><tr><th>Nom promotion</th><th>Capacité</th><th>Nombre d\'étudiants</th></tr></thead><tbody>';
-            allPromotions.forEach(p => {
-                html += `<tr><td><strong>${escapeHtml(p.nom)}</strong></td><td>${p.capacite || '-'}</td><td><span class="badge bg-secondary">Calcul...</span></td></tr>`;
-            });
-            html += '</tbody></table></div>';
             container.innerHTML = html;
         }
         
@@ -1036,31 +1411,23 @@
     const promoMap = {};
     allPromotions.forEach(p => promoMap[p.id] = p.nom);
     let html = '<div class="table-responsive"><table class="table table-bordered" id="fichesTable"><thead><tr><th>Nom fiche</th><th>Montant</th><th>Promotions concernées</th></tr></thead><tbody>';
-    
     filtrees.forEach(f => {
         let promotionsText = '';
         if(f.promotions && Array.isArray(f.promotions)) {
-            // Ne garder que les IDs qui existent dans promoMap
-            const validPromoNoms = f.promotions
-                .map(pid => promoMap[pid])
-                .filter(nom => nom !== undefined); // Filtre les IDs qui n'ont pas de nom correspondant
-            promotionsText = validPromoNoms.join(', ');
+            // MODIFICATION ICI : Filtrer les IDs qui n'ont pas de nom correspondant
+            const promoNoms = f.promotions.map(pid => promoMap[pid]).filter(p => p && p.trim() !== '');
+            promotionsText = promoNoms.join(', ');
         } else if(f.promotion) {
             promotionsText = promoMap[f.promotion] || '';
         }
+        // Si aucune promotion valide n'est trouvée, afficher un tiret
+        if(!promotionsText) promotionsText = '-';
         
-        if(promotionsText === '') promotionsText = 'Aucune promotion associée';
-        
-        html += `<tr><td><strong>${escapeHtml(f.nom)}</strong></td>
-                 <td>${(f.montant || 0).toLocaleString()} FC</td>
-                 <td>${escapeHtml(promotionsText)}</td>
-                 </tr>`;
+        html += `<tr><td><strong>${escapeHtml(f.nom)}</strong></td><td>${(f.montant || 0).toLocaleString()} FC</td><td>${escapeHtml(promotionsText)}</td></tr>`;
     });
-    
     html += '</tbody></table></div>';
     container.innerHTML = html;
 }
-        
         // Fonction d'export pour les listes
         function exporterListe(data, filename, headers) {
             const ws = XLSX.utils.json_to_sheet(data);
@@ -1237,79 +1604,77 @@
         
         // ========== PAIEMENTS RÉCENTS ==========
         
-    async function chargerPaiementsRecents() {
-    const container = document.getElementById('paiementsRecentsListe');
-    if(!container) return;
-    try {
-        // Attendre que les données de base soient chargées
-        if(allPromotions.length === 0 || allAnnees.length === 0) {
-            container.innerHTML = '<div class="text-center py-5"><div class="loading-spinner"></div><p class="mt-3">Chargement des données...</p></div>';
-            // Réessayer dans 1 seconde
-            setTimeout(() => chargerPaiementsRecents(), 1000);
-            return;
-        }
-        
-        const snapshot = await db.collection('transactions').orderBy('date', 'desc').limit(15).get({ source: isOnline ? 'default' : 'cache' });
-        if(snapshot.empty) {
-            container.innerHTML = `<div class="empty-state-mystic"><i class="bi bi-inbox"></i><h5>Aucun paiement enregistré</h5><p class="text-muted">Les paiements effectués apparaîtront ici</p></div>`;
-            return;
-        }
-        const transactions = [];
-        snapshot.forEach(doc => transactions.push({ id: doc.id, ...doc.data() }));
-        transactions.sort((a, b) => (b.date?.toDate() || 0) - (a.date?.toDate() || 0));
-        
-        const totalMontant = transactions.reduce((sum, t) => sum + (t.montantTotal || 0), 0);
-        const uniqueEtudiants = new Set(transactions.map(t => t.etudiantId)).size;
-        const today = new Date(); today.setHours(0,0,0,0);
-        const todayTransactions = transactions.filter(t => t.date && t.date.toDate() >= today);
-        const todayMontant = todayTransactions.reduce((sum, t) => sum + (t.montantTotal || 0), 0);
-        
-        let html = `<div class="paiements-stats-grid">
-            <div class="mystic-stat-card"><div class="mystic-stat-icon"><i class="bi bi-cash-stack"></i></div><div class="mystic-stat-number">${totalMontant.toLocaleString()} FC</div><div class="mystic-stat-label">Total collecté</div></div>
-            <div class="mystic-stat-card"><div class="mystic-stat-icon"><i class="bi bi-receipt"></i></div><div class="mystic-stat-number">${transactions.length}</div><div class="mystic-stat-label">Paiements récents</div></div>
-            <div class="mystic-stat-card"><div class="mystic-stat-icon"><i class="bi bi-people-fill"></i></div><div class="mystic-stat-number">${uniqueEtudiants}</div><div class="mystic-stat-label">Étudiants distincts</div></div>
-            <div class="mystic-stat-card"><div class="mystic-stat-icon"><i class="bi bi-calendar-day"></i></div><div class="mystic-stat-number">${todayMontant.toLocaleString()} FC</div><div class="mystic-stat-label">Aujourd'hui</div></div>
-        </div><div class="paiements-timeline">`;
-        
-        for (const t of transactions.slice(0, 15)) {
-            const dateTransaction = t.date ? new Date(t.date.toDate()) : new Date();
-            const dateFormatted = dateTransaction.toLocaleString('fr-FR', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' });
-            
-            // Récupérer les noms à partir des IDs si nécessaire
-            let promoNom = t.promotionNom;
-            if(!promoNom && t.promotion) {
-                const promo = allPromotions.find(p => p.id === t.promotion);
-                promoNom = promo ? promo.nom : '-';
+        async function chargerPaiementsRecents() {
+            const container = document.getElementById('paiementsRecentsListe');
+            if(!container) return;
+            try {
+                // Attendre que les données de base soient chargées
+                if(allPromotions.length === 0 || allAnnees.length === 0) {
+                    container.innerHTML = '<div class="text-center py-5"><div class="loading-spinner"></div><p class="mt-3">Chargement des données...</p></div>';
+                    setTimeout(() => chargerPaiementsRecents(), 1000);
+                    return;
+                }
+                
+                let transactions = [...allTransactions];
+                transactions.sort((a, b) => (b.date?.toDate() || 0) - (a.date?.toDate() || 0));
+                transactions = transactions.slice(0, 15);
+                
+                if(transactions.length === 0) {
+                    container.innerHTML = `<div class="empty-state-mystic"><i class="bi bi-inbox"></i><h5>Aucun paiement enregistré</h5><p class="text-muted">Les paiements effectués apparaîtront ici</p></div>`;
+                    return;
+                }
+                
+                const totalMontant = transactions.reduce((sum, t) => sum + (t.montantTotal || 0), 0);
+                const uniqueEtudiants = new Set(transactions.map(t => t.etudiantId)).size;
+                const today = new Date(); today.setHours(0,0,0,0);
+                const todayTransactions = transactions.filter(t => t.date && t.date.toDate() >= today);
+                const todayMontant = todayTransactions.reduce((sum, t) => sum + (t.montantTotal || 0), 0);
+                
+                let html = `<div class="paiements-stats-grid">
+                    <div class="mystic-stat-card"><div class="mystic-stat-icon"><i class="bi bi-cash-stack"></i></div><div class="mystic-stat-number">${totalMontant.toLocaleString()} FC</div><div class="mystic-stat-label">Total collecté</div></div>
+                    <div class="mystic-stat-card"><div class="mystic-stat-icon"><i class="bi bi-receipt"></i></div><div class="mystic-stat-number">${transactions.length}</div><div class="mystic-stat-label">Paiements récents</div></div>
+                    <div class="mystic-stat-card"><div class="mystic-stat-icon"><i class="bi bi-people-fill"></i></div><div class="mystic-stat-number">${uniqueEtudiants}</div><div class="mystic-stat-label">Étudiants distincts</div></div>
+                    <div class="mystic-stat-card"><div class="mystic-stat-icon"><i class="bi bi-calendar-day"></i></div><div class="mystic-stat-number">${todayMontant.toLocaleString()} FC</div><div class="mystic-stat-label">Aujourd'hui</div></div>
+                </div><div class="paiements-timeline">`;
+                
+                for (const t of transactions) {
+                    const dateTransaction = t.date ? new Date(t.date.toDate()) : new Date();
+                    const dateFormatted = dateTransaction.toLocaleString('fr-FR', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' });
+                    
+                    let promoNom = t.promotionNom;
+                    if(!promoNom && t.promotion) {
+                        const promo = allPromotions.find(p => p.id === t.promotion);
+                        promoNom = promo ? promo.nom : '-';
+                    }
+                    promoNom = promoNom || '-';
+                    
+                    let anneeNom = t.anneeAcademiqueNom;
+                    if(!anneeNom && t.anneeAcademiqueId) {
+                        const annee = allAnnees.find(a => a.id === t.anneeAcademiqueId);
+                        anneeNom = annee ? (annee.annee || annee.nom) : '-';
+                    }
+                    anneeNom = anneeNom || '-';
+                    
+                    let fichesNoms = [];
+                    if(t.fiches && Array.isArray(t.fiches)) {
+                        fichesNoms = t.fiches.map(f => f.nom || f.id);
+                    }
+                    const fichesHtml = fichesNoms.length > 0 ? `<div class="fiches-list">${fichesNoms.slice(0,3).map(fnom => `<span class="fiche-tag"><i class="bi bi-file-text"></i> ${escapeHtml(fnom)}</span>`).join('')}</div>` : '';
+                    
+                    html += `<div class="timeline-item"><div class="timeline-dot"></div><div class="paiement-card-mystic">
+                        <div class="paiement-header-mystic"><span class="paiement-numero"><i class="bi bi-upc-scan"></i> ${escapeHtml(t.numeroRecu || t.id.substring(0,12))}</span><span class="paiement-date"><i class="bi bi-calendar3"></i> ${dateFormatted}</span></div>
+                        <div class="paiement-etudiant"><i class="bi bi-person-circle"></i> ${escapeHtml(t.etudiantNom || '-')}</div>
+                        <div class="paiement-details"><span class="paiement-promotion"><i class="bi bi-trophy"></i> ${escapeHtml(promoNom)}</span><span class="paiement-annee"><i class="bi bi-calendar-week"></i> ${escapeHtml(anneeNom)}</span><span class="paiement-montant"><i class="bi bi-cash-stack"></i> ${(t.montantTotal || 0).toLocaleString()} FC</span></div>
+                        ${fichesHtml}
+                    </div></div>`;
+                }
+                html += `</div><div class="text-center mt-4 text-muted small"><i class="bi bi-gem"></i> Affichage des ${Math.min(transactions.length, 15)} derniers paiements ${!isOnline ? '(mode hors-ligne)' : ''}</div>`;
+                container.innerHTML = html;
+            } catch(error) {
+                console.error('Erreur chargement paiements:', error);
+                container.innerHTML = `<div class="empty-state-mystic"><i class="bi bi-exclamation-triangle-fill" style="color:#dc3545;"></i><h5>Erreur de chargement</h5><p class="text-muted">${error.message}</p></div>`;
             }
-            promoNom = promoNom || '-';
-            
-            let anneeNom = t.anneeAcademiqueNom;
-            if(!anneeNom && t.anneeAcademiqueId) {
-                const annee = allAnnees.find(a => a.id === t.anneeAcademiqueId);
-                anneeNom = annee ? (annee.annee || annee.nom) : '-';
-            }
-            anneeNom = anneeNom || '-';
-            
-            let fichesNoms = [];
-            if(t.fiches && Array.isArray(t.fiches)) {
-                fichesNoms = t.fiches.map(f => f.nom || f.id);
-            }
-            const fichesHtml = fichesNoms.length > 0 ? `<div class="fiches-list">${fichesNoms.slice(0,3).map(fnom => `<span class="fiche-tag"><i class="bi bi-file-text"></i> ${escapeHtml(fnom)}</span>`).join('')}</div>` : '';
-            
-            html += `<div class="timeline-item"><div class="timeline-dot"></div><div class="paiement-card-mystic">
-                <div class="paiement-header-mystic"><span class="paiement-numero"><i class="bi bi-upc-scan"></i> ${escapeHtml(t.numeroRecu || t.id.substring(0,12))}</span><span class="paiement-date"><i class="bi bi-calendar3"></i> ${dateFormatted}</span></div>
-                <div class="paiement-etudiant"><i class="bi bi-person-circle"></i> ${escapeHtml(t.etudiantNom || '-')}</div>
-                <div class="paiement-details"><span class="paiement-promotion"><i class="bi bi-trophy"></i> ${escapeHtml(promoNom)}</span><span class="paiement-annee"><i class="bi bi-calendar-week"></i> ${escapeHtml(anneeNom)}</span><span class="paiement-montant"><i class="bi bi-cash-stack"></i> ${(t.montantTotal || 0).toLocaleString()} FC</span></div>
-                ${fichesHtml}
-            </div></div>`;
         }
-        html += `</div><div class="text-center mt-4 text-muted small"><i class="bi bi-gem"></i> Affichage des ${Math.min(transactions.length, 15)} derniers paiements ${!isOnline ? '(mode hors-ligne)' : ''}</div>`;
-        container.innerHTML = html;
-    } catch(error) {
-        console.error('Erreur chargement paiements:', error);
-        container.innerHTML = `<div class="empty-state-mystic"><i class="bi bi-exclamation-triangle-fill" style="color:#dc3545;"></i><h5>Erreur de chargement</h5><p class="text-muted">${error.message}</p></div>`;
-    }
-}
         
         // ========== ÉTUDIANTS ==========
         
@@ -1642,85 +2007,16 @@
             } catch(e) {}
         }
         
-        // Version alternative avec un toast plus détaillé
-function showRealTimeNotification(transaction) {
-    const montant = (transaction.montantTotal || 0).toLocaleString();
-    const etudiant = transaction.etudiantNom || 'Un étudiant';
-    const matricule = transaction.etudiantMatricule || '';
-    const numeroRecu = transaction.numeroRecu || transaction.id.substring(0, 12);
-    
-    // Récupérer les noms des fiches payées
-    let fichesHtml = '';
-    if (transaction.fiches && Array.isArray(transaction.fiches) && transaction.fiches.length > 0) {
-        const fichesNoms = transaction.fiches.map(f => f.nom || 'Fiche');
-        fichesHtml = `<br><small><i class="bi bi-file-text"></i> ${fichesNoms.join(', ')}</small>`;
-    }
-    
-    // Créer un toast personnalisé avec plus de détails
-    const container = document.getElementById('toastContainer');
-    const toastHtml = `
-        <div class="toast notification-toast show" style="background: linear-gradient(135deg, #003366, #002244); color: white; border-radius: 15px; margin-bottom: 10px; min-width: 320px; box-shadow: 0 5px 20px rgba(0,0,0,0.3);">
-            <div class="toast-header" style="background: transparent; color: white; border-bottom: 1px solid rgba(255,255,255,0.2);">
-                <i class="bi bi-bell-fill me-2" style="color: #ffb347;"></i>
-                <strong class="me-auto">Nouveau paiement reçu</strong>
-                <small>${new Date().toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'})}</small>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" style="font-size: 12px;"></button>
-            </div>
-            <div class="toast-body">
-                <div style="display: flex; align-items: center; margin-bottom: 8px;">
-                    <i class="bi bi-person-circle me-2" style="font-size: 24px;"></i>
-                    <div>
-                        <strong style="font-size: 16px;">${escapeHtml(etudiant)}</strong>
-                        ${matricule ? `<br><small style="opacity: 0.8;">Matricule: ${escapeHtml(matricule)}</small>` : ''}
-                    </div>
-                </div>
-                <div style="background: rgba(255,255,255,0.1); padding: 10px; border-radius: 10px; margin: 10px 0;">
-                    <div style="display: flex; justify-content: space-between;">
-                        <span><i class="bi bi-cash-stack"></i> Montant:</span>
-                        <strong style="color: #ffb347; font-size: 18px;">${montant} FC</strong>
-                    </div>
-                    ${transaction.fiches && transaction.fiches.length > 0 ? `
-                    <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.2);">
-                        <i class="bi bi-file-text"></i> Fiches payées:<br>
-                        <small>${transaction.fiches.map(f => escapeHtml(f.nom || 'Fiche')).join(' • ')}</small>
-                    </div>
-                    ` : ''}
-                </div>
-                <div style="font-family: monospace; font-size: 12px; opacity: 0.8;">
-                    <i class="bi bi-upc-scan"></i> Reçu N° ${escapeHtml(numeroRecu)}
-                </div>
-            </div>
-        </div>
-    `;
-    
-    container.insertAdjacentHTML('afterbegin', toastHtml);
-    
-    // Auto-suppression après 8 secondes (plus long pour lire les détails)
-    setTimeout(() => {
-        const toast = container.firstElementChild;
-        if (toast) {
-            toast.style.transition = 'opacity 0.3s';
-            toast.style.opacity = '0';
-            setTimeout(() => toast.remove(), 300);
+        function showRealTimeNotification(transaction) {
+            const montant = (transaction.montantTotal || 0).toLocaleString();
+            const etudiant = transaction.etudiantNom || 'Un étudiant';
+            const message = `💰 ${etudiant} a payé ${montant} FC`;
+            showToast(message, 'success');
+            if (Notification.permission === 'granted') {
+                new Notification('Nouveau paiement', { body: message, icon: '/icon-192x192.png', vibrate: [200,100,200] });
+            }
+            if (notificationSound) notificationSound.play().catch(e => console.log('Son non joué'));
         }
-    }, 8000);
-    
-    // Notification système
-    if (Notification.permission === 'granted') {
-        let fichesText = '';
-        if (transaction.fiches && Array.isArray(transaction.fiches)) {
-            fichesText = ' - ' + transaction.fiches.map(f => f.nom || 'Fiche').join(', ');
-        }
-        new Notification('💰 Nouveau paiement', { 
-            body: `${etudiant} a payé ${montant} FC${fichesText}`, 
-            icon: '/icon-192x192.png', 
-            vibrate: [200, 100, 200],
-            tag: transaction.id || 'paiement'
-        });
-    }
-    
-    if (notificationSound) notificationSound.play().catch(e => console.log('Son non joué'));
-}
         
         function requestNotificationPermission() {
             if ('Notification' in window && Notification.permission === 'default') {
@@ -1773,67 +2069,383 @@ function showRealTimeNotification(transaction) {
             } catch(e) { console.error(e); }
         }
         
-        // ========== SETUP LISTENERS ==========
+        // ========== CHARGEMENT DES DONNÉES DEPUIS LE CACHE ==========
         
-        function setupRealtimeListeners() {
-            let promotionsLoaded = false;
-            let etudiantsLoaded = false;
+        async function loadFromCacheAndDisplay() {
+            console.log('📦 Chargement des données depuis le cache...');
             
-            db.collection('anneesAcademiques').onSnapshot(snapshot => {
-                allAnnees = [];
-                snapshot.forEach(doc => allAnnees.push({ id: doc.id, ...doc.data() }));
+            try {
+                const annees = await getCachedData('anneesAcademiques');
+                if (annees.length > 0) {
+                    allAnnees = annees;
+                    chargerAnneesListe();
+                    chargerAnneesSelect();
+                    chargerJournalierAnneesSelect();
+                }
+                
+                const promotions = await getCachedData('promotions');
+                if (promotions.length > 0) {
+                    allPromotions = promotions;
+                    chargerPromotionsSelects();
+                    afficherBoutonsPromotions();
+                    chargerPromotionsListe();
+                }
+                
+                const fiches = await getCachedData('fiches');
+                if (fiches.length > 0) {
+                    allFiches = fiches;
+                    chargerFichesListe();
+                    chargerFichesSelect();
+                }
+                
+                const etudiants = await getCachedData('etudiants');
+                if (etudiants.length > 0) {
+                    allEtudiants = etudiants;
+                    afficherBoutonsPromotions();
+                    if (currentSelectedPromotion !== undefined) {
+                        afficherEtudiantsParPromotion(currentSelectedPromotion);
+                    } else {
+                        afficherEtudiantsParPromotion(null);
+                    }
+                }
+                
+                const utilisateurs = await getCachedData('utilisateurs');
+                if (utilisateurs.length > 0) {
+                    allUtilisateurs = utilisateurs;
+                    chargerComptesListe();
+                }
+                
+                const transactions = await getCachedData('transactions');
+                if (transactions.length > 0) {
+                    allTransactions = transactions;
+                    mettreAJourStatsHeader();
+                    chargerPaiementsRecents();
+                }
+                
+                console.log('✅ Données chargées depuis le cache');
+                
+            } catch (error) {
+                console.error('❌ Erreur chargement cache:', error);
+            }
+        }
+        
+        // ========== CHARGEMENT DES DONNÉES DEPUIS FIRESTORE AVEC CACHE ==========
+        
+        async function loadAllDataFromFirestore() {
+            console.log('🔄 Chargement des données depuis Firestore...');
+            
+            try {
+                // Annees Academiques
+                const anneesSnap = await db.collection('anneesAcademiques').get({ source: isOnline ? 'default' : 'cache' });
+                anneesSnap.forEach(doc => {
+                    const data = { id: doc.id, ...doc.data() };
+                    allAnnees = allAnnees.filter(a => a.id !== doc.id);
+                    allAnnees.push(data);
+                    cacheData('anneesAcademiques', data);
+                });
                 chargerAnneesListe();
                 chargerAnneesSelect();
                 chargerJournalierAnneesSelect();
-                mettreAJourStatsHeader();
-            });
-            
-            db.collection('transactions').onSnapshot(snapshot => {
-                allTransactions = [];
-                snapshot.forEach(doc => allTransactions.push({ id: doc.id, ...doc.data() }));
-                mettreAJourStatsHeader();
-                const paiementsPanel = document.getElementById('panel-paiementsRecents');
-                if(paiementsPanel && paiementsPanel.classList.contains('active')) chargerPaiementsRecents();
-            });
-            
-            db.collection('utilisateurs').where('role', '==', 'comptabilite').onSnapshot(snapshot => {
-                allUtilisateurs = [];
-                snapshot.forEach(doc => allUtilisateurs.push({ id: doc.id, ...doc.data() }));
+                
+                // Promotions
+                const promotionsSnap = await db.collection('promotions').get({ source: isOnline ? 'default' : 'cache' });
+                promotionsSnap.forEach(doc => {
+                    const data = { id: doc.id, ...doc.data() };
+                    allPromotions = allPromotions.filter(p => p.id !== doc.id);
+                    allPromotions.push(data);
+                    cacheData('promotions', data);
+                });
+                chargerPromotionsSelects();
+                afficherBoutonsPromotions();
+                chargerPromotionsListe();
+                
+                // Fiches
+                const fichesSnap = await db.collection('fiches').get({ source: isOnline ? 'default' : 'cache' });
+                fichesSnap.forEach(doc => {
+                    const data = { id: doc.id, ...doc.data() };
+                    allFiches = allFiches.filter(f => f.id !== doc.id);
+                    allFiches.push(data);
+                    cacheData('fiches', data);
+                });
+                chargerFichesListe();
+                chargerFichesSelect();
+                
+                // Etudiants
+                const etudiantsSnap = await db.collection('etudiants').get({ source: isOnline ? 'default' : 'cache' });
+                etudiantsSnap.forEach(doc => {
+                    const data = { id: doc.id, ...doc.data() };
+                    allEtudiants = allEtudiants.filter(e => e.id !== doc.id);
+                    allEtudiants.push(data);
+                    cacheData('etudiants', data);
+                });
+                afficherBoutonsPromotions();
+                if (currentSelectedPromotion !== undefined) {
+                    afficherEtudiantsParPromotion(currentSelectedPromotion);
+                } else {
+                    afficherEtudiantsParPromotion(null);
+                }
+                
+                // Utilisateurs (comptabilite)
+                const utilisateursSnap = await db.collection('utilisateurs').where('role', '==', 'comptabilite').get({ source: isOnline ? 'default' : 'cache' });
+                utilisateursSnap.forEach(doc => {
+                    const data = { id: doc.id, ...doc.data() };
+                    allUtilisateurs = allUtilisateurs.filter(u => u.id !== doc.id);
+                    allUtilisateurs.push(data);
+                    cacheData('utilisateurs', data);
+                });
                 chargerComptesListe();
+                
+                // Transactions
+                const transactionsSnap = await db.collection('transactions').orderBy('date', 'desc').get({ source: isOnline ? 'default' : 'cache' });
+                transactionsSnap.forEach(doc => {
+                    const data = { id: doc.id, ...doc.data() };
+                    allTransactions = allTransactions.filter(t => t.id !== doc.id);
+                    allTransactions.push(data);
+                    cacheData('transactions', data);
+                });
+                mettreAJourStatsHeader();
+                chargerPaiementsRecents();
+                
+                console.log('✅ Données synchronisées avec Firestore');
+                
+            } catch (error) {
+                console.error('❌ Erreur chargement Firestore:', error);
+                // En cas d'erreur, on utilise le cache existant
+                await loadFromCacheAndDisplay();
+            }
+        }
+        
+        // ========== SETUP REALTIME LISTENERS ==========
+        
+        function setupRealtimeListeners() {
+            // Annees Academiques
+            db.collection('anneesAcademiques').onSnapshot(snapshot => {
+                snapshot.docChanges().forEach(change => {
+                    const data = { id: change.doc.id, ...change.doc.data() };
+                    if (change.type === 'added') {
+                        allAnnees.push(data);
+                        cacheData('anneesAcademiques', data);
+                    } else if (change.type === 'modified') {
+                        const index = allAnnees.findIndex(a => a.id === data.id);
+                        if (index !== -1) allAnnees[index] = data;
+                        else allAnnees.push(data);
+                        cacheData('anneesAcademiques', data);
+                    } else if (change.type === 'removed') {
+                        allAnnees = allAnnees.filter(a => a.id !== data.id);
+                        clearCollectionCache('anneesAcademiques');
+                    }
+                });
+                chargerAnneesListe();
+                chargerAnneesSelect();
+                chargerJournalierAnneesSelect();
             });
             
+            // Promotions
+            db.collection('promotions').onSnapshot(snapshot => {
+                snapshot.docChanges().forEach(change => {
+                    const data = { id: change.doc.id, ...change.doc.data() };
+                    if (change.type === 'added') {
+                        allPromotions.push(data);
+                        cacheData('promotions', data);
+                    } else if (change.type === 'modified') {
+                        const index = allPromotions.findIndex(p => p.id === data.id);
+                        if (index !== -1) allPromotions[index] = data;
+                        else allPromotions.push(data);
+                        cacheData('promotions', data);
+                    } else if (change.type === 'removed') {
+                        allPromotions = allPromotions.filter(p => p.id !== data.id);
+                        clearCollectionCache('promotions');
+                    }
+                });
+                chargerPromotionsSelects();
+                afficherBoutonsPromotions();
+                chargerPromotionsListe();
+            });
+            
+            // Fiches
             db.collection('fiches').onSnapshot(snapshot => {
-                allFiches = [];
-                snapshot.forEach(doc => allFiches.push({ id: doc.id, ...doc.data() }));
-                if(allPromotions.length > 0) chargerFichesListe();
+                snapshot.docChanges().forEach(change => {
+                    const data = { id: change.doc.id, ...change.doc.data() };
+                    if (change.type === 'added') {
+                        allFiches.push(data);
+                        cacheData('fiches', data);
+                    } else if (change.type === 'modified') {
+                        const index = allFiches.findIndex(f => f.id === data.id);
+                        if (index !== -1) allFiches[index] = data;
+                        else allFiches.push(data);
+                        cacheData('fiches', data);
+                    } else if (change.type === 'removed') {
+                        allFiches = allFiches.filter(f => f.id !== data.id);
+                        clearCollectionCache('fiches');
+                    }
+                });
+                chargerFichesListe();
                 chargerFichesSelect();
             });
             
-            db.collection('promotions').onSnapshot(snapshot => {
-                allPromotions = [];
-                snapshot.forEach(doc => allPromotions.push({ id: doc.id, ...doc.data() }));
-                promotionsLoaded = true;
-                chargerPromotionsSelects();
-                if(allFiches.length > 0) chargerFichesListe();
-                if(etudiantsLoaded) {
-                    chargerPromotionsListe();
-                    afficherBoutonsPromotions();
-                    if(currentSelectedPromotion !== undefined) afficherEtudiantsParPromotion(currentSelectedPromotion);
+            // Etudiants
+            db.collection('etudiants').onSnapshot(snapshot => {
+                snapshot.docChanges().forEach(change => {
+                    const data = { id: change.doc.id, ...change.doc.data() };
+                    if (change.type === 'added') {
+                        allEtudiants.push(data);
+                        cacheData('etudiants', data);
+                    } else if (change.type === 'modified') {
+                        const index = allEtudiants.findIndex(e => e.id === data.id);
+                        if (index !== -1) allEtudiants[index] = data;
+                        else allEtudiants.push(data);
+                        cacheData('etudiants', data);
+                    } else if (change.type === 'removed') {
+                        allEtudiants = allEtudiants.filter(e => e.id !== data.id);
+                        clearCollectionCache('etudiants');
+                    }
+                });
+                afficherBoutonsPromotions();
+                if (currentSelectedPromotion !== undefined) {
+                    afficherEtudiantsParPromotion(currentSelectedPromotion);
                 } else {
-                    chargerPromotionsListeSansEtudiants();
+                    afficherEtudiantsParPromotion(null);
                 }
             });
             
-            db.collection('etudiants').onSnapshot(snapshot => {
-                allEtudiants = [];
-                snapshot.forEach(doc => allEtudiants.push({ id: doc.id, ...doc.data() }));
-                etudiantsLoaded = true;
-                if(promotionsLoaded) chargerPromotionsListe();
-                afficherBoutonsPromotions();
-                if(currentSelectedPromotion !== undefined) afficherEtudiantsParPromotion(currentSelectedPromotion);
-                else afficherEtudiantsParPromotion(null);
+            // Utilisateurs (comptabilite)
+            db.collection('utilisateurs').where('role', '==', 'comptabilite').onSnapshot(snapshot => {
+                snapshot.docChanges().forEach(change => {
+                    const data = { id: change.doc.id, ...change.doc.data() };
+                    if (change.type === 'added') {
+                        allUtilisateurs.push(data);
+                        cacheData('utilisateurs', data);
+                    } else if (change.type === 'modified') {
+                        const index = allUtilisateurs.findIndex(u => u.id === data.id);
+                        if (index !== -1) allUtilisateurs[index] = data;
+                        else allUtilisateurs.push(data);
+                        cacheData('utilisateurs', data);
+                    } else if (change.type === 'removed') {
+                        allUtilisateurs = allUtilisateurs.filter(u => u.id !== data.id);
+                        clearCollectionCache('utilisateurs');
+                    }
+                });
+                chargerComptesListe();
+            });
+            
+            // Transactions
+            db.collection('transactions').orderBy('date', 'desc').onSnapshot(snapshot => {
+                snapshot.docChanges().forEach(change => {
+                    const data = { id: change.doc.id, ...change.doc.data() };
+                    if (change.type === 'added') {
+                        allTransactions.unshift(data);
+                        cacheData('transactions', data);
+                        
+                        // Notification pour les nouveaux paiements
+                        const notifKey = `notif_${data.id}`;
+                        const alreadyShown = localStorage.getItem(notifKey);
+                        const transactionDate = data.date?.toDate() || new Date();
+                        const diffMinutes = (new Date() - transactionDate) / 1000 / 60;
+                        if (!alreadyShown && diffMinutes < 2) {
+                            localStorage.setItem(notifKey, Date.now().toString());
+                            showRealTimeNotification(data);
+                        }
+                    } else if (change.type === 'modified') {
+                        const index = allTransactions.findIndex(t => t.id === data.id);
+                        if (index !== -1) allTransactions[index] = data;
+                        else allTransactions.unshift(data);
+                        cacheData('transactions', data);
+                    } else if (change.type === 'removed') {
+                        allTransactions = allTransactions.filter(t => t.id !== data.id);
+                        clearCollectionCache('transactions');
+                    }
+                });
+                mettreAJourStatsHeader();
+                chargerPaiementsRecents();
             });
         }
+        
+        // ========== GESTION DE LA CONNEXION ==========
+        
+        window.addEventListener('online', () => {
+            isOnline = true;
+            updateSyncStatus(true);
+            document.getElementById('offlineIndicator').style.display = 'none';
+            showToast('🟢 Connecté - Synchronisation en cours', 'success');
+            syncOfflineData();
+            loadAllDataFromFirestore();
+        });
+        
+        window.addEventListener('offline', () => {
+            isOnline = false;
+            updateSyncStatus(false);
+            document.getElementById('offlineIndicator').style.display = 'block';
+            showToast('🔴 Mode hors-ligne - Données en cache', 'warning');
+        });
+        
+        // ========== MENUS ==========
+        
+        document.querySelectorAll('.menu-card').forEach(card => {
+            card.addEventListener('click', () => {
+                document.getElementById('homePage').style.display = 'none';
+                document.querySelectorAll('.content-panel').forEach(p => p.classList.remove('active'));
+                const panel = document.getElementById(`panel-${card.dataset.menu}`);
+                if(panel) panel.classList.add('active');
+                if(card.dataset.menu === 'paiementsRecents') chargerPaiementsRecents();
+                if(card.dataset.menu === 'annee') chargerAnneesListe();
+                if(card.dataset.menu === 'compta') chargerComptesListe();
+                if(card.dataset.menu === 'promotion') chargerPromotionsListe();
+                if(card.dataset.menu === 'fiche') chargerFichesListe();
+            });
+        });
+        
+        document.getElementById('homeBrand')?.addEventListener('click', (e) => { e.preventDefault(); goHome(); });
+        document.getElementById('refreshPaiementsBtn')?.addEventListener('click', () => { chargerPaiementsRecents(); });
+        
+        // ========== SESSION & PROFIL ==========
+        
+        const session = localStorage.getItem('session_doyen');
+        if(!session) window.location.href = 'login-doyen.html';
+        const sessionData = JSON.parse(session);
+        if(Date.now() > sessionData.expires) { localStorage.removeItem('session_doyen'); window.location.href = 'login-doyen.html'; }
+        let currentMatricule = sessionData.matricule;
+        
+        document.getElementById('profileBtn')?.addEventListener('click', async () => {
+            const doc = await db.collection('utilisateurs').doc(currentMatricule).get();
+            const userData = doc.data();
+            if(userData) {
+                document.getElementById('profilNom').textContent = userData.nomComplet;
+                document.getElementById('profilMatricule').textContent = `Matricule: ${currentMatricule}`;
+                document.getElementById('profilEmail').textContent = `Email: ${userData.email || '-'}`;
+            }
+            document.getElementById('profileModal').style.display = 'flex';
+        });
+        
+        window.closeProfileModal = () => document.getElementById('profileModal').style.display = 'none';
+        
+        document.getElementById('changePasswordBtn')?.addEventListener('click', async () => {
+            const np = document.getElementById('newPassword').value;
+            const cp = document.getElementById('confirmNewPassword').value;
+            if(np !== cp) { alert('Mots de passe différents'); return; }
+            if(np.length < 4) { alert('Minimum 4 caractères'); return; }
+            await db.collection('utilisateurs').doc(currentMatricule).update({ motDePasse: np });
+            alert('Mot de passe modifié');
+            closeProfileModal();
+        });
+        
+        document.getElementById('logoutBtn')?.addEventListener('click', () => {
+            localStorage.removeItem('session_doyen');
+            window.location.href = 'login-doyen.html';
+        });
+        
+        document.getElementById('searchEtudiant')?.addEventListener('input', (e) => {
+            currentSearchTerm = e.target.value;
+            document.getElementById('clearSearch').style.display = currentSearchTerm ? 'block' : 'none';
+            afficherEtudiantsParPromotion(currentSelectedPromotion);
+        });
+        document.getElementById('clearSearch')?.addEventListener('click', () => {
+            document.getElementById('searchEtudiant').value = '';
+            currentSearchTerm = '';
+            document.getElementById('clearSearch').style.display = 'none';
+            afficherEtudiantsParPromotion(currentSelectedPromotion);
+        });
+        document.getElementById('exportExcelBtn')?.addEventListener('click', () => exporterEtudiants('excel'));
+        document.getElementById('exportCsvBtn')?.addEventListener('click', () => exporterEtudiants('csv'));
         
         // Configuration des recherches
         document.getElementById('searchAnnee')?.addEventListener('input', (e) => {
@@ -1925,92 +2537,47 @@ function showRealTimeNotification(transaction) {
             exporterListe(data.map(f => ({ 'Nom': f.nom, 'Montant': f.montant || 0, 'Promotions': (f.promotions || []).map(pid => promoMap[pid] || pid).join(', ') })), 'fiches');
         });
         
-        // ========== MENUS ==========
-        
-        document.querySelectorAll('.menu-card').forEach(card => {
-            card.addEventListener('click', () => {
-                document.getElementById('homePage').style.display = 'none';
-                document.querySelectorAll('.content-panel').forEach(p => p.classList.remove('active'));
-                const panel = document.getElementById(`panel-${card.dataset.menu}`);
-                if(panel) panel.classList.add('active');
-                if(card.dataset.menu === 'paiementsRecents') chargerPaiementsRecents();
-                if(card.dataset.menu === 'annee') chargerAnneesListe();
-                if(card.dataset.menu === 'compta') chargerComptesListe();
-                if(card.dataset.menu === 'promotion') chargerPromotionsListe();
-                if(card.dataset.menu === 'fiche') chargerFichesListe();
-            });
-        });
-        
-        document.getElementById('homeBrand')?.addEventListener('click', (e) => { e.preventDefault(); goHome(); });
-        document.getElementById('refreshPaiementsBtn')?.addEventListener('click', () => { chargerPaiementsRecents(); });
-        
-        // ========== SESSION & PROFIL ==========
-        
-        const session = localStorage.getItem('session_doyen');
-        if(!session) window.location.href = 'login-doyen.html';
-        const sessionData = JSON.parse(session);
-        if(Date.now() > sessionData.expires) { localStorage.removeItem('session_doyen'); window.location.href = 'login-doyen.html'; }
-        let currentMatricule = sessionData.matricule;
-        
-        document.getElementById('profileBtn')?.addEventListener('click', async () => {
-            const doc = await db.collection('utilisateurs').doc(currentMatricule).get();
-            const userData = doc.data();
-            if(userData) {
-                document.getElementById('profilNom').textContent = userData.nomComplet;
-                document.getElementById('profilMatricule').textContent = `Matricule: ${currentMatricule}`;
-                document.getElementById('profilEmail').textContent = `Email: ${userData.email || '-'}`;
-            }
-            document.getElementById('profileModal').style.display = 'flex';
-        });
-        
-        window.closeProfileModal = () => document.getElementById('profileModal').style.display = 'none';
-        
-        document.getElementById('changePasswordBtn')?.addEventListener('click', async () => {
-            const np = document.getElementById('newPassword').value;
-            const cp = document.getElementById('confirmNewPassword').value;
-            if(np !== cp) { alert('Mots de passe différents'); return; }
-            if(np.length < 4) { alert('Minimum 4 caractères'); return; }
-            await db.collection('utilisateurs').doc(currentMatricule).update({ motDePasse: np });
-            alert('Mot de passe modifié');
-            closeProfileModal();
-        });
-        
-        document.getElementById('logoutBtn')?.addEventListener('click', () => {
-            localStorage.removeItem('session_doyen');
-            window.location.href = 'login-doyen.html';
-        });
-        
-        document.getElementById('searchEtudiant')?.addEventListener('input', (e) => {
-            currentSearchTerm = e.target.value;
-            document.getElementById('clearSearch').style.display = currentSearchTerm ? 'block' : 'none';
-            afficherEtudiantsParPromotion(currentSelectedPromotion);
-        });
-        document.getElementById('clearSearch')?.addEventListener('click', () => {
-            document.getElementById('searchEtudiant').value = '';
-            currentSearchTerm = '';
-            document.getElementById('clearSearch').style.display = 'none';
-            afficherEtudiantsParPromotion(currentSelectedPromotion);
-        });
-        document.getElementById('exportExcelBtn')?.addEventListener('click', () => exporterEtudiants('excel'));
-        document.getElementById('exportCsvBtn')?.addEventListener('click', () => exporterEtudiants('csv'));
-        
         // ========== INITIALISATION ==========
         
-        initNotificationSound();
-        listenNewTransactions();
-        setupRealtimeListeners();
-        
-        setTimeout(() => requestNotificationPermission(), 5000);
-        
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js').then(reg => {
-                    console.log('Service Worker enregistré:', reg.scope);
-                }).catch(err => console.log('Erreur Service Worker:', err));
-            });
+        async function init() {
+            // Afficher l'écran de démarrage
+            const splashScreen = document.getElementById('splash-screen');
+            
+            // Initialiser le cache
+            await initCacheDB();
+            
+            // Charger les données depuis le cache d'abord
+            await loadFromCacheAndDisplay();
+            
+            // Puis charger depuis Firestore pour mise à jour
+            await loadAllDataFromFirestore();
+            
+            // Configurer les listeners temps réel
+            setupRealtimeListeners();
+            
+            // Cacher l'écran de démarrage
+            setTimeout(() => {
+                if (splashScreen) splashScreen.classList.add('hidden');
+            }, 1500);
+            
+            // Notifications
+            initNotificationSound();
+            setTimeout(() => requestNotificationPermission(), 5000);
+            
+            // Service Worker
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', () => {
+                    navigator.serviceWorker.register('sw.js').then(reg => {
+                        console.log('Service Worker enregistré:', reg.scope);
+                    }).catch(err => console.log('Erreur Service Worker:', err));
+                });
+            }
+            
+            console.log('✅ Dashboard Doyen - Version hybride avec cache local');
         }
         
-        console.log('✅ Dashboard Doyen - Version complète avec recherche et rapport journalier');
+        // Démarrer l'application
+        init();
     </script>
 </body>
-</html> 
+</html>
