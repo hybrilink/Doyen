@@ -61,6 +61,10 @@
         .btn-action { background: var(--primary-blue); color: white; border: none; padding: 10px 20px; border-radius: 10px; transition: all 0.3s; }
         .btn-action:hover { background: var(--dark-blue); transform: translateY(-2px); }
         .btn-warning-custom { background: var(--accent-yellow); color: var(--primary-blue); border: none; }
+        .btn-refresh { background: #28a745; color: white; border: none; padding: 8px 15px; border-radius: 8px; cursor: pointer; transition: all 0.3s; margin-left: 10px; }
+        .btn-refresh:hover { background: #218838; transform: rotate(180deg); }
+        .btn-refresh i { transition: transform 0.3s; }
+        .btn-refresh:hover i { transform: rotate(180deg); }
 
         .info-text {
             text-align: center;
@@ -573,6 +577,12 @@
             border-radius: 10px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
+        
+        .last-update-badge {
+            font-size: 10px;
+            color: #888;
+            margin-left: 10px;
+        }
     </style>
 </head>
 <body>
@@ -613,11 +623,15 @@
             </div>
         </div>
         
-        <!-- Panel Années Académiques avec recherche -->
+        <!-- Panel Années Académiques -->
         <div id="panel-annee" class="content-panel">
             <div class="panel-header">
-                <h4><i class="bi bi-calendar-week-fill me-2"></i>Années Académiques</h4>
-                <div><button class="fullscreen-btn" onclick="toggleFullscreen('panel-annee')"><i class="bi bi-arrows-fullscreen"></i></button><button class="home-btn" onclick="goHome()"><i class="bi bi-house-door-fill"></i> Accueil</button></div>
+                <h4><i class="bi bi-calendar-week-fill me-2"></i>Années Académiques <span id="anneeLastUpdate" class="last-update-badge"></span></h4>
+                <div>
+                    <button class="btn-refresh" id="refreshAnneesBtn" title="Actualiser les années"><i class="bi bi-arrow-repeat"></i> Actualiser</button>
+                    <button class="fullscreen-btn" onclick="toggleFullscreen('panel-annee')"><i class="bi bi-arrows-fullscreen"></i></button>
+                    <button class="home-btn" onclick="goHome()"><i class="bi bi-house-door-fill"></i> Accueil</button>
+                </div>
             </div>
             <div class="search-export-bar">
                 <div class="search-group" style="flex: 2;">
@@ -635,11 +649,15 @@
             <div id="anneesListe"><div class="text-center"><div class="loading-spinner"></div> Chargement...</div></div>
         </div>
         
-        <!-- Panel Comptabilité avec recherche -->
+        <!-- Panel Comptabilité -->
         <div id="panel-compta" class="content-panel">
             <div class="panel-header">
-                <h4><i class="bi bi-person-badge-fill me-2"></i>Comptes Comptabilité</h4>
-                <div><button class="fullscreen-btn" onclick="toggleFullscreen('panel-compta')"><i class="bi bi-arrows-fullscreen"></i></button><button class="home-btn" onclick="goHome()"><i class="bi bi-house-door-fill"></i> Accueil</button></div>
+                <h4><i class="bi bi-person-badge-fill me-2"></i>Comptes Comptabilité <span id="compteLastUpdate" class="last-update-badge"></span></h4>
+                <div>
+                    <button class="btn-refresh" id="refreshComptesBtn" title="Actualiser les comptes"><i class="bi bi-arrow-repeat"></i> Actualiser</button>
+                    <button class="fullscreen-btn" onclick="toggleFullscreen('panel-compta')"><i class="bi bi-arrows-fullscreen"></i></button>
+                    <button class="home-btn" onclick="goHome()"><i class="bi bi-house-door-fill"></i> Accueil</button>
+                </div>
             </div>
             <div class="search-export-bar">
                 <div class="search-group" style="flex: 2;">
@@ -657,11 +675,15 @@
             <div id="comptesListe"><div class="text-center"><div class="loading-spinner"></div> Chargement...</div></div>
         </div>
         
-        <!-- Panel Promotions avec recherche -->
+        <!-- Panel Promotions -->
         <div id="panel-promotion" class="content-panel">
             <div class="panel-header">
-                <h4><i class="bi bi-trophy-fill me-2"></i>Promotions</h4>
-                <div><button class="fullscreen-btn" onclick="toggleFullscreen('panel-promotion')"><i class="bi bi-arrows-fullscreen"></i></button><button class="home-btn" onclick="goHome()"><i class="bi bi-house-door-fill"></i> Accueil</button></div>
+                <h4><i class="bi bi-trophy-fill me-2"></i>Promotions <span id="promotionLastUpdate" class="last-update-badge"></span></h4>
+                <div>
+                    <button class="btn-refresh" id="refreshPromotionsBtn" title="Actualiser les promotions"><i class="bi bi-arrow-repeat"></i> Actualiser</button>
+                    <button class="fullscreen-btn" onclick="toggleFullscreen('panel-promotion')"><i class="bi bi-arrows-fullscreen"></i></button>
+                    <button class="home-btn" onclick="goHome()"><i class="bi bi-house-door-fill"></i> Accueil</button>
+                </div>
             </div>
             <div class="search-export-bar">
                 <div class="search-group" style="flex: 2;">
@@ -679,11 +701,15 @@
             <div id="promotionsListe"><div class="text-center"><div class="loading-spinner"></div> Chargement...</div></div>
         </div>
         
-        <!-- Panel Fiches avec recherche -->
+        <!-- Panel Fiches -->
         <div id="panel-fiche" class="content-panel">
             <div class="panel-header">
-                <h4><i class="bi bi-file-text-fill me-2"></i>Fiches</h4>
-                <div><button class="fullscreen-btn" onclick="toggleFullscreen('panel-fiche')"><i class="bi bi-arrows-fullscreen"></i></button><button class="home-btn" onclick="goHome()"><i class="bi bi-house-door-fill"></i> Accueil</button></div>
+                <h4><i class="bi bi-file-text-fill me-2"></i>Fiches <span id="ficheLastUpdate" class="last-update-badge"></span></h4>
+                <div>
+                    <button class="btn-refresh" id="refreshFichesBtn" title="Actualiser les fiches"><i class="bi bi-arrow-repeat"></i> Actualiser</button>
+                    <button class="fullscreen-btn" onclick="toggleFullscreen('panel-fiche')"><i class="bi bi-arrows-fullscreen"></i></button>
+                    <button class="home-btn" onclick="goHome()"><i class="bi bi-house-door-fill"></i> Accueil</button>
+                </div>
             </div>
             <div class="search-export-bar">
                 <div class="search-group" style="flex: 2;">
@@ -703,16 +729,42 @@
         
         <!-- Panel Étudiants -->
         <div id="panel-etudiant" class="content-panel">
-            <div class="panel-header"><h4><i class="bi bi-mortarboard-fill me-2"></i>Étudiants</h4><div><button class="fullscreen-btn" onclick="toggleFullscreen('panel-etudiant')"><i class="bi bi-arrows-fullscreen"></i></button><button class="home-btn" onclick="goHome()"><i class="bi bi-house-door-fill"></i> Accueil</button></div></div>
+            <div class="panel-header">
+                <h4><i class="bi bi-mortarboard-fill me-2"></i>Étudiants <span id="etudiantLastUpdate" class="last-update-badge"></span></h4>
+                <div>
+                    <button class="btn-refresh" id="refreshEtudiantsBtn" title="Actualiser les étudiants"><i class="bi bi-arrow-repeat"></i> Actualiser</button>
+                    <button class="fullscreen-btn" onclick="toggleFullscreen('panel-etudiant')"><i class="bi bi-arrows-fullscreen"></i></button>
+                    <button class="home-btn" onclick="goHome()"><i class="bi bi-house-door-fill"></i> Accueil</button>
+                </div>
+            </div>
             <h5><i class="bi bi-diagram-3"></i> Étudiants par promotion</h5>
             <div id="promotionButtons" class="promotion-buttons"></div>
-            <div class="search-export-bar"><div class="search-group"><label><i class="bi bi-search"></i> Rechercher</label><div class="search-input-group"><i class="bi bi-search"></i><input type="text" class="form-control" id="searchEtudiant" placeholder="Nom..."><i class="bi bi-x-circle-fill clear-search" id="clearSearch"></i></div></div><div class="export-group"><button class="export-btn export-excel-btn" id="exportExcelBtn">Excel</button><button class="export-btn" id="exportCsvBtn">CSV</button></div></div>
+            <div class="search-export-bar">
+                <div class="search-group">
+                    <label><i class="bi bi-search"></i> Rechercher</label>
+                    <div class="search-input-group">
+                        <i class="bi bi-search"></i>
+                        <input type="text" class="form-control" id="searchEtudiant" placeholder="Nom...">
+                        <i class="bi bi-x-circle-fill clear-search" id="clearSearch"></i>
+                    </div>
+                </div>
+                <div class="export-group">
+                    <button class="export-btn export-excel-btn" id="exportExcelBtn">Excel</button>
+                    <button class="export-btn" id="exportCsvBtn">CSV</button>
+                </div>
+            </div>
             <div id="etudiantsListe"><div class="text-center"><div class="loading-spinner"></div> Chargement...</div></div>
         </div>
         
         <!-- Panel Rapports -->
         <div id="panel-rapport" class="content-panel">
-            <div class="panel-header"><h4><i class="bi bi-graph-up me-2"></i>Rapports paiement</h4><div><button class="fullscreen-btn" onclick="toggleFullscreen('panel-rapport')"><i class="bi bi-arrows-fullscreen"></i></button><button class="home-btn" onclick="goHome()"><i class="bi bi-house-door-fill"></i> Accueil</button></div></div>
+            <div class="panel-header">
+                <h4><i class="bi bi-graph-up me-2"></i>Rapports paiement</h4>
+                <div>
+                    <button class="fullscreen-btn" onclick="toggleFullscreen('panel-rapport')"><i class="bi bi-arrows-fullscreen"></i></button>
+                    <button class="home-btn" onclick="goHome()"><i class="bi bi-house-door-fill"></i> Accueil</button>
+                </div>
+            </div>
             <div class="rapport-filters">
                 <div class="row">
                     <div class="col-md-3 mb-2"><label>Année académique</label><select class="form-select" id="rapportAnnee"><option value="">Sélectionner année</option></select></div>
@@ -774,7 +826,7 @@
         
         <div id="panel-paiementsRecents" class="content-panel">
             <div class="panel-header">
-                <h4><i class="bi bi-clock-history me-2" style="color: #667eea;"></i>Paiements Récents</h4>
+                <h4><i class="bi bi-clock-history me-2" style="color: #667eea;"></i>Paiements Récents <span class="last-update-badge">(Temps réel)</span></h4>
                 <div>
                     <button class="refresh-btn-mystic" id="refreshPaiementsBtn"><i class="bi bi-arrow-repeat"></i> Actualiser</button>
                     <button class="fullscreen-btn ms-2" onclick="toggleFullscreen('panel-paiementsRecents')"><i class="bi bi-arrows-fullscreen"></i></button>
@@ -785,7 +837,10 @@
         </div>
         
         <div id="panel-bordereau" class="content-panel">
-            <div class="panel-header"><h4><i class="bi bi-qr-code-scan me-2"></i>Vérification de Bordereau / Reçu</h4><div><button class="fullscreen-btn" onclick="toggleFullscreen('panel-bordereau')"><i class="bi bi-arrows-fullscreen"></i></button><button class="home-btn" onclick="goHome()"><i class="bi bi-house-door-fill"></i> Accueil</button></div></div>
+            <div class="panel-header">
+                <h4><i class="bi bi-qr-code-scan me-2"></i>Vérification de Bordereau / Reçu</h4>
+                <div><button class="fullscreen-btn" onclick="toggleFullscreen('panel-bordereau')"><i class="bi bi-arrows-fullscreen"></i></button><button class="home-btn" onclick="goHome()"><i class="bi bi-house-door-fill"></i> Accueil</button></div>
+            </div>
             <div class="bordereau-card">
                 <div class="row">
                     <div class="col-md-8"><label class="form-label"><i class="bi bi-upc-scan"></i> Numéro du reçu / bordereau</label><input type="text" class="form-control form-control-lg" id="bordereauNumero" placeholder="Ex: 20241215-143025"></div>
@@ -796,7 +851,10 @@
         </div>
         
         <div id="panel-about" class="content-panel">
-            <div class="panel-header"><h4><i class="bi bi-info-circle-fill me-2"></i>À propos</h4><div><button class="fullscreen-btn" onclick="toggleFullscreen('panel-about')"><i class="bi bi-arrows-fullscreen"></i></button><button class="home-btn" onclick="goHome()"><i class="bi bi-house-door-fill"></i> Accueil</button></div></div>
+            <div class="panel-header">
+                <h4><i class="bi bi-info-circle-fill me-2"></i>À propos</h4>
+                <div><button class="fullscreen-btn" onclick="toggleFullscreen('panel-about')"><i class="bi bi-arrows-fullscreen"></i></button><button class="home-btn" onclick="goHome()"><i class="bi bi-house-door-fill"></i> Accueil</button></div>
+            </div>
             <div class="about-container">
                 <div class="about-logo"><img src="t.png" alt="HYBRILINK-TECH Logo" onerror="this.src='https://via.placeholder.com/120x120?text=HT'"><h2>HYBRILINK - TECH</h2></div>
                 <div class="text-center mb-4"><h3 style="color: var(--primary-blue);">HYBRILINK - Votre Partenaire Digital Complet</h3></div>
@@ -830,7 +888,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     <script>
-        // Configuration Firebase
+        // ========== CONFIGURATION FIREBASE ==========
         const firebaseConfig = {
             apiKey: "AIzaSyBb82N2-5ns7qKjQBAj5UvDW87s2PZ27F0",
             authDomain: "fsa-unilu.firebaseapp.com",
@@ -841,14 +899,13 @@
         };
         
         firebase.initializeApp(firebaseConfig);
-        
         const db = firebase.firestore();
         
         db.enablePersistence({ synchronizeTabs: true })
             .then(() => console.log('✅ Persistance Firestore activée'))
             .catch((err) => console.warn('Persistance non activée:', err));
         
-        // Variables globales
+        // ========== VARIABLES GLOBALES ==========
         let allAnnees = [];
         let allPromotions = [];
         let allEtudiants = [];
@@ -865,6 +922,77 @@
         let promotionSearchTerm = '';
         let ficheSearchTerm = '';
         
+        // Timestamps des dernières mises à jour
+        let lastUpdates = {
+            annees: null,
+            comptes: null,
+            promotions: null,
+            fiches: null,
+            etudiants: null
+        };
+        
+        // ========== SYSTÈME DE CACHE ==========
+        class StaticDataCache {
+            constructor() {
+                this.cache = {};
+                this.CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+            }
+            
+            async getCollection(collectionName, forceRefresh = false) {
+                const now = Date.now();
+                
+                if (!forceRefresh && this.cache[collectionName] && 
+                    now - this.cache[collectionName].timestamp < this.CACHE_DURATION) {
+                    console.log(`📦 Cache utilisé pour ${collectionName}`);
+                    return this.cache[collectionName].data;
+                }
+                
+                return this.refreshCollection(collectionName);
+            }
+            
+            // ✅ ZÉRO LECTURE AU LANCEMENT
+async refreshCollection(collectionName) {
+    const cachedData = this.cache[collectionName]?.data;
+    
+    // 1. Retourner immédiatement le cache s'il existe (0 lecture)
+    if (cachedData && cachedData.length > 0) {
+        console.log(`📦 Cache utilisé pour ${collectionName} (0 lecture)`);
+        return cachedData;
+    }
+    
+    // 2. Sinon, charger depuis le cache Firestore (toujours 0 lecture)
+    try {
+        const snapshot = await db.collection(collectionName).get({ source: 'cache' });
+        let data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        
+        this.cache[collectionName] = {
+            data: data,
+            timestamp: Date.now()
+        };
+        
+        return data;
+    } catch (error) {
+        console.warn(`Erreur chargement ${collectionName}:`, error);
+        return [];
+    }
+}
+            
+            async refreshAllStaticData() {
+                console.log('🔄 Rafraîchissement de toutes les données statiques...');
+                await Promise.all([
+                    this.refreshCollection('anneesAcademiques'),
+                    this.refreshCollection('promotions'),
+                    this.refreshCollection('fiches'),
+                    this.refreshCollection('etudiants'),
+                    this.refreshCollection('utilisateurs')
+                ]);
+                return true;
+            }
+        }
+        
+        const staticCache = new StaticDataCache();
+        
+        // ========== FONCTIONS UTILITAIRES ==========
         function updateSyncStatus(online) {
             const statusEl = document.getElementById('syncStatus');
             if (!statusEl) return;
@@ -874,6 +1002,15 @@
             } else {
                 statusEl.innerHTML = '<i class="bi bi-cloud-check"></i> Synchro';
                 statusEl.className = 'sync-status';
+            }
+        }
+        
+        function updateLastUpdateDisplay(collection) {
+            const elementId = `${collection}LastUpdate`;
+            const element = document.getElementById(elementId);
+            if (element && lastUpdates[collection]) {
+                const date = new Date(lastUpdates[collection]);
+                element.innerHTML = `Dernière mise à jour: ${date.toLocaleTimeString()}`;
             }
         }
         
@@ -891,33 +1028,32 @@
             showToast('🔴 Mode hors-ligne - Données en cache', 'warning');
         });
         
-       function showToast(message, type = 'success') {
-    const container = document.getElementById('toastContainer');
-    const bgColor = type === 'success' ? '#28a745' : (type === 'warning' ? '#ffc107' : '#dc3545');
-    const textColor = type === 'warning' ? '#333' : 'white';
-    const icon = type === 'success' ? 'check-circle-fill' : (type === 'warning' ? 'exclamation-triangle-fill' : 'x-circle-fill');
-    
-    // Convertir les sauts de ligne en <br> pour l'affichage HTML
-    const messageHtml = message.replace(/\n/g, '<br>');
-    
-    const toastHtml = `<div class="toast notification-toast" style="background: ${bgColor}; color: ${textColor}; border-radius: 10px; margin-bottom: 10px;">
-        <div class="toast-body">
-            <div style="display: flex; align-items: flex-start;">
-                <i class="bi bi-${icon} me-2" style="font-size: 20px;"></i>
-                <div>${messageHtml}</div>
-            </div>
-        </div>
-    </div>`;
-    container.insertAdjacentHTML('afterbegin', toastHtml);
-    setTimeout(() => {
-        const firstToast = container.firstElementChild;
-        if (firstToast) {
-            firstToast.style.transition = 'opacity 0.3s';
-            firstToast.style.opacity = '0';
-            setTimeout(() => firstToast.remove(), 300);
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const bgColor = type === 'success' ? '#28a745' : (type === 'warning' ? '#ffc107' : '#dc3545');
+            const textColor = type === 'warning' ? '#333' : 'white';
+            const icon = type === 'success' ? 'check-circle-fill' : (type === 'warning' ? 'exclamation-triangle-fill' : 'x-circle-fill');
+            
+            const messageHtml = message.replace(/\n/g, '<br>');
+            
+            const toastHtml = `<div class="toast notification-toast" style="background: ${bgColor}; color: ${textColor}; border-radius: 10px; margin-bottom: 10px;">
+                <div class="toast-body">
+                    <div style="display: flex; align-items: flex-start;">
+                        <i class="bi bi-${icon} me-2" style="font-size: 20px;"></i>
+                        <div>${messageHtml}</div>
+                    </div>
+                </div>
+            </div>`;
+            container.insertAdjacentHTML('afterbegin', toastHtml);
+            setTimeout(() => {
+                const firstToast = container.firstElementChild;
+                if (firstToast) {
+                    firstToast.style.transition = 'opacity 0.3s';
+                    firstToast.style.opacity = '0';
+                    setTimeout(() => firstToast.remove(), 300);
+                }
+            }, 5000);
         }
-    }, 5000); // Augmenté à 5 secondes pour avoir le temps de lire
-}
         
         function escapeHtml(t) { if(!t) return ''; const d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
         
@@ -939,8 +1075,7 @@
             document.getElementById('homePage').style.display = 'block'; 
         }
         
-        // ========== FONCTIONS D'AFFICHAGE AVEC RECHERCHE ==========
-        
+        // ========== AFFICHAGE DES LISTES ==========
         function chargerAnneesListe() {
             const container = document.getElementById('anneesListe');
             if(!container) return;
@@ -960,7 +1095,7 @@
             filtrees.forEach(a => {
                 html += `<tr><td><strong>${escapeHtml(a.annee || a.nom)}</strong></td><td>${a.statut === 'active' ? '<span class="text-success">Active</span>' : '<span class="text-muted">Inactive</span>'}</td></tr>`;
             });
-            html += '</tbody></table></div>';
+            html += '</tbody>}</div>';
             container.innerHTML = html;
         }
         
@@ -986,7 +1121,7 @@
             filtrees.forEach(c => {
                 html += `<tr><td><strong>${escapeHtml(c.nomComplet)}</strong></td><td>${escapeHtml(c.email)}</td><td>${c.dateCreation ? new Date(c.dateCreation.toDate()).toLocaleDateString() : '-'}</td></tr>`;
             });
-            html += '</tbody></table></div>';
+            html += '</tbody>}</div>';
             container.innerHTML = html;
         }
         
@@ -1005,11 +1140,6 @@
                 filtrees = filtrees.filter(p => (p.nom || '').toLowerCase().includes(term));
             }
             
-            if(allEtudiants.length === 0) {
-                container.innerHTML = '<div class="text-center"><div class="loading-spinner"></div> Calcul des effectifs...</div>';
-                return;
-            }
-            
             let html = '<div class="table-responsive"><table class="table table-bordered" id="promotionsTable"><thead><tr><th>Nom promotion</th><th>Capacité</th><th>Nombre d\'étudiants</th></tr></thead><tbody>';
             
             filtrees.forEach(p => {
@@ -1017,7 +1147,7 @@
                 html += `<tr><td><strong>${escapeHtml(p.nom)}</strong></td><td>${p.capacite || '-'}</td><td><span class="badge bg-primary fs-6">${count}</span> étudiant(s)</td></tr>`;
             });
             
-            html += '</tbody></table></div>';
+            html += '</tbody>}</div>';
             
             const totalEtudiants = allEtudiants.length;
             html += `<div class="alert alert-info mt-3"><i class="bi bi-people-fill"></i> <strong>Total général:</strong> ${totalEtudiants} étudiant(s) réparti(s) dans ${allPromotions.length} promotion(s)</div>`;
@@ -1025,54 +1155,40 @@
             container.innerHTML = html;
         }
         
-        function chargerPromotionsListeSansEtudiants() {
-            const container = document.getElementById('promotionsListe');
+        function chargerFichesListe() {
+            const container = document.getElementById('fichesListe');
             if(!container) return;
-            let html = '<div class="table-responsive"><table class="table table-bordered"><thead><tr><th>Nom promotion</th><th>Capacité</th><th>Nombre d\'étudiants</th></tr></thead><tbody>';
-            allPromotions.forEach(p => {
-                html += `<tr><td><strong>${escapeHtml(p.nom)}</strong></td><td>${p.capacite || '-'}</td><td><span class="badge bg-secondary">Calcul...</span></td></tr>`;
+            
+            let filtrees = [...allFiches];
+            if(ficheSearchTerm) {
+                const term = ficheSearchTerm.toLowerCase();
+                filtrees = filtrees.filter(f => (f.nom || '').toLowerCase().includes(term));
+            }
+            
+            if(filtrees.length === 0) { 
+                container.innerHTML = '<div class="alert alert-info">Aucune fiche trouvée</div>'; 
+                return; 
+            }
+            
+            const promoMap = {};
+            allPromotions.forEach(p => promoMap[p.id] = p.nom);
+            let html = '<div class="table-responsive"><table class="table table-bordered" id="fichesTable"><thead><tr><th>Nom fiche</th><th>Montant</th><th>Promotions concernées</th></tr></thead><tbody>';
+            filtrees.forEach(f => {
+                let promotionsText = '';
+                if(f.promotions && Array.isArray(f.promotions)) {
+                    const promoNoms = f.promotions.map(pid => promoMap[pid]).filter(p => p && p.trim() !== '');
+                    promotionsText = promoNoms.join(', ');
+                } else if(f.promotion) {
+                    promotionsText = promoMap[f.promotion] || '';
+                }
+                if(!promotionsText) promotionsText = '-';
+                
+                html += `<tr><td><strong>${escapeHtml(f.nom)}</strong></td><td>${(f.montant || 0).toLocaleString()} FC</td><td>${escapeHtml(promotionsText)}</td></tr>`;
             });
-            html += '</tbody></table></div>';
+            html += '</tbody>}</div>';
             container.innerHTML = html;
         }
         
-        function chargerFichesListe() {
-    const container = document.getElementById('fichesListe');
-    if(!container) return;
-    
-    let filtrees = [...allFiches];
-    if(ficheSearchTerm) {
-        const term = ficheSearchTerm.toLowerCase();
-        filtrees = filtrees.filter(f => (f.nom || '').toLowerCase().includes(term));
-    }
-    
-    if(filtrees.length === 0) { 
-        container.innerHTML = '<div class="alert alert-info">Aucune fiche trouvée</div>'; 
-        return; 
-    }
-    
-    const promoMap = {};
-    allPromotions.forEach(p => promoMap[p.id] = p.nom);
-    let html = '<div class="table-responsive"><table class="table table-bordered" id="fichesTable"><thead><tr><th>Nom fiche</th><th>Montant</th><th>Promotions concernées</th></tr></thead><tbody>';
-    filtrees.forEach(f => {
-        let promotionsText = '';
-        if(f.promotions && Array.isArray(f.promotions)) {
-            // MODIFICATION ICI : Filtrer les IDs qui n'ont pas de nom correspondant
-            const promoNoms = f.promotions.map(pid => promoMap[pid]).filter(p => p && p.trim() !== '');
-            promotionsText = promoNoms.join(', ');
-        } else if(f.promotion) {
-            promotionsText = promoMap[f.promotion] || '';
-        }
-        // Si aucune promotion valide n'est trouvée, afficher un tiret
-        if(!promotionsText) promotionsText = '-';
-        
-        html += `<tr><td><strong>${escapeHtml(f.nom)}</strong></td><td>${(f.montant || 0).toLocaleString()} FC</td><td>${escapeHtml(promotionsText)}</td></tr>`;
-    });
-    html += '</tbody></table></div>';
-    container.innerHTML = html;
-}
-        
-        // Fonction d'export pour les listes
         function exporterListe(data, filename, headers) {
             const ws = XLSX.utils.json_to_sheet(data);
             const wb = XLSX.utils.book_new();
@@ -1082,7 +1198,6 @@
         }
         
         // ========== RAPPORT JOURNALIER ==========
-        
         function chargerJournalierAnneesSelect() {
             const select = document.getElementById('journalierAnnee');
             if(select) {
@@ -1108,7 +1223,6 @@
             
             if(debut > fin) { alert('La date de début doit être antérieure à la date de fin'); return; }
             
-            // Filtrer les transactions
             let transactionsFiltrees = allTransactions.filter(t => {
                 if(t.anneeAcademiqueId !== anneeId) return false;
                 if(!t.date) return false;
@@ -1132,21 +1246,8 @@
                 return;
             }
             
-            // Calcul des statistiques
             const totalMontant = transactionsFiltrees.reduce((sum, t) => sum + (t.montantTotal || 0), 0);
             const uniqueEtudiants = new Set(transactionsFiltrees.map(t => t.etudiantId)).size;
-            
-            // Grouper par jour
-            const paiementsParJour = {};
-            transactionsFiltrees.forEach(t => {
-                const jour = t.date.toDate().toLocaleDateString('fr-FR');
-                if(!paiementsParJour[jour]) {
-                    paiementsParJour[jour] = { montant: 0, nombre: 0, transactions: [] };
-                }
-                paiementsParJour[jour].montant += t.montantTotal || 0;
-                paiementsParJour[jour].nombre++;
-                paiementsParJour[jour].transactions.push(t);
-            });
             
             let html = `<div class="rapport-summary">
                 <div class="row text-center">
@@ -1162,13 +1263,10 @@
                 </div>
             </div>`;
             
-            // Tableau détaillé des paiements
             html += `<div class="table-responsive mt-4">
                 <table class="rapport-table" id="journalierTable">
                     <thead>
-                        <tr>
-                            <th>Date</th><th>Heure</th><th>Numéro reçu</th><th>Étudiant</th><th>Promotion</th><th>Fiches</th><th class="text-end">Montant</th>
-                        </tr>
+                        <tr><th>Date</th><th>Heure</th><th>Numéro reçu</th><th>Étudiant</th><th>Promotion</th><th>Fiches</th><th class="text-end">Montant</th></tr>
                     </thead>
                     <tbody>`;
             
@@ -1199,16 +1297,14 @@
                             <td class="text-end">${totalMontant.toLocaleString()} FC</td>
                         </tr>
                     </tfoot>
-                </table>
-            </div>
-            <div class="text-center mt-4">
-                <button class="btn-action" id="exporterJournalierExcel"><i class="bi bi-file-excel"></i> Exporter en Excel</button>
-                <button class="print-rapport ms-2" id="imprimerJournalier"><i class="bi bi-printer"></i> Imprimer</button>
-            </div>`;
+                </table></div>
+                <div class="text-center mt-4">
+                    <button class="btn-action" id="exporterJournalierExcel"><i class="bi bi-file-excel"></i> Exporter en Excel</button>
+                    <button class="print-rapport ms-2" id="imprimerJournalier"><i class="bi bi-printer"></i> Imprimer</button>
+                </div>`;
             
             document.getElementById('journalierResultat').innerHTML = html;
             
-            // Événements pour export et impression
             document.getElementById('exporterJournalierExcel')?.addEventListener('click', () => {
                 const table = document.getElementById('journalierTable');
                 if(!table) return;
@@ -1247,183 +1343,172 @@
         });
         
         // ========== PAIEMENTS RÉCENTS ==========
-        
-    async function chargerPaiementsRecents() {
-    const container = document.getElementById('paiementsRecentsListe');
-    if(!container) return;
-    try {
-        // Attendre que les données de base soient chargées
-        if(allPromotions.length === 0 || allAnnees.length === 0) {
-            container.innerHTML = '<div class="text-center py-5"><div class="loading-spinner"></div><p class="mt-3">Chargement des données...</p></div>';
-            // Réessayer dans 1 seconde
-            setTimeout(() => chargerPaiementsRecents(), 1000);
-            return;
-        }
-        
-        const snapshot = await db.collection('transactions').orderBy('date', 'desc').limit(15).get({ source: isOnline ? 'default' : 'cache' });
-        if(snapshot.empty) {
-            container.innerHTML = `<div class="empty-state-mystic"><i class="bi bi-inbox"></i><h5>Aucun paiement enregistré</h5><p class="text-muted">Les paiements effectués apparaîtront ici</p></div>`;
-            return;
-        }
-        const transactions = [];
-        snapshot.forEach(doc => transactions.push({ id: doc.id, ...doc.data() }));
-        transactions.sort((a, b) => (b.date?.toDate() || 0) - (a.date?.toDate() || 0));
-        
-        const totalMontant = transactions.reduce((sum, t) => sum + (t.montantTotal || 0), 0);
-        const uniqueEtudiants = new Set(transactions.map(t => t.etudiantId)).size;
-        const today = new Date(); today.setHours(0,0,0,0);
-        const todayTransactions = transactions.filter(t => t.date && t.date.toDate() >= today);
-        const todayMontant = todayTransactions.reduce((sum, t) => sum + (t.montantTotal || 0), 0);
-        
-        let html = `<div class="paiements-stats-grid">
-            <div class="mystic-stat-card"><div class="mystic-stat-icon"><i class="bi bi-cash-stack"></i></div><div class="mystic-stat-number">${totalMontant.toLocaleString()} FC</div><div class="mystic-stat-label">Total collecté</div></div>
-            <div class="mystic-stat-card"><div class="mystic-stat-icon"><i class="bi bi-receipt"></i></div><div class="mystic-stat-number">${transactions.length}</div><div class="mystic-stat-label">Paiements récents</div></div>
-            <div class="mystic-stat-card"><div class="mystic-stat-icon"><i class="bi bi-people-fill"></i></div><div class="mystic-stat-number">${uniqueEtudiants}</div><div class="mystic-stat-label">Étudiants distincts</div></div>
-            <div class="mystic-stat-card"><div class="mystic-stat-icon"><i class="bi bi-calendar-day"></i></div><div class="mystic-stat-number">${todayMontant.toLocaleString()} FC</div><div class="mystic-stat-label">Aujourd'hui</div></div>
-        </div><div class="paiements-timeline">`;
-        
-        for (const t of transactions.slice(0, 15)) {
-            const dateTransaction = t.date ? new Date(t.date.toDate()) : new Date();
-            const dateFormatted = dateTransaction.toLocaleString('fr-FR', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' });
+        async function chargerPaiementsRecents() {
+            const container = document.getElementById('paiementsRecentsListe');
+            if(!container) return;
             
-            // Récupérer les noms à partir des IDs si nécessaire
-            let promoNom = t.promotionNom;
-            if(!promoNom && t.promotion) {
-                const promo = allPromotions.find(p => p.id === t.promotion);
-                promoNom = promo ? promo.nom : '-';
+            try {
+                if(allPromotions.length === 0 || allAnnees.length === 0) {
+                    container.innerHTML = '<div class="text-center py-5"><div class="loading-spinner"></div><p class="mt-3">Chargement des données...</p></div>';
+                    setTimeout(() => chargerPaiementsRecents(), 1000);
+                    return;
+                }
+                
+                if(allTransactions.length === 0) {
+                    container.innerHTML = `<div class="empty-state-mystic"><i class="bi bi-inbox"></i><h5>Aucun paiement enregistré</h5><p class="text-muted">Les paiements effectués apparaîtront ici</p></div>`;
+                    return;
+                }
+                
+                const transactions = [...allTransactions].sort((a, b) => (b.date?.toDate() || 0) - (a.date?.toDate() || 0)).slice(0, 15);
+                
+                const totalMontant = transactions.reduce((sum, t) => sum + (t.montantTotal || 0), 0);
+                const uniqueEtudiants = new Set(transactions.map(t => t.etudiantId)).size;
+                const today = new Date(); today.setHours(0,0,0,0);
+                const todayTransactions = transactions.filter(t => t.date && t.date.toDate() >= today);
+                const todayMontant = todayTransactions.reduce((sum, t) => sum + (t.montantTotal || 0), 0);
+                
+                let html = `<div class="paiements-stats-grid">
+                    <div class="mystic-stat-card"><div class="mystic-stat-icon"><i class="bi bi-cash-stack"></i></div><div class="mystic-stat-number">${totalMontant.toLocaleString()} FC</div><div class="mystic-stat-label">Total collecté</div></div>
+                    <div class="mystic-stat-card"><div class="mystic-stat-icon"><i class="bi bi-receipt"></i></div><div class="mystic-stat-number">${transactions.length}</div><div class="mystic-stat-label">Paiements récents</div></div>
+                    <div class="mystic-stat-card"><div class="mystic-stat-icon"><i class="bi bi-people-fill"></i></div><div class="mystic-stat-number">${uniqueEtudiants}</div><div class="mystic-stat-label">Étudiants distincts</div></div>
+                    <div class="mystic-stat-card"><div class="mystic-stat-icon"><i class="bi bi-calendar-day"></i></div><div class="mystic-stat-number">${todayMontant.toLocaleString()} FC</div><div class="mystic-stat-label">Aujourd'hui</div></div>
+                </div><div class="paiements-timeline">`;
+                
+                for (const t of transactions) {
+                    const dateTransaction = t.date ? new Date(t.date.toDate()) : new Date();
+                    const dateFormatted = dateTransaction.toLocaleString('fr-FR', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' });
+                    
+                    let promoNom = t.promotionNom;
+                    if(!promoNom && t.promotion) {
+                        const promo = allPromotions.find(p => p.id === t.promotion);
+                        promoNom = promo ? promo.nom : '-';
+                    }
+                    promoNom = promoNom || '-';
+                    
+                    let anneeNom = t.anneeAcademiqueNom;
+                    if(!anneeNom && t.anneeAcademiqueId) {
+                        const annee = allAnnees.find(a => a.id === t.anneeAcademiqueId);
+                        anneeNom = annee ? (annee.annee || annee.nom) : '-';
+                    }
+                    anneeNom = anneeNom || '-';
+                    
+                    let fichesNoms = [];
+                    if(t.fiches && Array.isArray(t.fiches)) {
+                        fichesNoms = t.fiches.map(f => f.nom || f.id);
+                    }
+                    const fichesHtml = fichesNoms.length > 0 ? `<div class="fiches-list">${fichesNoms.slice(0,3).map(fnom => `<span class="fiche-tag"><i class="bi bi-file-text"></i> ${escapeHtml(fnom)}</span>`).join('')}</div>` : '';
+                    
+                    html += `<div class="timeline-item"><div class="timeline-dot"></div><div class="paiement-card-mystic">
+                        <div class="paiement-header-mystic"><span class="paiement-numero"><i class="bi bi-upc-scan"></i> ${escapeHtml(t.numeroRecu || t.id.substring(0,12))}</span><span class="paiement-date"><i class="bi bi-calendar3"></i> ${dateFormatted}</span></div>
+                        <div class="paiement-etudiant"><i class="bi bi-person-circle"></i> ${escapeHtml(t.etudiantNom || '-')}</div>
+                        <div class="paiement-details"><span class="paiement-promotion"><i class="bi bi-trophy"></i> ${escapeHtml(promoNom)}</span><span class="paiement-annee"><i class="bi bi-calendar-week"></i> ${escapeHtml(anneeNom)}</span><span class="paiement-montant"><i class="bi bi-cash-stack"></i> ${(t.montantTotal || 0).toLocaleString()} FC</span></div>
+                        ${fichesHtml}
+                    </div></div>`;
+                }
+                
+                html += `</div><div class="text-center mt-4 text-muted small"><i class="bi bi-gem"></i> Affichage des ${Math.min(transactions.length, 15)} derniers paiements ${!isOnline ? '(mode hors-ligne)' : ''}</div>`;
+                container.innerHTML = html;
+                
+            } catch(error) {
+                console.error('Erreur chargement paiements:', error);
+                container.innerHTML = `<div class="empty-state-mystic"><i class="bi bi-exclamation-triangle-fill" style="color:#dc3545;"></i><h5>Erreur de chargement</h5><p class="text-muted">${error.message}</p></div>`;
             }
-            promoNom = promoNom || '-';
-            
-            let anneeNom = t.anneeAcademiqueNom;
-            if(!anneeNom && t.anneeAcademiqueId) {
-                const annee = allAnnees.find(a => a.id === t.anneeAcademiqueId);
-                anneeNom = annee ? (annee.annee || annee.nom) : '-';
-            }
-            anneeNom = anneeNom || '-';
-            
-            let fichesNoms = [];
-            if(t.fiches && Array.isArray(t.fiches)) {
-                fichesNoms = t.fiches.map(f => f.nom || f.id);
-            }
-            const fichesHtml = fichesNoms.length > 0 ? `<div class="fiches-list">${fichesNoms.slice(0,3).map(fnom => `<span class="fiche-tag"><i class="bi bi-file-text"></i> ${escapeHtml(fnom)}</span>`).join('')}</div>` : '';
-            
-            html += `<div class="timeline-item"><div class="timeline-dot"></div><div class="paiement-card-mystic">
-                <div class="paiement-header-mystic"><span class="paiement-numero"><i class="bi bi-upc-scan"></i> ${escapeHtml(t.numeroRecu || t.id.substring(0,12))}</span><span class="paiement-date"><i class="bi bi-calendar3"></i> ${dateFormatted}</span></div>
-                <div class="paiement-etudiant"><i class="bi bi-person-circle"></i> ${escapeHtml(t.etudiantNom || '-')}</div>
-                <div class="paiement-details"><span class="paiement-promotion"><i class="bi bi-trophy"></i> ${escapeHtml(promoNom)}</span><span class="paiement-annee"><i class="bi bi-calendar-week"></i> ${escapeHtml(anneeNom)}</span><span class="paiement-montant"><i class="bi bi-cash-stack"></i> ${(t.montantTotal || 0).toLocaleString()} FC</span></div>
-                ${fichesHtml}
-            </div></div>`;
         }
-        html += `</div><div class="text-center mt-4 text-muted small"><i class="bi bi-gem"></i> Affichage des ${Math.min(transactions.length, 15)} derniers paiements ${!isOnline ? '(mode hors-ligne)' : ''}</div>`;
-        container.innerHTML = html;
-    } catch(error) {
-        console.error('Erreur chargement paiements:', error);
-        container.innerHTML = `<div class="empty-state-mystic"><i class="bi bi-exclamation-triangle-fill" style="color:#dc3545;"></i><h5>Erreur de chargement</h5><p class="text-muted">${error.message}</p></div>`;
-    }
-}
         
         // ========== ÉTUDIANTS ==========
-        
         function afficherBoutonsPromotions() {
-    const container = document.getElementById('promotionButtons');
-    if(!container) return;
-    if(allPromotions.length === 0) { 
-        container.innerHTML = '<div class="alert alert-info">Aucune promotion</div>'; 
-        return; 
-    }
-    
-    // ✅ AFFICHE LES BOUTONS DES PROMOTIONS
-    let html = '';
-    allPromotions.forEach(p => {
-        const count = allEtudiants.filter(e => e.promotion === p.id).length;
-        html += `<button class="promotion-btn" data-promo="${p.id}">📚 ${escapeHtml(p.nom)} <span class="badge bg-secondary">${count}</span></button>`;
-    });
-    container.innerHTML = html;
-    
-    // ✅ AFFICHE LE MESSAGE D'INVITATION (pas la liste)
-    document.getElementById('etudiantsListe').innerHTML = `
-        <div class="text-center py-5" style="background: #f8f9fa; border-radius: 15px;">
-            <i class="bi bi-arrow-up-circle" style="font-size: 48px; color: #003366; opacity: 0.5;"></i>
-            <h5 class="mt-3" style="color: #003366;">Sélectionnez une promotion</h5>
-            <p class="text-muted">Cliquez sur une promotion ci-dessus pour afficher la liste des étudiants</p>
-        </div>
-    `;
-    
-    // Événements sur les boutons
-    document.querySelectorAll('.promotion-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            document.querySelectorAll('.promotion-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            currentSelectedPromotion = btn.dataset.promo;
-            currentSearchTerm = '';
-            const si = document.getElementById('searchEtudiant');
-            if(si) si.value = '';
-            document.getElementById('clearSearch').style.display = 'none';
-            afficherEtudiantsParPromotion(currentSelectedPromotion); // ✅ Affiche la liste SEULEMENT au clic
-        });
-    });
-}
+            const container = document.getElementById('promotionButtons');
+            if(!container) return;
+            if(allPromotions.length === 0) { 
+                container.innerHTML = '<div class="alert alert-info">Aucune promotion</div>'; 
+                return; 
+            }
+            
+            let html = '';
+            allPromotions.forEach(p => {
+                const count = allEtudiants.filter(e => e.promotion === p.id).length;
+                html += `<button class="promotion-btn" data-promo="${p.id}">📚 ${escapeHtml(p.nom)} <span class="badge bg-secondary">${count}</span></button>`;
+            });
+            container.innerHTML = html;
+            
+            document.getElementById('etudiantsListe').innerHTML = `
+                <div class="text-center py-5" style="background: #f8f9fa; border-radius: 15px;">
+                    <i class="bi bi-arrow-up-circle" style="font-size: 48px; color: #003366; opacity: 0.5;"></i>
+                    <h5 class="mt-3" style="color: #003366;">Sélectionnez une promotion</h5>
+                    <p class="text-muted">Cliquez sur une promotion ci-dessus pour afficher la liste des étudiants</p>
+                </div>
+            `;
+            
+            document.querySelectorAll('.promotion-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.promotion-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    currentSelectedPromotion = btn.dataset.promo;
+                    currentSearchTerm = '';
+                    const si = document.getElementById('searchEtudiant');
+                    if(si) si.value = '';
+                    document.getElementById('clearSearch').style.display = 'none';
+                    afficherEtudiantsParPromotion(currentSelectedPromotion);
+                });
+            });
+        }
+        
         function afficherEtudiantsParPromotion(promoId) {
-    // Si pas de promotion sélectionnée
-    if(!promoId) {
-        document.getElementById('etudiantsListe').innerHTML = `
-            <div class="text-center py-5" style="background: #f8f9fa; border-radius: 15px;">
-                <i class="bi bi-arrow-up-circle" style="font-size: 48px; color: #003366; opacity: 0.5;"></i>
-                <h5 class="mt-3" style="color: #003366;">Sélectionnez une promotion</h5>
-                <p class="text-muted">Cliquez sur une promotion ci-dessus pour afficher la liste des étudiants</p>
-            </div>
-        `;
-        return;
-    }
-    
-    let filtres = allEtudiants.filter(e => e.promotion === promoId);
-    
-    if(currentSearchTerm) {
-        const s = currentSearchTerm.toLowerCase();
-        filtres = filtres.filter(e => e.nom?.toLowerCase().includes(s));
-    }
-    
-    const promoMap = {};
-    allPromotions.forEach(p => promoMap[p.id] = p.nom);
-    const promoNom = promoMap[promoId] || promoId;
-    
-    if(filtres.length === 0) {
-        document.getElementById('etudiantsListe').innerHTML = `
-            <div class="alert alert-info">
-                <i class="bi bi-info-circle"></i> 
-                Aucun étudiant trouvé dans la promotion "${escapeHtml(promoNom)}"
-                ${currentSearchTerm ? ' pour la recherche "' + escapeHtml(currentSearchTerm) + '"' : ''}
-            </div>`;
-        return;
-    }
-    
-    let html = `
-        <div class="mb-3">
-            <h5><i class="bi bi-trophy-fill" style="color: #003366;"></i> Promotion : ${escapeHtml(promoNom)}</h5>
-            <div class="text-muted"><i class="bi bi-people-fill"></i> ${filtres.length} étudiant(s)</div>
-        </div>
-        <div class="table-responsive">
-            <table class="etudiants-table" id="etudiantsTable">
-                <thead>
-                    <tr>
-                        <th>N°</th>
-                        <th>Matricule</th>
-                        <th>Nom</th>
-                    </tr>
-                </thead>
-                <tbody>`;
-    
-    filtres.forEach((e, idx) => {
-        html += `<tr>
-            <td>${idx+1}</td>
-            <td><span style="font-family:monospace;">${escapeHtml(e.matricule || e.id.substring(0,8))}</span></td>
-            <td><strong>${escapeHtml(e.nom)}</strong></td>
-        </tr>`;
-    });
-    
-    html += `</tbody></table></div>`;
-    document.getElementById('etudiantsListe').innerHTML = html;
-}
+            if(!promoId) {
+                document.getElementById('etudiantsListe').innerHTML = `
+                    <div class="text-center py-5" style="background: #f8f9fa; border-radius: 15px;">
+                        <i class="bi bi-arrow-up-circle" style="font-size: 48px; color: #003366; opacity: 0.5;"></i>
+                        <h5 class="mt-3" style="color: #003366;">Sélectionnez une promotion</h5>
+                        <p class="text-muted">Cliquez sur une promotion ci-dessus pour afficher la liste des étudiants</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            let filtres = allEtudiants.filter(e => e.promotion === promoId);
+            
+            if(currentSearchTerm) {
+                const s = currentSearchTerm.toLowerCase();
+                filtres = filtres.filter(e => e.nom?.toLowerCase().includes(s));
+            }
+            
+            const promoMap = {};
+            allPromotions.forEach(p => promoMap[p.id] = p.nom);
+            const promoNom = promoMap[promoId] || promoId;
+            
+            if(filtres.length === 0) {
+                document.getElementById('etudiantsListe').innerHTML = `
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle"></i> 
+                        Aucun étudiant trouvé dans la promotion "${escapeHtml(promoNom)}"
+                        ${currentSearchTerm ? ' pour la recherche "' + escapeHtml(currentSearchTerm) + '"' : ''}
+                    </div>`;
+                return;
+            }
+            
+            let html = `
+                <div class="mb-3">
+                    <h5><i class="bi bi-trophy-fill" style="color: #003366;"></i> Promotion : ${escapeHtml(promoNom)}</h5>
+                    <div class="text-muted"><i class="bi bi-people-fill"></i> ${filtres.length} étudiant(s)</div>
+                </div>
+                <div class="table-responsive">
+                    <table class="etudiants-table" id="etudiantsTable">
+                        <thead>
+                            <tr><th>N°</th><th>Matricule</th><th>Nom</th></tr>
+                        </thead>
+                        <tbody>`;
+            
+            filtres.forEach((e, idx) => {
+                html += `<tr>
+                    <td>${idx+1}</td>
+                    <td><span style="font-family:monospace;">${escapeHtml(e.matricule || e.id.substring(0,8))}</span></td>
+                    <td><strong>${escapeHtml(e.nom)}</strong></td>
+                </tr>`;
+            });
+            
+            html += `</tbody></table></div>`;
+            document.getElementById('etudiantsListe').innerHTML = html;
+        }
         
         function exporterEtudiants(format) {
             let data = currentSelectedPromotion === null ? [...allEtudiants] : allEtudiants.filter(e => e.promotion === currentSelectedPromotion);
@@ -1443,7 +1528,6 @@
         }
         
         // ========== RAPPORTS PRINCIPAUX ==========
-        
         function chargerAnneesSelect() {
             const select = document.getElementById('rapportAnnee');
             if(select) {
@@ -1665,7 +1749,6 @@
         });
         
         // ========== VÉRIFICATION BORDEREAU ==========
-        
         document.getElementById('verifierBordereauBtn')?.addEventListener('click', async () => {
             const numero = document.getElementById('bordereauNumero').value.trim();
             if(!numero) { alert('Veuillez entrer un numéro de reçu'); return; }
@@ -1699,7 +1782,6 @@
         });
         
         // ========== NOTIFICATIONS ==========
-        
         let notificationSound = null;
         
         function initNotificationSound() {
@@ -1709,51 +1791,36 @@
             } catch(e) {}
         }
         
-       function showRealTimeNotification(transaction) {
-    const montant = (transaction.montantTotal || 0).toLocaleString();
-    const etudiant = transaction.etudiantNom || 'Un étudiant';
-    
-    // Récupérer les noms des fiches payées
-    let fichesText = '';
-    if (transaction.fiches && Array.isArray(transaction.fiches) && transaction.fiches.length > 0) {
-        const fichesNoms = transaction.fiches.map(f => f.nom || f.id).filter(n => n);
-        if (fichesNoms.length > 0) {
-            // Limiter à 3 fiches maximum pour ne pas surcharger la notification
-            const fichesAffichees = fichesNoms.slice(0, 3);
-            fichesText = `\n📋 ${fichesAffichees.join(', ')}`;
-            if (fichesNoms.length > 3) {
-                fichesText += ` et ${fichesNoms.length - 3} autre(s)`;
+        function showRealTimeNotification(transaction) {
+            const montant = (transaction.montantTotal || 0).toLocaleString();
+            const etudiant = transaction.etudiantNom || 'Un étudiant';
+            
+            let fichesText = '';
+            if (transaction.fiches && Array.isArray(transaction.fiches) && transaction.fiches.length > 0) {
+                const fichesNoms = transaction.fiches.map(f => f.nom || f.id).filter(n => n);
+                if (fichesNoms.length > 0) {
+                    const fichesAffichees = fichesNoms.slice(0, 3);
+                    fichesText = `\n📋 ${fichesAffichees.join(', ')}`;
+                    if (fichesNoms.length > 3) {
+                        fichesText += ` et ${fichesNoms.length - 3} autre(s)`;
+                    }
+                }
             }
+            
+            const messageToast = `💰 ${etudiant} a payé ${montant} FC${fichesText ? '\n' + fichesText : ''}`;
+            showToast(messageToast, 'success');
+            
+            if (Notification.permission === 'granted') {
+                new Notification('Nouveau paiement', { 
+                    body: `💰 ${etudiant} a payé ${montant} FC`, 
+                    icon: '/icon-192x192.png', 
+                    vibrate: [200, 100, 200]
+                });
+            }
+            
+            if (notificationSound) notificationSound.play().catch(e => console.log('Son non joué'));
         }
-    }
-    
-    // Récupérer la promotion
-    const promoNom = transaction.promotionNom || 
-        (transaction.promotion ? (allPromotions.find(p => p.id === transaction.promotion)?.nom || '') : '');
-    
-    // Message complet pour le toast
-    const messageToast = `💰 ${etudiant} a payé ${montant} FC${fichesText ? '\n' + fichesText : ''}`;
-    showToast(messageToast, 'success');
-    
-    // Message pour la notification système (plus concis)
-    const messageNotif = `💰 ${etudiant} a payé ${montant} FC${fichesText ? ' - ' + fichesText.replace('\n', '') : ''}`;
-    
-    if (Notification.permission === 'granted') {
-        new Notification('Nouveau paiement', { 
-            body: messageNotif, 
-            icon: '/icon-192x192.png', 
-            vibrate: [200, 100, 200],
-            // Ajouter des données supplémentaires
-            data: {
-                transactionId: transaction.id,
-                montant: montant,
-                etudiant: etudiant
-            }
-        });
-    }
-    
-    if (notificationSound) notificationSound.play().catch(e => console.log('Son non joué'));
-}
+        
         function requestNotificationPermission() {
             if ('Notification' in window && Notification.permission === 'default') {
                 const banner = document.createElement('div');
@@ -1765,27 +1832,6 @@
                 document.getElementById('enableNotifBtn')?.addEventListener('click', () => { Notification.requestPermission(); banner.remove(); });
                 document.getElementById('laterNotifBtn')?.addEventListener('click', () => banner.remove());
             }
-        }
-        
-        function listenNewTransactions() {
-            db.collection('transactions').orderBy('date', 'desc').limit(20).onSnapshot((snapshot) => {
-                snapshot.docChanges().forEach((change) => {
-                    if (change.type === 'added') {
-                        const transaction = change.doc.data();
-                        const transactionId = change.doc.id;
-                        const notifKey = `notif_${transactionId}`;
-                        const alreadyShown = localStorage.getItem(notifKey);
-                        const transactionDate = transaction.date?.toDate() || new Date();
-                        const diffMinutes = (new Date() - transactionDate) / 1000 / 60;
-                        if (!alreadyShown && diffMinutes < 2) {
-                            localStorage.setItem(notifKey, Date.now().toString());
-                            showRealTimeNotification(transaction);
-                        }
-                    }
-                });
-                mettreAJourStatsHeader();
-                chargerPaiementsRecents();
-            }, (error) => console.error('Erreur écoute transactions:', error));
         }
         
         async function mettreAJourStatsHeader() {
@@ -1805,69 +1851,155 @@
             } catch(e) { console.error(e); }
         }
         
-        // ========== SETUP LISTENERS ==========
+        // ========== FONCTIONS D'ACTUALISATION PAR COLLECTION ==========
+        async function refreshAnnees() {
+            const btn = document.getElementById('refreshAnneesBtn');
+            if(btn) { btn.disabled = true; btn.innerHTML = '<div class="loading-spinner" style="width:16px;height:16px;"></div>'; }
+            try {
+                allAnnees = await staticCache.refreshCollection('anneesAcademiques');
+                lastUpdates.annees = Date.now();
+                chargerAnneesListe();
+                chargerAnneesSelect();
+                chargerJournalierAnneesSelect();
+                updateLastUpdateDisplay('annee');
+                showToast('✅ Années académiques actualisées', 'success');
+            } catch(e) { showToast('Erreur lors de l\'actualisation', 'error'); }
+            finally { if(btn) { btn.disabled = false; btn.innerHTML = '<i class="bi bi-arrow-repeat"></i> Actualiser'; } }
+        }
         
+        async function refreshComptes() {
+            const btn = document.getElementById('refreshComptesBtn');
+            if(btn) { btn.disabled = true; btn.innerHTML = '<div class="loading-spinner" style="width:16px;height:16px;"></div>'; }
+            try {
+                const data = await staticCache.refreshCollection('utilisateurs');
+                allUtilisateurs = data.filter(u => u.role === 'comptabilite');
+                lastUpdates.comptes = Date.now();
+                chargerComptesListe();
+                updateLastUpdateDisplay('compte');
+                showToast('✅ Comptes actualisés', 'success');
+            } catch(e) { showToast('Erreur lors de l\'actualisation', 'error'); }
+            finally { if(btn) { btn.disabled = false; btn.innerHTML = '<i class="bi bi-arrow-repeat"></i> Actualiser'; } }
+        }
+        
+        async function refreshPromotions() {
+            const btn = document.getElementById('refreshPromotionsBtn');
+            if(btn) { btn.disabled = true; btn.innerHTML = '<div class="loading-spinner" style="width:16px;height:16px;"></div>'; }
+            try {
+                allPromotions = await staticCache.refreshCollection('promotions');
+                lastUpdates.promotions = Date.now();
+                chargerPromotionsSelects();
+                chargerPromotionsListe();
+                afficherBoutonsPromotions();
+                updateLastUpdateDisplay('promotion');
+                showToast('✅ Promotions actualisées', 'success');
+            } catch(e) { showToast('Erreur lors de l\'actualisation', 'error'); }
+            finally { if(btn) { btn.disabled = false; btn.innerHTML = '<i class="bi bi-arrow-repeat"></i> Actualiser'; } }
+        }
+        
+        async function refreshFiches() {
+            const btn = document.getElementById('refreshFichesBtn');
+            if(btn) { btn.disabled = true; btn.innerHTML = '<div class="loading-spinner" style="width:16px;height:16px;"></div>'; }
+            try {
+                allFiches = await staticCache.refreshCollection('fiches');
+                lastUpdates.fiches = Date.now();
+                chargerFichesListe();
+                chargerFichesSelect();
+                updateLastUpdateDisplay('fiche');
+                showToast('✅ Fiches actualisées', 'success');
+            } catch(e) { showToast('Erreur lors de l\'actualisation', 'error'); }
+            finally { if(btn) { btn.disabled = false; btn.innerHTML = '<i class="bi bi-arrow-repeat"></i> Actualiser'; } }
+        }
+        
+        async function refreshEtudiants() {
+            const btn = document.getElementById('refreshEtudiantsBtn');
+            if(btn) { btn.disabled = true; btn.innerHTML = '<div class="loading-spinner" style="width:16px;height:16px;"></div>'; }
+            try {
+                allEtudiants = await staticCache.refreshCollection('etudiants');
+                lastUpdates.etudiants = Date.now();
+                afficherBoutonsPromotions();
+                if(currentSelectedPromotion) afficherEtudiantsParPromotion(currentSelectedPromotion);
+                chargerPromotionsListe();
+                updateLastUpdateDisplay('etudiant');
+                showToast('✅ Étudiants actualisés', 'success');
+            } catch(e) { showToast('Erreur lors de l\'actualisation', 'error'); }
+            finally { if(btn) { btn.disabled = false; btn.innerHTML = '<i class="bi bi-arrow-repeat"></i> Actualiser'; } }
+        }
+        
+        // ========== SETUP DES ÉCOUTEURS ==========
         function setupRealtimeListeners() {
-            let promotionsLoaded = false;
-            let etudiantsLoaded = false;
+            // ✅ TRANSACTIONS - GARDER onSnapshot (TEMPS RÉEL)
+            db.collection('transactions').orderBy('date', 'desc').limit(50).onSnapshot((snapshot) => {
+                allTransactions = [];
+                snapshot.forEach(doc => allTransactions.push({ id: doc.id, ...doc.data() }));
+                mettreAJourStatsHeader();
+                
+                snapshot.docChanges().forEach((change) => {
+                    if (change.type === 'added') {
+                        const transaction = change.doc.data();
+                        const transactionId = change.doc.id;
+                        const notifKey = `notif_${transactionId}`;
+                        const alreadyShown = localStorage.getItem(notifKey);
+                        const transactionDate = transaction.date?.toDate() || new Date();
+                        const diffMinutes = (new Date() - transactionDate) / 1000 / 60;
+                        if (!alreadyShown && diffMinutes < 2) {
+                            localStorage.setItem(notifKey, Date.now().toString());
+                            showRealTimeNotification(transaction);
+                        }
+                    }
+                });
+                
+                const paiementsPanel = document.getElementById('panel-paiementsRecents');
+                if(paiementsPanel && paiementsPanel.classList.contains('active')) {
+                    chargerPaiementsRecents();
+                }
+            }, (error) => console.error('Erreur écoute transactions:', error));
             
-            db.collection('anneesAcademiques').onSnapshot(snapshot => {
-                allAnnees = [];
-                snapshot.forEach(doc => allAnnees.push({ id: doc.id, ...doc.data() }));
+            // ✅ DONNÉES STATIQUES - Chargement initial depuis cache
+            staticCache.getCollection('anneesAcademiques').then(data => {
+                allAnnees = data;
+                lastUpdates.annees = Date.now();
                 chargerAnneesListe();
                 chargerAnneesSelect();
                 chargerJournalierAnneesSelect();
                 mettreAJourStatsHeader();
+                updateLastUpdateDisplay('annee');
             });
             
-            db.collection('transactions').onSnapshot(snapshot => {
-                allTransactions = [];
-                snapshot.forEach(doc => allTransactions.push({ id: doc.id, ...doc.data() }));
-                mettreAJourStatsHeader();
-                const paiementsPanel = document.getElementById('panel-paiementsRecents');
-                if(paiementsPanel && paiementsPanel.classList.contains('active')) chargerPaiementsRecents();
-            });
-            
-            db.collection('utilisateurs').where('role', '==', 'comptabilite').onSnapshot(snapshot => {
-                allUtilisateurs = [];
-                snapshot.forEach(doc => allUtilisateurs.push({ id: doc.id, ...doc.data() }));
-                chargerComptesListe();
-            });
-            
-            db.collection('fiches').onSnapshot(snapshot => {
-                allFiches = [];
-                snapshot.forEach(doc => allFiches.push({ id: doc.id, ...doc.data() }));
-                if(allPromotions.length > 0) chargerFichesListe();
-                chargerFichesSelect();
-            });
-            
-            db.collection('promotions').onSnapshot(snapshot => {
-                allPromotions = [];
-                snapshot.forEach(doc => allPromotions.push({ id: doc.id, ...doc.data() }));
-                promotionsLoaded = true;
+            staticCache.getCollection('promotions').then(data => {
+                allPromotions = data;
+                lastUpdates.promotions = Date.now();
                 chargerPromotionsSelects();
-                if(allFiches.length > 0) chargerFichesListe();
-                if(etudiantsLoaded) {
-                    chargerPromotionsListe();
-                    afficherBoutonsPromotions();
-                    if(currentSelectedPromotion !== undefined) afficherEtudiantsParPromotion(currentSelectedPromotion);
-                } else {
-                    chargerPromotionsListeSansEtudiants();
-                }
+                chargerPromotionsListe();
+                afficherBoutonsPromotions();
+                updateLastUpdateDisplay('promotion');
             });
             
-            db.collection('etudiants').onSnapshot(snapshot => {
-                allEtudiants = [];
-                snapshot.forEach(doc => allEtudiants.push({ id: doc.id, ...doc.data() }));
-                etudiantsLoaded = true;
-                if(promotionsLoaded) chargerPromotionsListe();
+            staticCache.getCollection('fiches').then(data => {
+                allFiches = data;
+                lastUpdates.fiches = Date.now();
+                chargerFichesListe();
+                chargerFichesSelect();
+                updateLastUpdateDisplay('fiche');
+            });
+            
+            staticCache.getCollection('etudiants').then(data => {
+                allEtudiants = data;
+                lastUpdates.etudiants = Date.now();
                 afficherBoutonsPromotions();
-                if(currentSelectedPromotion !== undefined) afficherEtudiantsParPromotion(currentSelectedPromotion);
-                else afficherEtudiantsParPromotion(null);
+                if(currentSelectedPromotion) afficherEtudiantsParPromotion(currentSelectedPromotion);
+                chargerPromotionsListe();
+                updateLastUpdateDisplay('etudiant');
+            });
+            
+            staticCache.getCollection('utilisateurs').then(data => {
+                allUtilisateurs = data.filter(u => u.role === 'comptabilite');
+                lastUpdates.comptes = Date.now();
+                chargerComptesListe();
+                updateLastUpdateDisplay('compte');
             });
         }
         
-        // Configuration des recherches
+        // ========== CONFIGURATION DES RECHERCHES ==========
         document.getElementById('searchAnnee')?.addEventListener('input', (e) => {
             anneeSearchTerm = e.target.value;
             document.getElementById('clearSearchAnnee').style.display = anneeSearchTerm ? 'block' : 'none';
@@ -1916,7 +2048,19 @@
             chargerFichesListe();
         });
         
-        // Exports
+        document.getElementById('searchEtudiant')?.addEventListener('input', (e) => {
+            currentSearchTerm = e.target.value;
+            document.getElementById('clearSearch').style.display = currentSearchTerm ? 'block' : 'none';
+            afficherEtudiantsParPromotion(currentSelectedPromotion);
+        });
+        document.getElementById('clearSearch')?.addEventListener('click', () => {
+            document.getElementById('searchEtudiant').value = '';
+            currentSearchTerm = '';
+            document.getElementById('clearSearch').style.display = 'none';
+            afficherEtudiantsParPromotion(currentSelectedPromotion);
+        });
+        
+        // ========== EXPORTS ==========
         document.getElementById('exportAnneeExcelBtn')?.addEventListener('click', () => {
             let data = [...allAnnees];
             if(anneeSearchTerm) {
@@ -1941,8 +2085,6 @@
                 const term = promotionSearchTerm.toLowerCase();
                 data = data.filter(p => (p.nom || '').toLowerCase().includes(term));
             }
-            const promoMap = {};
-            allPromotions.forEach(p => promoMap[p.id] = p.nom);
             exporterListe(data.map(p => ({ 'Nom': p.nom, 'Capacité': p.capacite || '-', 'Étudiants': allEtudiants.filter(e => e.promotion === p.id).length })), 'promotions');
         });
         
@@ -1957,8 +2099,18 @@
             exporterListe(data.map(f => ({ 'Nom': f.nom, 'Montant': f.montant || 0, 'Promotions': (f.promotions || []).map(pid => promoMap[pid] || pid).join(', ') })), 'fiches');
         });
         
-        // ========== MENUS ==========
+        document.getElementById('exportExcelBtn')?.addEventListener('click', () => exporterEtudiants('excel'));
+        document.getElementById('exportCsvBtn')?.addEventListener('click', () => exporterEtudiants('csv'));
         
+        // ========== BOUTONS D'ACTUALISATION ==========
+        document.getElementById('refreshAnneesBtn')?.addEventListener('click', refreshAnnees);
+        document.getElementById('refreshComptesBtn')?.addEventListener('click', refreshComptes);
+        document.getElementById('refreshPromotionsBtn')?.addEventListener('click', refreshPromotions);
+        document.getElementById('refreshFichesBtn')?.addEventListener('click', refreshFiches);
+        document.getElementById('refreshEtudiantsBtn')?.addEventListener('click', refreshEtudiants);
+        document.getElementById('refreshPaiementsBtn')?.addEventListener('click', () => chargerPaiementsRecents());
+        
+        // ========== MENUS ==========
         document.querySelectorAll('.menu-card').forEach(card => {
             card.addEventListener('click', () => {
                 document.getElementById('homePage').style.display = 'none';
@@ -1974,10 +2126,8 @@
         });
         
         document.getElementById('homeBrand')?.addEventListener('click', (e) => { e.preventDefault(); goHome(); });
-        document.getElementById('refreshPaiementsBtn')?.addEventListener('click', () => { chargerPaiementsRecents(); });
         
         // ========== SESSION & PROFIL ==========
-        
         const session = localStorage.getItem('session_doyen');
         if(!session) window.location.href = 'login-doyen.html';
         const sessionData = JSON.parse(session);
@@ -2012,24 +2162,8 @@
             window.location.href = 'login-doyen.html';
         });
         
-        document.getElementById('searchEtudiant')?.addEventListener('input', (e) => {
-            currentSearchTerm = e.target.value;
-            document.getElementById('clearSearch').style.display = currentSearchTerm ? 'block' : 'none';
-            afficherEtudiantsParPromotion(currentSelectedPromotion);
-        });
-        document.getElementById('clearSearch')?.addEventListener('click', () => {
-            document.getElementById('searchEtudiant').value = '';
-            currentSearchTerm = '';
-            document.getElementById('clearSearch').style.display = 'none';
-            afficherEtudiantsParPromotion(currentSelectedPromotion);
-        });
-        document.getElementById('exportExcelBtn')?.addEventListener('click', () => exporterEtudiants('excel'));
-        document.getElementById('exportCsvBtn')?.addEventListener('click', () => exporterEtudiants('csv'));
-        
         // ========== INITIALISATION ==========
-        
         initNotificationSound();
-        listenNewTransactions();
         setupRealtimeListeners();
         
         setTimeout(() => requestNotificationPermission(), 5000);
@@ -2042,7 +2176,7 @@
             });
         }
         
-        console.log('✅ Dashboard Doyen - Version complète avec recherche et rapport journalier');
+        console.log('✅ Dashboard Doyen - Version optimisée avec cache et boutons d\'actualisation par collection');
     </script>
 </body>
 </html>
