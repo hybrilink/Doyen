@@ -891,33 +891,15 @@
             showToast('🔴 Mode hors-ligne - Données en cache', 'warning');
         });
         
-       function showToast(message, type = 'success') {
-    const container = document.getElementById('toastContainer');
-    const bgColor = type === 'success' ? '#28a745' : (type === 'warning' ? '#ffc107' : '#dc3545');
-    const textColor = type === 'warning' ? '#333' : 'white';
-    const icon = type === 'success' ? 'check-circle-fill' : (type === 'warning' ? 'exclamation-triangle-fill' : 'x-circle-fill');
-    
-    // Convertir les sauts de ligne en <br> pour l'affichage HTML
-    const messageHtml = message.replace(/\n/g, '<br>');
-    
-    const toastHtml = `<div class="toast notification-toast" style="background: ${bgColor}; color: ${textColor}; border-radius: 10px; margin-bottom: 10px;">
-        <div class="toast-body">
-            <div style="display: flex; align-items: flex-start;">
-                <i class="bi bi-${icon} me-2" style="font-size: 20px;"></i>
-                <div>${messageHtml}</div>
-            </div>
-        </div>
-    </div>`;
-    container.insertAdjacentHTML('afterbegin', toastHtml);
-    setTimeout(() => {
-        const firstToast = container.firstElementChild;
-        if (firstToast) {
-            firstToast.style.transition = 'opacity 0.3s';
-            firstToast.style.opacity = '0';
-            setTimeout(() => firstToast.remove(), 300);
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const bgColor = type === 'success' ? '#28a745' : (type === 'warning' ? '#ffc107' : '#dc3545');
+            const textColor = type === 'warning' ? '#333' : 'white';
+            const icon = type === 'success' ? 'check-circle-fill' : (type === 'warning' ? 'exclamation-triangle-fill' : 'x-circle-fill');
+            const toastHtml = `<div class="toast notification-toast" style="background: ${bgColor}; color: ${textColor}; border-radius: 10px; margin-bottom: 10px;"><div class="toast-body"><i class="bi bi-${icon} me-2"></i>${message}</div></div>`;
+            container.insertAdjacentHTML('afterbegin', toastHtml);
+            setTimeout(() => container.firstElementChild?.remove(), 4000);
         }
-    }, 5000); // Augmenté à 5 secondes pour avoir le temps de lire
-}
         
         function escapeHtml(t) { if(!t) return ''; const d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
         
@@ -1054,20 +1036,27 @@
     const promoMap = {};
     allPromotions.forEach(p => promoMap[p.id] = p.nom);
     let html = '<div class="table-responsive"><table class="table table-bordered" id="fichesTable"><thead><tr><th>Nom fiche</th><th>Montant</th><th>Promotions concernées</th></tr></thead><tbody>';
+    
     filtrees.forEach(f => {
         let promotionsText = '';
         if(f.promotions && Array.isArray(f.promotions)) {
-            // MODIFICATION ICI : Filtrer les IDs qui n'ont pas de nom correspondant
-            const promoNoms = f.promotions.map(pid => promoMap[pid]).filter(p => p && p.trim() !== '');
-            promotionsText = promoNoms.join(', ');
+            // Ne garder que les IDs qui existent dans promoMap
+            const validPromoNoms = f.promotions
+                .map(pid => promoMap[pid])
+                .filter(nom => nom !== undefined); // Filtre les IDs qui n'ont pas de nom correspondant
+            promotionsText = validPromoNoms.join(', ');
         } else if(f.promotion) {
             promotionsText = promoMap[f.promotion] || '';
         }
-        // Si aucune promotion valide n'est trouvée, afficher un tiret
-        if(!promotionsText) promotionsText = '-';
         
-        html += `<tr><td><strong>${escapeHtml(f.nom)}</strong></td><td>${(f.montant || 0).toLocaleString()} FC</td><td>${escapeHtml(promotionsText)}</td></tr>`;
+        if(promotionsText === '') promotionsText = 'Aucune promotion associée';
+        
+        html += `<tr><td><strong>${escapeHtml(f.nom)}</strong></td>
+                 <td>${(f.montant || 0).toLocaleString()} FC</td>
+                 <td>${escapeHtml(promotionsText)}</td>
+                 </tr>`;
     });
+    
     html += '</tbody></table></div>';
     container.innerHTML = html;
 }
@@ -1325,105 +1314,49 @@
         // ========== ÉTUDIANTS ==========
         
         function afficherBoutonsPromotions() {
-    const container = document.getElementById('promotionButtons');
-    if(!container) return;
-    if(allPromotions.length === 0) { 
-        container.innerHTML = '<div class="alert alert-info">Aucune promotion</div>'; 
-        return; 
-    }
-    
-    // ✅ AFFICHE LES BOUTONS DES PROMOTIONS
-    let html = '';
-    allPromotions.forEach(p => {
-        const count = allEtudiants.filter(e => e.promotion === p.id).length;
-        html += `<button class="promotion-btn" data-promo="${p.id}">📚 ${escapeHtml(p.nom)} <span class="badge bg-secondary">${count}</span></button>`;
-    });
-    container.innerHTML = html;
-    
-    // ✅ AFFICHE LE MESSAGE D'INVITATION (pas la liste)
-    document.getElementById('etudiantsListe').innerHTML = `
-        <div class="text-center py-5" style="background: #f8f9fa; border-radius: 15px;">
-            <i class="bi bi-arrow-up-circle" style="font-size: 48px; color: #003366; opacity: 0.5;"></i>
-            <h5 class="mt-3" style="color: #003366;">Sélectionnez une promotion</h5>
-            <p class="text-muted">Cliquez sur une promotion ci-dessus pour afficher la liste des étudiants</p>
-        </div>
-    `;
-    
-    // Événements sur les boutons
-    document.querySelectorAll('.promotion-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            document.querySelectorAll('.promotion-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            currentSelectedPromotion = btn.dataset.promo;
-            currentSearchTerm = '';
-            const si = document.getElementById('searchEtudiant');
-            if(si) si.value = '';
-            document.getElementById('clearSearch').style.display = 'none';
-            afficherEtudiantsParPromotion(currentSelectedPromotion); // ✅ Affiche la liste SEULEMENT au clic
-        });
-    });
-}
+            const container = document.getElementById('promotionButtons');
+            if(!container) return;
+            if(allPromotions.length === 0) { container.innerHTML = '<div class="alert alert-info">Aucune promotion</div>'; return; }
+            let html = '<button class="promotion-btn" data-promo="all">📋 Tous</button>';
+            allPromotions.forEach(p => {
+                const count = allEtudiants.filter(e => e.promotion === p.id).length;
+                html += `<button class="promotion-btn" data-promo="${p.id}">📚 ${escapeHtml(p.nom)} <span class="badge bg-secondary">${count}</span></button>`;
+            });
+            container.innerHTML = html;
+            document.querySelectorAll('.promotion-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.promotion-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    currentSelectedPromotion = btn.dataset.promo === 'all' ? null : btn.dataset.promo;
+                    currentSearchTerm = '';
+                    const si = document.getElementById('searchEtudiant');
+                    if(si) si.value = '';
+                    document.getElementById('clearSearch').style.display = 'none';
+                    afficherEtudiantsParPromotion(currentSelectedPromotion);
+                });
+            });
+        }
+        
         function afficherEtudiantsParPromotion(promoId) {
-    // Si pas de promotion sélectionnée
-    if(!promoId) {
-        document.getElementById('etudiantsListe').innerHTML = `
-            <div class="text-center py-5" style="background: #f8f9fa; border-radius: 15px;">
-                <i class="bi bi-arrow-up-circle" style="font-size: 48px; color: #003366; opacity: 0.5;"></i>
-                <h5 class="mt-3" style="color: #003366;">Sélectionnez une promotion</h5>
-                <p class="text-muted">Cliquez sur une promotion ci-dessus pour afficher la liste des étudiants</p>
-            </div>
-        `;
-        return;
-    }
-    
-    let filtres = allEtudiants.filter(e => e.promotion === promoId);
-    
-    if(currentSearchTerm) {
-        const s = currentSearchTerm.toLowerCase();
-        filtres = filtres.filter(e => e.nom?.toLowerCase().includes(s));
-    }
-    
-    const promoMap = {};
-    allPromotions.forEach(p => promoMap[p.id] = p.nom);
-    const promoNom = promoMap[promoId] || promoId;
-    
-    if(filtres.length === 0) {
-        document.getElementById('etudiantsListe').innerHTML = `
-            <div class="alert alert-info">
-                <i class="bi bi-info-circle"></i> 
-                Aucun étudiant trouvé dans la promotion "${escapeHtml(promoNom)}"
-                ${currentSearchTerm ? ' pour la recherche "' + escapeHtml(currentSearchTerm) + '"' : ''}
-            </div>`;
-        return;
-    }
-    
-    let html = `
-        <div class="mb-3">
-            <h5><i class="bi bi-trophy-fill" style="color: #003366;"></i> Promotion : ${escapeHtml(promoNom)}</h5>
-            <div class="text-muted"><i class="bi bi-people-fill"></i> ${filtres.length} étudiant(s)</div>
-        </div>
-        <div class="table-responsive">
-            <table class="etudiants-table" id="etudiantsTable">
-                <thead>
-                    <tr>
-                        <th>N°</th>
-                        <th>Matricule</th>
-                        <th>Nom</th>
-                    </tr>
-                </thead>
-                <tbody>`;
-    
-    filtres.forEach((e, idx) => {
-        html += `<tr>
-            <td>${idx+1}</td>
-            <td><span style="font-family:monospace;">${escapeHtml(e.matricule || e.id.substring(0,8))}</span></td>
-            <td><strong>${escapeHtml(e.nom)}</strong></td>
-        </tr>`;
-    });
-    
-    html += `</tbody></table></div>`;
-    document.getElementById('etudiantsListe').innerHTML = html;
-}
+            let filtres = promoId === null ? [...allEtudiants] : allEtudiants.filter(e => e.promotion === promoId);
+            if(currentSearchTerm) {
+                const s = currentSearchTerm.toLowerCase();
+                filtres = filtres.filter(e => e.nom?.toLowerCase().includes(s));
+            }
+            const promoMap = {};
+            allPromotions.forEach(p => promoMap[p.id] = p.nom);
+            if(filtres.length === 0) {
+                document.getElementById('etudiantsListe').innerHTML = '<div class="alert alert-info">Aucun étudiant trouvé</div>';
+                return;
+            }
+            let html = `<div class="mb-2 text-muted"><i class="bi bi-people-fill"></i> ${filtres.length} étudiant(s)</div>
+            <div class="table-responsive"><table class="etudiants-table" id="etudiantsTable"><thead><tr><th>N°</th><th>Matricule</th><th>Nom</th><th>Promotion</th></tr></thead><tbody>`;
+            filtres.forEach((e, idx) => {
+                html += `<tr><td>${idx+1}</td><td><span style="font-family:monospace;">${e.matricule || e.id.substring(0,8)}</span></td><td><strong>${escapeHtml(e.nom)}</strong></td><td>${escapeHtml(promoMap[e.promotion] || '-')}</td></tr>`;
+            });
+            html += `</tbody></table></div>`;
+            document.getElementById('etudiantsListe').innerHTML = html;
+        }
         
         function exporterEtudiants(format) {
             let data = currentSelectedPromotion === null ? [...allEtudiants] : allEtudiants.filter(e => e.promotion === currentSelectedPromotion);
@@ -1709,51 +1642,17 @@
             } catch(e) {}
         }
         
-       function showRealTimeNotification(transaction) {
-    const montant = (transaction.montantTotal || 0).toLocaleString();
-    const etudiant = transaction.etudiantNom || 'Un étudiant';
-    
-    // Récupérer les noms des fiches payées
-    let fichesText = '';
-    if (transaction.fiches && Array.isArray(transaction.fiches) && transaction.fiches.length > 0) {
-        const fichesNoms = transaction.fiches.map(f => f.nom || f.id).filter(n => n);
-        if (fichesNoms.length > 0) {
-            // Limiter à 3 fiches maximum pour ne pas surcharger la notification
-            const fichesAffichees = fichesNoms.slice(0, 3);
-            fichesText = `\n📋 ${fichesAffichees.join(', ')}`;
-            if (fichesNoms.length > 3) {
-                fichesText += ` et ${fichesNoms.length - 3} autre(s)`;
+        function showRealTimeNotification(transaction) {
+            const montant = (transaction.montantTotal || 0).toLocaleString();
+            const etudiant = transaction.etudiantNom || 'Un étudiant';
+            const message = `💰 ${etudiant} a payé ${montant} FC`;
+            showToast(message, 'success');
+            if (Notification.permission === 'granted') {
+                new Notification('Nouveau paiement', { body: message, icon: '/icon-192x192.png', vibrate: [200,100,200] });
             }
+            if (notificationSound) notificationSound.play().catch(e => console.log('Son non joué'));
         }
-    }
-    
-    // Récupérer la promotion
-    const promoNom = transaction.promotionNom || 
-        (transaction.promotion ? (allPromotions.find(p => p.id === transaction.promotion)?.nom || '') : '');
-    
-    // Message complet pour le toast
-    const messageToast = `💰 ${etudiant} a payé ${montant} FC${fichesText ? '\n' + fichesText : ''}`;
-    showToast(messageToast, 'success');
-    
-    // Message pour la notification système (plus concis)
-    const messageNotif = `💰 ${etudiant} a payé ${montant} FC${fichesText ? ' - ' + fichesText.replace('\n', '') : ''}`;
-    
-    if (Notification.permission === 'granted') {
-        new Notification('Nouveau paiement', { 
-            body: messageNotif, 
-            icon: '/icon-192x192.png', 
-            vibrate: [200, 100, 200],
-            // Ajouter des données supplémentaires
-            data: {
-                transactionId: transaction.id,
-                montant: montant,
-                etudiant: etudiant
-            }
-        });
-    }
-    
-    if (notificationSound) notificationSound.play().catch(e => console.log('Son non joué'));
-}
+        
         function requestNotificationPermission() {
             if ('Notification' in window && Notification.permission === 'default') {
                 const banner = document.createElement('div');
@@ -2045,4 +1944,4 @@
         console.log('✅ Dashboard Doyen - Version complète avec recherche et rapport journalier');
     </script>
 </body>
-</html>
+</html> 
