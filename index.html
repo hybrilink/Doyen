@@ -891,15 +891,33 @@
             showToast('🔴 Mode hors-ligne - Données en cache', 'warning');
         });
         
-        function showToast(message, type = 'success') {
-            const container = document.getElementById('toastContainer');
-            const bgColor = type === 'success' ? '#28a745' : (type === 'warning' ? '#ffc107' : '#dc3545');
-            const textColor = type === 'warning' ? '#333' : 'white';
-            const icon = type === 'success' ? 'check-circle-fill' : (type === 'warning' ? 'exclamation-triangle-fill' : 'x-circle-fill');
-            const toastHtml = `<div class="toast notification-toast" style="background: ${bgColor}; color: ${textColor}; border-radius: 10px; margin-bottom: 10px;"><div class="toast-body"><i class="bi bi-${icon} me-2"></i>${message}</div></div>`;
-            container.insertAdjacentHTML('afterbegin', toastHtml);
-            setTimeout(() => container.firstElementChild?.remove(), 4000);
+       function showToast(message, type = 'success') {
+    const container = document.getElementById('toastContainer');
+    const bgColor = type === 'success' ? '#28a745' : (type === 'warning' ? '#ffc107' : '#dc3545');
+    const textColor = type === 'warning' ? '#333' : 'white';
+    const icon = type === 'success' ? 'check-circle-fill' : (type === 'warning' ? 'exclamation-triangle-fill' : 'x-circle-fill');
+    
+    // Convertir les sauts de ligne en <br> pour l'affichage HTML
+    const messageHtml = message.replace(/\n/g, '<br>');
+    
+    const toastHtml = `<div class="toast notification-toast" style="background: ${bgColor}; color: ${textColor}; border-radius: 10px; margin-bottom: 10px;">
+        <div class="toast-body">
+            <div style="display: flex; align-items: flex-start;">
+                <i class="bi bi-${icon} me-2" style="font-size: 20px;"></i>
+                <div>${messageHtml}</div>
+            </div>
+        </div>
+    </div>`;
+    container.insertAdjacentHTML('afterbegin', toastHtml);
+    setTimeout(() => {
+        const firstToast = container.firstElementChild;
+        if (firstToast) {
+            firstToast.style.transition = 'opacity 0.3s';
+            firstToast.style.opacity = '0';
+            setTimeout(() => firstToast.remove(), 300);
         }
+    }, 5000); // Augmenté à 5 secondes pour avoir le temps de lire
+}
         
         function escapeHtml(t) { if(!t) return ''; const d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
         
@@ -1691,17 +1709,51 @@
             } catch(e) {}
         }
         
-        function showRealTimeNotification(transaction) {
-            const montant = (transaction.montantTotal || 0).toLocaleString();
-            const etudiant = transaction.etudiantNom || 'Un étudiant';
-            const message = `💰 ${etudiant} a payé ${montant} FC`;
-            showToast(message, 'success');
-            if (Notification.permission === 'granted') {
-                new Notification('Nouveau paiement', { body: message, icon: '/icon-192x192.png', vibrate: [200,100,200] });
+       function showRealTimeNotification(transaction) {
+    const montant = (transaction.montantTotal || 0).toLocaleString();
+    const etudiant = transaction.etudiantNom || 'Un étudiant';
+    
+    // Récupérer les noms des fiches payées
+    let fichesText = '';
+    if (transaction.fiches && Array.isArray(transaction.fiches) && transaction.fiches.length > 0) {
+        const fichesNoms = transaction.fiches.map(f => f.nom || f.id).filter(n => n);
+        if (fichesNoms.length > 0) {
+            // Limiter à 3 fiches maximum pour ne pas surcharger la notification
+            const fichesAffichees = fichesNoms.slice(0, 3);
+            fichesText = `\n📋 ${fichesAffichees.join(', ')}`;
+            if (fichesNoms.length > 3) {
+                fichesText += ` et ${fichesNoms.length - 3} autre(s)`;
             }
-            if (notificationSound) notificationSound.play().catch(e => console.log('Son non joué'));
         }
-        
+    }
+    
+    // Récupérer la promotion
+    const promoNom = transaction.promotionNom || 
+        (transaction.promotion ? (allPromotions.find(p => p.id === transaction.promotion)?.nom || '') : '');
+    
+    // Message complet pour le toast
+    const messageToast = `💰 ${etudiant} a payé ${montant} FC${fichesText ? '\n' + fichesText : ''}`;
+    showToast(messageToast, 'success');
+    
+    // Message pour la notification système (plus concis)
+    const messageNotif = `💰 ${etudiant} a payé ${montant} FC${fichesText ? ' - ' + fichesText.replace('\n', '') : ''}`;
+    
+    if (Notification.permission === 'granted') {
+        new Notification('Nouveau paiement', { 
+            body: messageNotif, 
+            icon: '/icon-192x192.png', 
+            vibrate: [200, 100, 200],
+            // Ajouter des données supplémentaires
+            data: {
+                transactionId: transaction.id,
+                montant: montant,
+                etudiant: etudiant
+            }
+        });
+    }
+    
+    if (notificationSound) notificationSound.play().catch(e => console.log('Son non joué'));
+}
         function requestNotificationPermission() {
             if ('Notification' in window && Notification.permission === 'default') {
                 const banner = document.createElement('div');
