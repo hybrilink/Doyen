@@ -1126,38 +1126,68 @@
         
         // ========== SYSTÈME DE CACHE ==========
         class StaticDataCache {
-            constructor() {
-                this.cache = {};
-                this.CACHE_DURATION = 5 * 60 * 1000;
-            }
-            
-            async getCollection(collectionName, forceRefresh = false) {
-                const now = Date.now();
-                if (!forceRefresh && this.cache[collectionName] && 
-                    now - this.cache[collectionName].timestamp < this.CACHE_DURATION) {
-                    console.log(`📦 Cache utilisé pour ${collectionName}`);
-                    return this.cache[collectionName].data;
-                }
-                return this.refreshCollection(collectionName);
-            }
-            
-            async refreshCollection(collectionName) {
-                const cachedData = this.cache[collectionName]?.data;
-                if (cachedData && cachedData.length > 0) {
-                    console.log(`📦 Cache utilisé pour ${collectionName}`);
-                    return cachedData;
-                }
-                try {
-                    const snapshot = await db.collection(collectionName).get({ source: 'cache' });
-                    let data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                    this.cache[collectionName] = { data: data, timestamp: Date.now() };
-                    return data;
-                } catch (error) {
-                    console.warn(`Erreur chargement ${collectionName}:`, error);
-                    return [];
-                }
-            }
+    constructor() {
+        this.cache = {};
+        this.CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+    }
+    
+    async getCollection(collectionName, forceRefresh = false) {
+        const now = Date.now();
+        
+        // Si le cache est valide et qu'on ne force pas le rafraîchissement
+        if (!forceRefresh && this.cache[collectionName] && 
+            now - this.cache[collectionName].timestamp < this.CACHE_DURATION) {
+            console.log(`📦 Cache utilisé pour ${collectionName} (${Math.round((now - this.cache[collectionName].timestamp)/1000)}s)`);
+            return this.cache[collectionName].data;
         }
+        
+        // Sinon, charger depuis Firestore
+        return this.refreshCollection(collectionName);
+    }
+    
+    async refreshCollection(collectionName) {
+        try {
+            console.log(`🔄 Chargement depuis Firestore: ${collectionName}`);
+            
+            // Essayer d'abord depuis le cache Firestore (données locales)
+            let snapshot;
+            try {
+                snapshot = await db.collection(collectionName).get({ source: 'cache' });
+                console.log(`📦 ${collectionName}: chargé depuis le cache Firestore`);
+            } catch (cacheError) {
+                // Si le cache Firestore échoue, essayer le serveur
+                console.log(`🌐 ${collectionName}: cache Firestore indisponible, tentative serveur...`);
+                snapshot = await db.collection(collectionName).get({ source: 'server' });
+            }
+            
+            let data = [];
+            if (snapshot && !snapshot.empty) {
+                data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                console.log(`✅ ${collectionName}: ${data.length} documents chargés`);
+            } else {
+                console.log(`⚠️ ${collectionName}: aucun document trouvé`);
+            }
+            
+            // Mettre à jour le cache local
+            this.cache[collectionName] = { 
+                data: data, 
+                timestamp: Date.now() 
+            };
+            
+            return data;
+        } catch (error) {
+            console.error(`❌ Erreur chargement ${collectionName}:`, error);
+            
+            // En cas d'erreur, retourner les données en cache si disponibles
+            if (this.cache[collectionName] && this.cache[collectionName].data.length > 0) {
+                console.log(`📦 ${collectionName}: utilisation du cache de secours`);
+                return this.cache[collectionName].data;
+            }
+            
+            return [];
+        }
+    }
+}
         
         const staticCache = new StaticDataCache();
         
