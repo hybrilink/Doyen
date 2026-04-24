@@ -128,7 +128,11 @@
         .fullscreen-btn { background: transparent; border: none; color: var(--primary-blue); font-size: 20px; cursor: pointer; padding: 5px; transition: all 0.3s; }
         .fullscreen-btn:hover { transform: scale(1.1); }
         .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
-        .today-stats-bar { background: linear-gradient(135deg, var(--accent-yellow), #ff9800); padding: 8px 20px; border-radius: 30px; display: inline-flex; align-items: center; gap: 15px; font-size: 13px; font-weight: bold; color: var(--primary-blue); box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .today-stats-bar { background: linear-gradient(135deg, var(--accent-yellow), #ff9800); padding: 8px 20px; border-radius: 30px; display: inline-flex; align-items: center; gap: 20px; font-size: 13px; font-weight: bold; color: var(--primary-blue); box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .today-stats-bar i { font-size: 14px; }
+        .today-stats-bar .entrees span { background: white; padding: 2px 8px; border-radius: 20px; color: #28a745; }
+        .today-stats-bar .sorties span { background: white; padding: 2px 8px; border-radius: 20px; color: #dc3545; }
+        .today-stats-bar .solde span { background: white; padding: 2px 8px; border-radius: 20px; color: #003366; }
         .navbar-right { display: flex; align-items: center; gap: 15px; flex-wrap: wrap; }
         .loading-spinner { display: inline-block; width: 20px; height: 20px; border: 3px solid #f3f3f3; border-top: 3px solid var(--primary-blue); border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
@@ -583,6 +587,129 @@
             color: #888;
             margin-left: 10px;
         }
+
+        /* Styles pour la gestion financière */
+        .finance-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .finance-card {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+            text-align: center;
+        }
+        
+        .finance-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+        }
+        
+        .finance-card.entrees {
+            border-left: 4px solid #28a745;
+            border-right: 4px solid #28a745;
+        }
+        
+        .finance-card.sorties {
+            border-left: 4px solid #dc3545;
+            border-right: 4px solid #dc3545;
+        }
+        
+        .finance-card.solde {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+        
+        .finance-card.solde .finance-number {
+            color: white;
+        }
+        
+        .finance-icon {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+        
+        .finance-card.entrees .finance-icon { color: #28a745; }
+        .finance-card.sorties .finance-icon { color: #dc3545; }
+        .finance-card.solde .finance-icon { color: #ffb347; }
+        
+        .finance-label {
+            font-size: 14px;
+            opacity: 0.8;
+            margin-bottom: 5px;
+        }
+        
+        .finance-number {
+            font-size: 32px;
+            font-weight: bold;
+            color: var(--primary-blue);
+        }
+        
+        .depenses-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .depense-item {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 12px;
+            border-left: 4px solid #dc3545;
+            transition: all 0.2s;
+        }
+        
+        .depense-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .depense-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        .depense-montant {
+            font-weight: bold;
+            color: #dc3545;
+            font-size: 18px;
+        }
+        
+        .depense-date {
+            font-size: 11px;
+            color: #888;
+        }
+        
+        .depense-motif {
+            font-size: 13px;
+            color: #555;
+            margin-top: 5px;
+        }
+        
+        .depense-comptable {
+            font-size: 11px;
+            color: #888;
+            margin-top: 8px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .filter-date-group {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
     </style>
 </head>
 <body>
@@ -592,8 +719,9 @@
             <div class="navbar-right">
                 <div class="today-stats-bar">
                     <i class="bi bi-calendar-day"></i> Aujourd'hui:
-                    <i class="bi bi-cash-stack"></i> <span id="todayMontantHeader">0 FC</span>
-                    <i class="bi bi-receipt"></i> <span id="todayCountHeader">0</span>
+                    <span class="entrees"><i class="bi bi-arrow-up-circle-fill"></i> <span id="todayEntreesHeader">0 FC</span></span>
+                    <span class="sorties"><i class="bi bi-arrow-down-circle-fill"></i> <span id="todaySortiesHeader">0 FC</span></span>
+                    <span class="solde"><i class="bi bi-piggy-bank-fill"></i> <span id="todaySoldeHeader">0 FC</span></span>
                 </div>
                 <div id="syncStatus" class="sync-status"><i class="bi bi-cloud-check"></i> Synchro</div>
                 <div class="profile-photo" id="profileBtn"><i class="bi bi-person-circle"></i></div>
@@ -619,6 +747,7 @@
                 <div class="col-md-3 col-sm-6"><div class="menu-card" data-menu="paiementsRecents"><div class="menu-icon"><i class="bi bi-clock-history"></i></div><div class="menu-title">Paiements Récents</div></div></div>
                 <div class="col-md-3 col-sm-6"><div class="menu-card" data-menu="bordereau"><div class="menu-icon"><i class="bi bi-qr-code-scan"></i></div><div class="menu-title">Vérification Bordereau</div></div></div>
                 <div class="col-md-3 col-sm-6"><div class="menu-card" data-menu="rapportJournalier"><div class="menu-icon"><i class="bi bi-journal-bookmark-fill"></i></div><div class="menu-title">Rapport Journalier</div></div></div>
+                <div class="col-md-3 col-sm-6"><div class="menu-card" data-menu="finance"><div class="menu-icon"><i class="bi bi-piggy-bank-fill"></i></div><div class="menu-title">Gestion Financière</div></div></div>
                 <div class="col-md-3 col-sm-6"><div class="menu-card" data-menu="about"><div class="menu-icon"><i class="bi bi-info-circle-fill"></i></div><div class="menu-title">À propos</div></div></div>
             </div>
         </div>
@@ -785,7 +914,7 @@
             <div id="rapportResultat" class="rapport-container"><div class="empty-rapport text-center py-5"><i class="bi bi-funnel" style="font-size:48px;color:#ccc;"></i><p class="mt-2">Sélectionnez une année académique, une promotion (optionnelle), une fiche (optionnelle) et cliquez sur Afficher</p></div></div>
         </div>
         
-        <!-- Panel Rapport Journalier -->
+        <!-- Panel Rapport Journalier (avec prise en compte des dépenses) -->
         <div id="panel-rapportJournalier" class="content-panel">
             <div class="panel-header">
                 <h4><i class="bi bi-journal-bookmark-fill me-2" style="color: #667eea;"></i>Rapport Journalier</h4>
@@ -793,9 +922,9 @@
             </div>
             
             <div class="rapport-journalier-card">
-                <h5><i class="bi bi-calendar-range"></i> Filtrer les paiements par période</h5>
+                <h5><i class="bi bi-calendar-range"></i> Filtrer par période</h5>
                 <div class="row">
-                    <div class="col-md-4 mb-3">
+                    <div class="col-md-3 mb-3">
                         <label class="form-label"><i class="bi bi-building"></i> Année académique</label>
                         <select class="form-select" id="journalierAnnee">
                             <option value="">-- Sélectionner une année --</option>
@@ -809,7 +938,7 @@
                         <label class="form-label"><i class="bi bi-calendar-end"></i> Date fin</label>
                         <input type="date" class="form-control" id="journalierDateFin">
                     </div>
-                    <div class="col-md-2 mb-3 d-flex align-items-end">
+                    <div class="col-md-3 mb-3 d-flex align-items-end">
                         <button class="btn-action w-100" id="afficherJournalier"><i class="bi bi-eye-fill"></i> Afficher</button>
                     </div>
                 </div>
@@ -818,12 +947,13 @@
             <div id="journalierResultat">
                 <div class="empty-state-mystic text-center py-5">
                     <i class="bi bi-calendar2-week"></i>
-                    <h5>Sélectionnez une période pour voir le rapport journalier</h5>
+                    <h5>Sélectionnez une période pour voir le rapport</h5>
                     <p class="text-muted">Choisissez l'année académique et les dates de début/fin</p>
                 </div>
             </div>
         </div>
         
+        <!-- Panel Paiements Récents -->
         <div id="panel-paiementsRecents" class="content-panel">
             <div class="panel-header">
                 <h4><i class="bi bi-clock-history me-2" style="color: #667eea;"></i>Paiements Récents <span class="last-update-badge">(Temps réel)</span></h4>
@@ -836,6 +966,7 @@
             <div id="paiementsRecentsListe"><div class="text-center py-5"><div class="loading-spinner"></div><p class="mt-3 text-muted">Chargement des 15 derniers paiements...</p></div></div>
         </div>
         
+        <!-- Panel Bordereau -->
         <div id="panel-bordereau" class="content-panel">
             <div class="panel-header">
                 <h4><i class="bi bi-qr-code-scan me-2"></i>Vérification de Bordereau / Reçu</h4>
@@ -850,6 +981,65 @@
             <div id="bordereauResultat" style="display: none;"></div>
         </div>
         
+        <!-- Panel Gestion Financière -->
+        <div id="panel-finance" class="content-panel">
+            <div class="panel-header">
+                <h4><i class="bi bi-piggy-bank-fill me-2" style="color: #667eea;"></i>Gestion Financière</h4>
+                <div>
+                    <button class="btn-refresh" id="refreshFinanceBtn"><i class="bi bi-arrow-repeat"></i> Actualiser</button>
+                    <button class="fullscreen-btn" onclick="toggleFullscreen('panel-finance')"><i class="bi bi-arrows-fullscreen"></i></button>
+                    <button class="home-btn" onclick="goHome()"><i class="bi bi-house-door-fill"></i> Accueil</button>
+                </div>
+            </div>
+            
+            <!-- Cartes statistiques -->
+            <div class="finance-stats-grid">
+                <div class="finance-card entrees">
+                    <div class="finance-icon"><i class="bi bi-arrow-up-circle-fill"></i></div>
+                    <div class="finance-label">TOTAL DES ENTRÉES</div>
+                    <div class="finance-number" id="totalEntrees">0 FC</div>
+                    <small>Toutes transactions confondues</small>
+                </div>
+                <div class="finance-card sorties">
+                    <div class="finance-icon"><i class="bi bi-arrow-down-circle-fill"></i></div>
+                    <div class="finance-label">TOTAL DES SORTIES</div>
+                    <div class="finance-number" id="totalSorties">0 FC</div>
+                    <small>Dépenses enregistrées</small>
+                </div>
+                <div class="finance-card solde">
+                    <div class="finance-icon"><i class="bi bi-piggy-bank-fill"></i></div>
+                    <div class="finance-label">SOLDE ACTUEL</div>
+                    <div class="finance-number" id="soldeActuel">0 FC</div>
+                    <small>Entrées - Sorties</small>
+                </div>
+            </div>
+            
+            <!-- Filtres par date -->
+            <div class="filter-date-group">
+                <div class="row">
+                    <div class="col-md-5 mb-2">
+                        <label><i class="bi bi-calendar-start"></i> Date début</label>
+                        <input type="date" class="form-control" id="financeDateDebut">
+                    </div>
+                    <div class="col-md-5 mb-2">
+                        <label><i class="bi bi-calendar-end"></i> Date fin</label>
+                        <input type="date" class="form-control" id="financeDateFin">
+                    </div>
+                    <div class="col-md-2 mb-2 d-flex align-items-end">
+                        <button class="btn-action w-100" id="filtrerDepensesBtn"><i class="bi bi-funnel"></i> Filtrer</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Liste des dépenses (5 dernières par défaut) -->
+            <h5 class="mb-3"><i class="bi bi-receipt-cut"></i> Historique des dépenses</h5>
+            <div id="depensesListe" class="depenses-list">
+                <div class="text-center py-5"><div class="loading-spinner"></div><p class="mt-3">Chargement des dépenses...</p></div>
+            </div>
+            <div class="text-muted small mt-2 text-center" id="depensesInfoMsg"></div>
+        </div>
+        
+        <!-- Panel À propos -->
         <div id="panel-about" class="content-panel">
             <div class="panel-header">
                 <h4><i class="bi bi-info-circle-fill me-2"></i>À propos</h4>
@@ -912,17 +1102,16 @@
         let allFiches = [];
         let allUtilisateurs = [];
         let allTransactions = [];
+        let allDepenses = [];
         let currentSelectedPromotion = null;
         let currentSearchTerm = '';
         let isOnline = navigator.onLine;
         
-        // Variables pour la recherche dans chaque panel
         let anneeSearchTerm = '';
         let compteSearchTerm = '';
         let promotionSearchTerm = '';
         let ficheSearchTerm = '';
         
-        // Timestamps des dernières mises à jour
         let lastUpdates = {
             annees: null,
             comptes: null,
@@ -931,62 +1120,42 @@
             etudiants: null
         };
         
+        let totalEntrees = 0;
+        let totalSorties = 0;
+        let solde = 0;
+        
         // ========== SYSTÈME DE CACHE ==========
         class StaticDataCache {
             constructor() {
                 this.cache = {};
-                this.CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+                this.CACHE_DURATION = 5 * 60 * 1000;
             }
             
             async getCollection(collectionName, forceRefresh = false) {
                 const now = Date.now();
-                
                 if (!forceRefresh && this.cache[collectionName] && 
                     now - this.cache[collectionName].timestamp < this.CACHE_DURATION) {
                     console.log(`📦 Cache utilisé pour ${collectionName}`);
                     return this.cache[collectionName].data;
                 }
-                
                 return this.refreshCollection(collectionName);
             }
             
-            // ✅ ZÉRO LECTURE AU LANCEMENT
-async refreshCollection(collectionName) {
-    const cachedData = this.cache[collectionName]?.data;
-    
-    // 1. Retourner immédiatement le cache s'il existe (0 lecture)
-    if (cachedData && cachedData.length > 0) {
-        console.log(`📦 Cache utilisé pour ${collectionName} (0 lecture)`);
-        return cachedData;
-    }
-    
-    // 2. Sinon, charger depuis le cache Firestore (toujours 0 lecture)
-    try {
-        const snapshot = await db.collection(collectionName).get({ source: 'cache' });
-        let data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        
-        this.cache[collectionName] = {
-            data: data,
-            timestamp: Date.now()
-        };
-        
-        return data;
-    } catch (error) {
-        console.warn(`Erreur chargement ${collectionName}:`, error);
-        return [];
-    }
-}
-            
-            async refreshAllStaticData() {
-                console.log('🔄 Rafraîchissement de toutes les données statiques...');
-                await Promise.all([
-                    this.refreshCollection('anneesAcademiques'),
-                    this.refreshCollection('promotions'),
-                    this.refreshCollection('fiches'),
-                    this.refreshCollection('etudiants'),
-                    this.refreshCollection('utilisateurs')
-                ]);
-                return true;
+            async refreshCollection(collectionName) {
+                const cachedData = this.cache[collectionName]?.data;
+                if (cachedData && cachedData.length > 0) {
+                    console.log(`📦 Cache utilisé pour ${collectionName}`);
+                    return cachedData;
+                }
+                try {
+                    const snapshot = await db.collection(collectionName).get({ source: 'cache' });
+                    let data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    this.cache[collectionName] = { data: data, timestamp: Date.now() };
+                    return data;
+                } catch (error) {
+                    console.warn(`Erreur chargement ${collectionName}:`, error);
+                    return [];
+                }
             }
         }
         
@@ -1033,9 +1202,7 @@ async refreshCollection(collectionName) {
             const bgColor = type === 'success' ? '#28a745' : (type === 'warning' ? '#ffc107' : '#dc3545');
             const textColor = type === 'warning' ? '#333' : 'white';
             const icon = type === 'success' ? 'check-circle-fill' : (type === 'warning' ? 'exclamation-triangle-fill' : 'x-circle-fill');
-            
             const messageHtml = message.replace(/\n/g, '<br>');
-            
             const toastHtml = `<div class="toast notification-toast" style="background: ${bgColor}; color: ${textColor}; border-radius: 10px; margin-bottom: 10px;">
                 <div class="toast-body">
                     <div style="display: flex; align-items: flex-start;">
@@ -1075,23 +1242,147 @@ async refreshCollection(collectionName) {
             document.getElementById('homePage').style.display = 'block'; 
         }
         
+        // ========== FONCTIONS FINANCIÈRES ==========
+        async function calculerTotauxFinanciers() {
+            try {
+                let entrees = 0;
+                allTransactions.forEach(t => { entrees += t.montantTotal || 0; });
+                totalEntrees = entrees;
+                
+                let sorties = 0;
+                allDepenses.forEach(d => { sorties += d.montant || 0; });
+                totalSorties = sorties;
+                
+                solde = totalEntrees - totalSorties;
+                
+                const financePanel = document.getElementById('panel-finance');
+                if (financePanel && financePanel.classList.contains('active')) {
+                    document.getElementById('totalEntrees').innerHTML = totalEntrees.toLocaleString() + ' FC';
+                    document.getElementById('totalSorties').innerHTML = totalSorties.toLocaleString() + ' FC';
+                    document.getElementById('soldeActuel').innerHTML = solde.toLocaleString() + ' FC';
+                }
+                return { entrees: totalEntrees, sorties: totalSorties, solde: solde };
+            } catch(e) {
+                console.error('Erreur calcul totaux:', e);
+                return { entrees: 0, sorties: 0, solde: 0 };
+            }
+        }
+        
+        async function mettreAJourStatsHeader() {
+            try {
+                const aujourdhui = new Date();
+                aujourdhui.setHours(0,0,0,0);
+                const demain = new Date(aujourdhui);
+                demain.setDate(demain.getDate() + 1);
+                
+                let totalEntreesJour = 0;
+                allTransactions.forEach(t => {
+                    if(t.date) {
+                        const tDate = t.date.toDate();
+                        if(tDate >= aujourdhui && tDate < demain) {
+                            totalEntreesJour += t.montantTotal || 0;
+                        }
+                    }
+                });
+                
+                let totalSortiesJour = 0;
+                allDepenses.forEach(d => {
+                    if(d.date) {
+                        const dDate = d.date.toDate();
+                        if(dDate >= aujourdhui && dDate < demain) {
+                            totalSortiesJour += d.montant || 0;
+                        }
+                    }
+                });
+                
+                const soldeJour = totalEntreesJour - totalSortiesJour;
+                
+                document.getElementById('todayEntreesHeader').innerHTML = totalEntreesJour.toLocaleString() + ' FC';
+                document.getElementById('todaySortiesHeader').innerHTML = totalSortiesJour.toLocaleString() + ' FC';
+                document.getElementById('todaySoldeHeader').innerHTML = soldeJour.toLocaleString() + ' FC';
+                
+            } catch(e) { console.error('Erreur stats header:', e); }
+        }
+        
+        async function chargerDepenses(filtreDebut = null, filtreFin = null) {
+            const container = document.getElementById('depensesListe');
+            if (!container) return;
+            
+            try {
+                let depenses = [...allDepenses];
+                
+                if (filtreDebut) {
+                    const debut = new Date(filtreDebut);
+                    debut.setHours(0,0,0,0);
+                    depenses = depenses.filter(d => d.date && d.date.toDate() >= debut);
+                }
+                if (filtreFin) {
+                    const fin = new Date(filtreFin);
+                    fin.setHours(23,59,59,999);
+                    depenses = depenses.filter(d => d.date && d.date.toDate() <= fin);
+                }
+                
+                depenses.sort((a, b) => (b.date?.toDate() || 0) - (a.date?.toDate() || 0));
+                
+                const avecFiltre = (filtreDebut || filtreFin);
+                const depensesAffichees = avecFiltre ? depenses : depenses.slice(0, 5);
+                const infoMsg = document.getElementById('depensesInfoMsg');
+                
+                if (depensesAffichees.length === 0) {
+                    container.innerHTML = `<div class="empty-state-mystic text-center py-5">
+                        <i class="bi bi-inbox" style="font-size: 48px; color: #ccc;"></i>
+                        <h5>Aucune dépense trouvée</h5>
+                        <p class="text-muted">${avecFiltre ? 'Aucune dépense pour cette période' : 'Aucune dépense enregistrée'}</p>
+                    </div>`;
+                    if (infoMsg) infoMsg.innerHTML = '';
+                    return;
+                }
+                
+                let html = '';
+                for (const d of depensesAffichees) {
+                    const date = d.date ? new Date(d.date.toDate()).toLocaleString('fr-FR') : '-';
+                    html += `
+                        <div class="depense-item">
+                            <div class="depense-header">
+                                <span class="depense-montant"><i class="bi bi-cash-stack"></i> ${(d.montant || 0).toLocaleString()} FC</span>
+                                <span class="depense-date"><i class="bi bi-calendar3"></i> ${date}</span>
+                            </div>
+                            <div class="depense-motif"><i class="bi bi-chat-text"></i> ${escapeHtml(d.motif || '-')}</div>
+                            <div class="depense-comptable"><i class="bi bi-person-circle"></i> ${escapeHtml(d.comptable || '-')}</div>
+                        </div>
+                    `;
+                }
+                
+                container.innerHTML = html;
+                
+                if (infoMsg) {
+                    if (!avecFiltre && allDepenses.length > 5) {
+                        infoMsg.innerHTML = '<i class="bi bi-info-circle"></i> Affichage des 5 dernières dépenses. Utilisez les filtres par date pour voir plus.';
+                    } else {
+                        infoMsg.innerHTML = '';
+                    }
+                }
+                
+            } catch(e) {
+                console.error('Erreur chargement dépenses:', e);
+                container.innerHTML = '<div class="text-center py-5 text-danger">Erreur de chargement des dépenses</div>';
+            }
+        }
+        
         // ========== AFFICHAGE DES LISTES ==========
         function chargerAnneesListe() {
             const container = document.getElementById('anneesListe');
             if(!container) return;
-            
             let filtrees = [...allAnnees];
             if(anneeSearchTerm) {
                 const term = anneeSearchTerm.toLowerCase();
                 filtrees = filtrees.filter(a => (a.annee || a.nom || '').toLowerCase().includes(term));
             }
-            
             if(filtrees.length === 0) { 
                 container.innerHTML = '<div class="alert alert-info">Aucune année académique trouvée</div>'; 
                 return; 
             }
-            
-            let html = '<div class="table-responsive"><table class="table table-bordered" id="anneesTable"><thead><tr><th>Année académique</th><th>Statut</th></tr></thead><tbody>';
+            let html = '<div class="table-responsive"><table class="table table-bordered"><thead><tr><th>Année académique</th><th>Statut</th></tr></thead><tbody>';
             filtrees.forEach(a => {
                 html += `<tr><td><strong>${escapeHtml(a.annee || a.nom)}</strong></td><td>${a.statut === 'active' ? '<span class="text-success">Active</span>' : '<span class="text-muted">Inactive</span>'}</td></tr>`;
             });
@@ -1102,24 +1393,18 @@ async refreshCollection(collectionName) {
         function chargerComptesListe() {
             const container = document.getElementById('comptesListe');
             if(!container) return;
-            
             let filtrees = [...allUtilisateurs];
             if(compteSearchTerm) {
                 const term = compteSearchTerm.toLowerCase();
-                filtrees = filtrees.filter(c => 
-                    (c.nomComplet || '').toLowerCase().includes(term) || 
-                    (c.email || '').toLowerCase().includes(term)
-                );
+                filtrees = filtrees.filter(c => (c.nomComplet || '').toLowerCase().includes(term) || (c.email || '').toLowerCase().includes(term));
             }
-            
             if(filtrees.length === 0) { 
                 container.innerHTML = '<div class="alert alert-info">Aucun compte trouvé</div>'; 
                 return; 
             }
-            
-            let html = '<div class="table-responsive"><table class="table table-bordered" id="comptesTable"><thead><tr><th>Nom complet</th><th>Email</th><th>Date création</th></tr></thead><tbody>';
+            let html = '<div class="table-responsive"><table class="table table-bordered"><thead><tr><th>Nom complet</th><th>Email</th><th>Date création</th></tr></thead><tbody>';
             filtrees.forEach(c => {
-                html += `<tr><td><strong>${escapeHtml(c.nomComplet)}</strong></td><td>${escapeHtml(c.email)}</td><td>${c.dateCreation ? new Date(c.dateCreation.toDate()).toLocaleDateString() : '-'}</td></tr>`;
+                html += `<tr><td><strong>${escapeHtml(c.nomComplet)}</strong></td><td>${escapeHtml(c.email)}</span></td><td>${c.dateCreation ? new Date(c.dateCreation.toDate()).toLocaleDateString() : '-'}</td></tr>`;
             });
             html += '</tbody>}</div>';
             container.innerHTML = html;
@@ -1128,51 +1413,41 @@ async refreshCollection(collectionName) {
         function chargerPromotionsListe() {
             const container = document.getElementById('promotionsListe');
             if(!container) return;
-            
             if(allPromotions.length === 0) { 
                 container.innerHTML = '<div class="alert alert-info">Aucune promotion</div>'; 
                 return; 
             }
-            
             let filtrees = [...allPromotions];
             if(promotionSearchTerm) {
                 const term = promotionSearchTerm.toLowerCase();
                 filtrees = filtrees.filter(p => (p.nom || '').toLowerCase().includes(term));
             }
-            
-            let html = '<div class="table-responsive"><table class="table table-bordered" id="promotionsTable"><thead><tr><th>Nom promotion</th><th>Capacité</th><th>Nombre d\'étudiants</th></tr></thead><tbody>';
-            
+            let html = '<div class="table-responsive"><table class="table table-bordered"><thead><tr><th>Nom promotion</th><th>Capacité</th><th>Nombre d\'étudiants</th></tr></thead><tbody>';
             filtrees.forEach(p => {
                 const count = allEtudiants.filter(e => e.promotion === p.id).length;
-                html += `<tr><td><strong>${escapeHtml(p.nom)}</strong></td><td>${p.capacite || '-'}</td><td><span class="badge bg-primary fs-6">${count}</span> étudiant(s)</td></tr>`;
+                html += `<tr><td><strong>${escapeHtml(p.nom)}</strong></span></td><td>${p.capacite || '-'}</span></td><td><span class="badge bg-primary">${count}</span> étudiant(s)</span></tr>`;
             });
-            
             html += '</tbody>}</div>';
-            
             const totalEtudiants = allEtudiants.length;
-            html += `<div class="alert alert-info mt-3"><i class="bi bi-people-fill"></i> <strong>Total général:</strong> ${totalEtudiants} étudiant(s) réparti(s) dans ${allPromotions.length} promotion(s)</div>`;
-            
+            html += `<div class="alert alert-info mt-3"><i class="bi bi-people-fill"></i> <strong>Total général:</strong> ${totalEtudiants} étudiant(s)</div>`;
             container.innerHTML = html;
         }
         
         function chargerFichesListe() {
             const container = document.getElementById('fichesListe');
             if(!container) return;
-            
             let filtrees = [...allFiches];
             if(ficheSearchTerm) {
                 const term = ficheSearchTerm.toLowerCase();
                 filtrees = filtrees.filter(f => (f.nom || '').toLowerCase().includes(term));
             }
-            
             if(filtrees.length === 0) { 
                 container.innerHTML = '<div class="alert alert-info">Aucune fiche trouvée</div>'; 
                 return; 
             }
-            
             const promoMap = {};
             allPromotions.forEach(p => promoMap[p.id] = p.nom);
-            let html = '<div class="table-responsive"><table class="table table-bordered" id="fichesTable"><thead><tr><th>Nom fiche</th><th>Montant</th><th>Promotions concernées</th></tr></thead><tbody>';
+            let html = '<div class="table-responsive"><table class="table table-bordered"><thead><tr><th>Nom fiche</th><th>Montant</th><th>Promotions concernées</th></tr></thead><tbody>';
             filtrees.forEach(f => {
                 let promotionsText = '';
                 if(f.promotions && Array.isArray(f.promotions)) {
@@ -1182,14 +1457,13 @@ async refreshCollection(collectionName) {
                     promotionsText = promoMap[f.promotion] || '';
                 }
                 if(!promotionsText) promotionsText = '-';
-                
-                html += `<tr><td><strong>${escapeHtml(f.nom)}</strong></td><td>${(f.montant || 0).toLocaleString()} FC</td><td>${escapeHtml(promotionsText)}</td></tr>`;
+                html += `<tr><td><strong>${escapeHtml(f.nom)}</strong></td><td>${(f.montant || 0).toLocaleString()} FC</span></td><td>${escapeHtml(promotionsText)}</span></tr>`;
             });
             html += '</tbody>}</div>';
             container.innerHTML = html;
         }
         
-        function exporterListe(data, filename, headers) {
+        function exporterListe(data, filename) {
             const ws = XLSX.utils.json_to_sheet(data);
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, 'Donnees');
@@ -1197,7 +1471,7 @@ async refreshCollection(collectionName) {
             showToast(`Exporté ${data.length} éléments`);
         }
         
-        // ========== RAPPORT JOURNALIER ==========
+        // ========== RAPPORT JOURNALIER (avec dépenses) ==========
         function chargerJournalierAnneesSelect() {
             const select = document.getElementById('journalierAnnee');
             if(select) {
@@ -1230,101 +1504,189 @@ async refreshCollection(collectionName) {
                 return tDate >= debut && tDate <= fin;
             });
             
+            let depensesFiltrees = allDepenses.filter(d => {
+                if(!d.date) return false;
+                const dDate = d.date.toDate();
+                return dDate >= debut && dDate <= fin;
+            });
+            
             transactionsFiltrees.sort((a,b) => (a.date?.toDate() || 0) - (b.date?.toDate() || 0));
+            depensesFiltrees.sort((a,b) => (a.date?.toDate() || 0) - (b.date?.toDate() || 0));
             
             const anneeNom = allAnnees.find(a => a.id === anneeId)?.annee || '';
             const dateDebutStr = dateDebut.split('-').reverse().join('/');
             const dateFinStr = dateFin.split('-').reverse().join('/');
             
-            if(transactionsFiltrees.length === 0) {
+            const totalEntreesPeriode = transactionsFiltrees.reduce((sum, t) => sum + (t.montantTotal || 0), 0);
+            const totalSortiesPeriode = depensesFiltrees.reduce((sum, d) => sum + (d.montant || 0), 0);
+            const soldePeriode = totalEntreesPeriode - totalSortiesPeriode;
+            
+            if(transactionsFiltrees.length === 0 && depensesFiltrees.length === 0) {
                 document.getElementById('journalierResultat').innerHTML = `
                     <div class="empty-state-mystic text-center py-5">
                         <i class="bi bi-inbox"></i>
-                        <h5>Aucun paiement trouvé</h5>
+                        <h5>Aucune donnée trouvée</h5>
                         <p class="text-muted">Pour la période du ${dateDebutStr} au ${dateFinStr} (${anneeNom})</p>
                     </div>`;
                 return;
             }
             
-            const totalMontant = transactionsFiltrees.reduce((sum, t) => sum + (t.montantTotal || 0), 0);
-            const uniqueEtudiants = new Set(transactionsFiltrees.map(t => t.etudiantId)).size;
-            
             let html = `<div class="rapport-summary">
                 <div class="row text-center">
                     <div class="col-md-3"><strong>📅 Période:</strong><br>${dateDebutStr} au ${dateFinStr}</div>
                     <div class="col-md-3"><strong>🏫 Année académique:</strong><br>${escapeHtml(anneeNom)}</div>
-                    <div class="col-md-3"><strong>💰 Total collecté:</strong><br><span class="fs-4 text-success">${totalMontant.toLocaleString()} FC</span></div>
-                    <div class="col-md-3"><strong>👨‍🎓 Étudiants distincts:</strong><br><span class="fs-4">${uniqueEtudiants}</span></div>
+                    <div class="col-md-3"><strong>💰 Total entrées:</strong><br><span class="fs-4 text-success">${totalEntreesPeriode.toLocaleString()} FC</span></div>
+                    <div class="col-md-3"><strong>📤 Total sorties:</strong><br><span class="fs-4 text-danger">${totalSortiesPeriode.toLocaleString()} FC</span></div>
                 </div>
                 <hr>
                 <div class="row text-center">
-                    <div class="col-md-6"><strong>📋 Nombre de transactions:</strong> ${transactionsFiltrees.length}</div>
-                    <div class="col-md-6"><strong>📊 Moyenne par transaction:</strong> ${Math.round(totalMontant/transactionsFiltrees.length).toLocaleString()} FC</div>
+                    <div class="col-md-4"><strong>💵 Solde période:</strong><br><span class="fs-4 ${soldePeriode >= 0 ? 'text-success' : 'text-danger'}">${soldePeriode.toLocaleString()} FC</span></div>
+                    <div class="col-md-4"><strong>📋 Transactions:</strong> ${transactionsFiltrees.length}</div>
+                    <div class="col-md-4"><strong>📋 Dépenses:</strong> ${depensesFiltrees.length}</div>
                 </div>
             </div>`;
             
-            html += `<div class="table-responsive mt-4">
-                <table class="rapport-table" id="journalierTable">
-                    <thead>
-                        <tr><th>Date</th><th>Heure</th><th>Numéro reçu</th><th>Étudiant</th><th>Promotion</th><th>Fiches</th><th class="text-end">Montant</th></tr>
-                    </thead>
-                    <tbody>`;
+            // Tableau des entrées
+            // Tableau des entrées
+if(transactionsFiltrees.length > 0) {
+    html += `<h5 class="mt-4 text-success"><i class="bi bi-arrow-up-circle-fill"></i> ENTRÉES (Paiements)</h5>
+    <div class="table-responsive">
+        <table class="rapport-table" id="journalierTableEntrees">
+            <thead><tr><th>Date</th><th>Heure</th><th>N° Reçu</th><th>Étudiant</th><th>Promotion</th><th>Détail</th><th>Montant</th></tr></thead>
+            <tbody>`;
+    transactionsFiltrees.forEach(t => {
+        const dateObj = t.date.toDate();
+        const dateStr = dateObj.toLocaleDateString('fr-FR');
+        const heureStr = dateObj.toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit' });
+        const promoNom = t.promotionNom || (t.promotion ? (allPromotions.find(p => p.id === t.promotion)?.nom || '-') : '-');
+        
+        // Générer le détail des fiches payées
+        let detailHtml = '-';
+        if(t.fiches && Array.isArray(t.fiches) && t.fiches.length > 0) {
+            detailHtml = t.fiches.map(f => {
+                const ficheInfo = allFiches.find(fi => fi.id === f.id);
+                const ficheNom = f.nom || (ficheInfo ? ficheInfo.nom : f.id);
+                // Essayer d'obtenir le montant payé pour cette fiche spécifique
+                let montantFiche = f.montantPaye || f.montant || (ficheInfo ? ficheInfo.montant : 0);
+                if (montantFiche === 0 && ficheInfo) {
+                    montantFiche = ficheInfo.montant || 0;
+                }
+                return `${escapeHtml(ficheNom)}: ${montantFiche.toLocaleString()} FC`;
+            }).join('<br>');
+        } else {
+            // Si pas de détails de fiches, afficher le montant total comme détail
+            detailHtml = `Paiement total`;
+        }
+        
+        html += `<tr>
+            <td>${dateStr}</td>
+            <td>${heureStr}</td>
+            <td><span style="font-family:monospace;">${escapeHtml(t.numeroRecu || t.id.substring(0,12))}</span></td>
+            <td><strong>${escapeHtml(t.etudiantNom || '-')}</strong></td>
+            <td>${escapeHtml(promoNom)}</td>
+            <td style="font-size:12px;">${detailHtml}</td>
+            <td class="text-end text-success fw-bold">${(t.montantTotal || 0).toLocaleString()} FC</td>
+        </tr>`;
+    });
+    html += `</tbody>
+            <tfoot><tr style="background:#f8f9fa;font-weight:bold;"><td colspan="6" class="text-end">TOTAL ENTRÉES:</td><td class="text-end">${totalEntreesPeriode.toLocaleString()} FC</td></tr></tfoot>
+        </table>
+    </div>`;
+}
             
-            transactionsFiltrees.forEach(t => {
-                const dateObj = t.date.toDate();
-                const dateStr = dateObj.toLocaleDateString('fr-FR');
-                const heureStr = dateObj.toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit' });
-                const promoNom = t.promotionNom || (t.promotion ? (allPromotions.find(p => p.id === t.promotion)?.nom || '-') : '-');
-                let fichesNoms = [];
-                if(t.fiches && Array.isArray(t.fiches)) fichesNoms = t.fiches.map(f => f.nom || f.id);
-                const fichesHtml = fichesNoms.slice(0,2).join(', ') + (fichesNoms.length > 2 ? '...' : '');
-                
-                html += `<tr>
-                    <td>${dateStr}</td>
-                    <td>${heureStr}</td>
-                    <td><span style="font-family:monospace;">${escapeHtml(t.numeroRecu || t.id.substring(0,12))}</span></td>
-                    <td><strong>${escapeHtml(t.etudiantNom || '-')}</strong></td>
-                    <td>${escapeHtml(promoNom)}</td>
-                    <td><small>${escapeHtml(fichesHtml) || '-'}</small></td>
-                    <td class="text-end text-success fw-bold">${(t.montantTotal || 0).toLocaleString()} FC</td>
-                </tr>`;
-            });
-            
-            html += `</tbody>
-                    <tfoot>
-                        <tr style="background: #f8f9fa; font-weight: bold;">
-                            <td colspan="6" class="text-end">TOTAL:</td>
-                            <td class="text-end">${totalMontant.toLocaleString()} FC</td>
-                        </tr>
-                    </tfoot>
-                </table></div>
-                <div class="text-center mt-4">
-                    <button class="btn-action" id="exporterJournalierExcel"><i class="bi bi-file-excel"></i> Exporter en Excel</button>
-                    <button class="print-rapport ms-2" id="imprimerJournalier"><i class="bi bi-printer"></i> Imprimer</button>
+            // Tableau des sorties
+            if(depensesFiltrees.length > 0) {
+                html += `<h5 class="mt-4 text-danger"><i class="bi bi-arrow-down-circle-fill"></i> SORTIES (Dépenses)</h5>
+                <div class="table-responsive">
+                    <table class="rapport-table" id="journalierTableSorties">
+                        <thead><tr><th>Date</th><th>Heure</th><th>N° Ticket</th><th>Motif</th><th>Comptable</th><th>Montant</th></tr></thead>
+                        <tbody>`;
+                depensesFiltrees.forEach(d => {
+                    const dateObj = d.date.toDate();
+                    const dateStr = dateObj.toLocaleDateString('fr-FR');
+                    const heureStr = dateObj.toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit' });
+                    html += `<tr>
+                        <td>${dateStr}</td>
+                        <td>${heureStr}</td>
+                        <td><span style="font-family:monospace;">${escapeHtml(d.numeroTicket || d.id.substring(0,12))}</span></td>
+                        <td>${escapeHtml(d.motif || '-')}</td>
+                        <td>${escapeHtml(d.comptable || '-')}</td>
+                        <td class="text-end text-danger fw-bold">${(d.montant || 0).toLocaleString()} FC</td>
+                    </tr>`;
+                });
+                html += `</tbody>
+                        <tfoot><tr style="background:#f8f9fa;font-weight:bold;"><td colspan="5" class="text-end">TOTAL SORTIES:</td><td class="text-end">${totalSortiesPeriode.toLocaleString()} FC</td></tr></tfoot>
+                    </table>
                 </div>`;
+            }
+            
+            html += `<div class="text-center mt-4">
+                <button class="btn-action" id="exporterJournalierExcel"><i class="bi bi-file-excel"></i> Exporter en Excel</button>
+                <button class="print-rapport ms-2" id="imprimerJournalier"><i class="bi bi-printer"></i> Imprimer</button>
+            </div>`;
             
             document.getElementById('journalierResultat').innerHTML = html;
             
             document.getElementById('exporterJournalierExcel')?.addEventListener('click', () => {
-                const table = document.getElementById('journalierTable');
-                if(!table) return;
-                const rows = [];
-                const headers = ['Date', 'Heure', 'Numéro reçu', 'Étudiant', 'Promotion', 'Fiches', 'Montant (FC)'];
-                rows.push(headers);
-                const bodyRows = table.querySelectorAll('tbody tr');
-                bodyRows.forEach(row => {
-                    const cells = [];
-                    row.querySelectorAll('td').forEach(cell => {
-                        cells.push(cell.innerText.trim());
-                    });
-                    rows.push(cells);
-                });
-                const ws = XLSX.utils.aoa_to_sheet(rows);
-                const wb = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(wb, ws, 'Rapport Journalier');
-                XLSX.writeFile(wb, `rapport_journalier_${dateDebut}_${dateFin}.xlsx`);
-                showToast('Rapport exporté', 'success');
-            });
+    const rows = [['RAPPORT JOURNALIER', '', '', '', '', '', '']];
+    rows.push(['Période:', `${dateDebutStr} au ${dateFinStr}`, 'Année:', anneeNom, '', '', '']);
+    rows.push(['', '', '', '', '', '', '']);
+    rows.push(['ENTRÉES (Paiements)', '', '', '', '', '', '']);
+    rows.push(['Date', 'Heure', 'N° Reçu', 'Étudiant', 'Promotion', 'Détail', 'Montant (FC)']);
+    transactionsFiltrees.forEach(t => {
+        const dateObj = t.date.toDate();
+        
+        // Générer le détail pour l'export
+        let detailExcel = '-';
+        if(t.fiches && Array.isArray(t.fiches) && t.fiches.length > 0) {
+            detailExcel = t.fiches.map(f => {
+                const ficheInfo = allFiches.find(fi => fi.id === f.id);
+                const ficheNom = f.nom || (ficheInfo ? ficheInfo.nom : f.id);
+                let montantFiche = f.montantPaye || f.montant || (ficheInfo ? ficheInfo.montant : 0);
+                if (montantFiche === 0 && ficheInfo) {
+                    montantFiche = ficheInfo.montant || 0;
+                }
+                return `${ficheNom}: ${montantFiche.toLocaleString()} FC`;
+            }).join(' | ');
+        } else {
+            detailExcel = 'Paiement total';
+        }
+        
+        rows.push([
+            dateObj.toLocaleDateString('fr-FR'),
+            dateObj.toLocaleTimeString('fr-FR'),
+            t.numeroRecu || t.id.substring(0,12),
+            t.etudiantNom || '-',
+            t.promotionNom || '-',
+            detailExcel,
+            (t.montantTotal || 0).toLocaleString()
+        ]);
+    });
+    rows.push(['', '', '', '', '', 'TOTAL ENTRÉES:', totalEntreesPeriode.toLocaleString()]);
+    rows.push(['', '', '', '', '', '', '']);
+    rows.push(['SORTIES (Dépenses)', '', '', '', '', '', '']);
+    rows.push(['Date', 'Heure', 'N° Ticket', 'Motif', 'Comptable', '', 'Montant (FC)']);
+    depensesFiltrees.forEach(d => {
+        const dateObj = d.date.toDate();
+        rows.push([
+            dateObj.toLocaleDateString('fr-FR'),
+            dateObj.toLocaleTimeString('fr-FR'),
+            d.numeroTicket || d.id.substring(0,12),
+            d.motif || '-',
+            d.comptable || '-',
+            '',
+            (d.montant || 0).toLocaleString()
+        ]);
+    });
+    rows.push(['', '', '', '', '', 'TOTAL SORTIES:', totalSortiesPeriode.toLocaleString()]);
+    rows.push(['', '', '', '', '', 'SOLDE PÉRIODE:', soldePeriode.toLocaleString()]);
+    const ws = XLSX.utils.aoa_to_sheet(rows);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Rapport Journalier');
+    XLSX.writeFile(wb, `rapport_journalier_${dateDebut}_${dateFin}.xlsx`);
+    showToast('Rapport exporté avec détails', 'success');
+});
+
             
             document.getElementById('imprimerJournalier')?.addEventListener('click', () => {
                 const w = window.open('', '_blank');
@@ -1332,9 +1694,10 @@ async refreshCollection(collectionName) {
                     <html><head><title>Rapport Journalier</title>
                     <style>body{font-family:Arial;padding:20px}table{border-collapse:collapse;width:100%}th,td{border:1px solid #ddd;padding:8px}th{background:#003366;color:white}.text-end{text-align:right}</style>
                     </head><body>
-                    <h2>Rapport Journalier des Paiements</h2>
+                    <h2>Rapport Journalier</h2>
                     <p>Période: ${dateDebutStr} au ${dateFinStr} - Année: ${escapeHtml(anneeNom)}</p>
-                    ${document.getElementById('journalierTable').outerHTML}
+                    ${document.getElementById('journalierTableEntrees') ? document.getElementById('journalierTableEntrees').outerHTML : '<p>Aucune entrée</p>'}
+                    ${document.getElementById('journalierTableSorties') ? document.getElementById('journalierTableSorties').outerHTML : '<p>Aucune sortie</p>'}
                     <p class="text-muted mt-3">Généré le ${new Date().toLocaleString()}</p>
                     <script>window.print();setTimeout(()=>window.close(),500);<\/script>
                 </body></html>`);
@@ -1346,58 +1709,48 @@ async refreshCollection(collectionName) {
         async function chargerPaiementsRecents() {
             const container = document.getElementById('paiementsRecentsListe');
             if(!container) return;
-            
             try {
                 if(allPromotions.length === 0 || allAnnees.length === 0) {
-                    container.innerHTML = '<div class="text-center py-5"><div class="loading-spinner"></div><p class="mt-3">Chargement des données...</p></div>';
+                    container.innerHTML = '<div class="text-center py-5"><div class="loading-spinner"></div><p class="mt-3">Chargement...</p></div>';
                     setTimeout(() => chargerPaiementsRecents(), 1000);
                     return;
                 }
-                
                 if(allTransactions.length === 0) {
-                    container.innerHTML = `<div class="empty-state-mystic"><i class="bi bi-inbox"></i><h5>Aucun paiement enregistré</h5><p class="text-muted">Les paiements effectués apparaîtront ici</p></div>`;
+                    container.innerHTML = `<div class="empty-state-mystic"><i class="bi bi-inbox"></i><h5>Aucun paiement</h5></div>`;
                     return;
                 }
-                
                 const transactions = [...allTransactions].sort((a, b) => (b.date?.toDate() || 0) - (a.date?.toDate() || 0)).slice(0, 15);
-                
                 const totalMontant = transactions.reduce((sum, t) => sum + (t.montantTotal || 0), 0);
                 const uniqueEtudiants = new Set(transactions.map(t => t.etudiantId)).size;
                 const today = new Date(); today.setHours(0,0,0,0);
                 const todayTransactions = transactions.filter(t => t.date && t.date.toDate() >= today);
                 const todayMontant = todayTransactions.reduce((sum, t) => sum + (t.montantTotal || 0), 0);
-                
                 let html = `<div class="paiements-stats-grid">
                     <div class="mystic-stat-card"><div class="mystic-stat-icon"><i class="bi bi-cash-stack"></i></div><div class="mystic-stat-number">${totalMontant.toLocaleString()} FC</div><div class="mystic-stat-label">Total collecté</div></div>
                     <div class="mystic-stat-card"><div class="mystic-stat-icon"><i class="bi bi-receipt"></i></div><div class="mystic-stat-number">${transactions.length}</div><div class="mystic-stat-label">Paiements récents</div></div>
                     <div class="mystic-stat-card"><div class="mystic-stat-icon"><i class="bi bi-people-fill"></i></div><div class="mystic-stat-number">${uniqueEtudiants}</div><div class="mystic-stat-label">Étudiants distincts</div></div>
                     <div class="mystic-stat-card"><div class="mystic-stat-icon"><i class="bi bi-calendar-day"></i></div><div class="mystic-stat-number">${todayMontant.toLocaleString()} FC</div><div class="mystic-stat-label">Aujourd'hui</div></div>
                 </div><div class="paiements-timeline">`;
-                
                 for (const t of transactions) {
                     const dateTransaction = t.date ? new Date(t.date.toDate()) : new Date();
                     const dateFormatted = dateTransaction.toLocaleString('fr-FR', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' });
-                    
                     let promoNom = t.promotionNom;
                     if(!promoNom && t.promotion) {
                         const promo = allPromotions.find(p => p.id === t.promotion);
                         promoNom = promo ? promo.nom : '-';
                     }
                     promoNom = promoNom || '-';
-                    
                     let anneeNom = t.anneeAcademiqueNom;
                     if(!anneeNom && t.anneeAcademiqueId) {
                         const annee = allAnnees.find(a => a.id === t.anneeAcademiqueId);
                         anneeNom = annee ? (annee.annee || annee.nom) : '-';
                     }
                     anneeNom = anneeNom || '-';
-                    
                     let fichesNoms = [];
                     if(t.fiches && Array.isArray(t.fiches)) {
                         fichesNoms = t.fiches.map(f => f.nom || f.id);
                     }
                     const fichesHtml = fichesNoms.length > 0 ? `<div class="fiches-list">${fichesNoms.slice(0,3).map(fnom => `<span class="fiche-tag"><i class="bi bi-file-text"></i> ${escapeHtml(fnom)}</span>`).join('')}</div>` : '';
-                    
                     html += `<div class="timeline-item"><div class="timeline-dot"></div><div class="paiement-card-mystic">
                         <div class="paiement-header-mystic"><span class="paiement-numero"><i class="bi bi-upc-scan"></i> ${escapeHtml(t.numeroRecu || t.id.substring(0,12))}</span><span class="paiement-date"><i class="bi bi-calendar3"></i> ${dateFormatted}</span></div>
                         <div class="paiement-etudiant"><i class="bi bi-person-circle"></i> ${escapeHtml(t.etudiantNom || '-')}</div>
@@ -1405,13 +1758,11 @@ async refreshCollection(collectionName) {
                         ${fichesHtml}
                     </div></div>`;
                 }
-                
-                html += `</div><div class="text-center mt-4 text-muted small"><i class="bi bi-gem"></i> Affichage des ${Math.min(transactions.length, 15)} derniers paiements ${!isOnline ? '(mode hors-ligne)' : ''}</div>`;
+                html += `</div><div class="text-center mt-4 text-muted small"><i class="bi bi-gem"></i> ${Math.min(transactions.length, 15)} derniers paiements</div>`;
                 container.innerHTML = html;
-                
             } catch(error) {
-                console.error('Erreur chargement paiements:', error);
-                container.innerHTML = `<div class="empty-state-mystic"><i class="bi bi-exclamation-triangle-fill" style="color:#dc3545;"></i><h5>Erreur de chargement</h5><p class="text-muted">${error.message}</p></div>`;
+                console.error('Erreur:', error);
+                container.innerHTML = `<div class="empty-state-mystic"><i class="bi bi-exclamation-triangle-fill" style="color:#dc3545;"></i><h5>Erreur</h5></div>`;
             }
         }
         
@@ -1423,22 +1774,13 @@ async refreshCollection(collectionName) {
                 container.innerHTML = '<div class="alert alert-info">Aucune promotion</div>'; 
                 return; 
             }
-            
             let html = '';
             allPromotions.forEach(p => {
                 const count = allEtudiants.filter(e => e.promotion === p.id).length;
                 html += `<button class="promotion-btn" data-promo="${p.id}">📚 ${escapeHtml(p.nom)} <span class="badge bg-secondary">${count}</span></button>`;
             });
             container.innerHTML = html;
-            
-            document.getElementById('etudiantsListe').innerHTML = `
-                <div class="text-center py-5" style="background: #f8f9fa; border-radius: 15px;">
-                    <i class="bi bi-arrow-up-circle" style="font-size: 48px; color: #003366; opacity: 0.5;"></i>
-                    <h5 class="mt-3" style="color: #003366;">Sélectionnez une promotion</h5>
-                    <p class="text-muted">Cliquez sur une promotion ci-dessus pour afficher la liste des étudiants</p>
-                </div>
-            `;
-            
+            document.getElementById('etudiantsListe').innerHTML = `<div class="text-center py-5"><i class="bi bi-arrow-up-circle" style="font-size:48px;color:#003366;opacity:0.5;"></i><h5>Sélectionnez une promotion</h5></div>`;
             document.querySelectorAll('.promotion-btn').forEach(btn => {
                 btn.addEventListener('click', () => {
                     document.querySelectorAll('.promotion-btn').forEach(b => b.classList.remove('active'));
@@ -1455,57 +1797,26 @@ async refreshCollection(collectionName) {
         
         function afficherEtudiantsParPromotion(promoId) {
             if(!promoId) {
-                document.getElementById('etudiantsListe').innerHTML = `
-                    <div class="text-center py-5" style="background: #f8f9fa; border-radius: 15px;">
-                        <i class="bi bi-arrow-up-circle" style="font-size: 48px; color: #003366; opacity: 0.5;"></i>
-                        <h5 class="mt-3" style="color: #003366;">Sélectionnez une promotion</h5>
-                        <p class="text-muted">Cliquez sur une promotion ci-dessus pour afficher la liste des étudiants</p>
-                    </div>
-                `;
+                document.getElementById('etudiantsListe').innerHTML = `<div class="text-center py-5"><i class="bi bi-arrow-up-circle" style="font-size:48px;color:#003366;opacity:0.5;"></i><h5>Sélectionnez une promotion</h5></div>`;
                 return;
             }
-            
             let filtres = allEtudiants.filter(e => e.promotion === promoId);
-            
             if(currentSearchTerm) {
                 const s = currentSearchTerm.toLowerCase();
                 filtres = filtres.filter(e => e.nom?.toLowerCase().includes(s));
             }
-            
             const promoMap = {};
             allPromotions.forEach(p => promoMap[p.id] = p.nom);
             const promoNom = promoMap[promoId] || promoId;
-            
             if(filtres.length === 0) {
-                document.getElementById('etudiantsListe').innerHTML = `
-                    <div class="alert alert-info">
-                        <i class="bi bi-info-circle"></i> 
-                        Aucun étudiant trouvé dans la promotion "${escapeHtml(promoNom)}"
-                        ${currentSearchTerm ? ' pour la recherche "' + escapeHtml(currentSearchTerm) + '"' : ''}
-                    </div>`;
+                document.getElementById('etudiantsListe').innerHTML = `<div class="alert alert-info">Aucun étudiant dans "${escapeHtml(promoNom)}"</div>`;
                 return;
             }
-            
-            let html = `
-                <div class="mb-3">
-                    <h5><i class="bi bi-trophy-fill" style="color: #003366;"></i> Promotion : ${escapeHtml(promoNom)}</h5>
-                    <div class="text-muted"><i class="bi bi-people-fill"></i> ${filtres.length} étudiant(s)</div>
-                </div>
-                <div class="table-responsive">
-                    <table class="etudiants-table" id="etudiantsTable">
-                        <thead>
-                            <tr><th>N°</th><th>Matricule</th><th>Nom</th></tr>
-                        </thead>
-                        <tbody>`;
-            
+            let html = `<div class="mb-3"><h5><i class="bi bi-trophy-fill"></i> Promotion: ${escapeHtml(promoNom)}</h5><div>${filtres.length} étudiant(s)</div></div>
+                <div class="table-responsive"><table class="etudiants-table"><thead><tr><th>N°</th><th>Matricule</th><th>Nom</th></tr></thead><tbody>`;
             filtres.forEach((e, idx) => {
-                html += `<tr>
-                    <td>${idx+1}</td>
-                    <td><span style="font-family:monospace;">${escapeHtml(e.matricule || e.id.substring(0,8))}</span></td>
-                    <td><strong>${escapeHtml(e.nom)}</strong></td>
-                </tr>`;
+                html += `<tr><td>${idx+1}</td><td>${escapeHtml(e.matricule || e.id.substring(0,8))}</td><td><strong>${escapeHtml(e.nom)}</strong></td></tr>`;
             });
-            
             html += `</tbody></table></div>`;
             document.getElementById('etudiantsListe').innerHTML = html;
         }
@@ -1531,10 +1842,8 @@ async refreshCollection(collectionName) {
         function chargerAnneesSelect() {
             const select = document.getElementById('rapportAnnee');
             if(select) {
-                select.innerHTML = '<option value="">-- Sélectionner une année --</option>';
-                allAnnees.forEach(a => {
-                    select.innerHTML += `<option value="${a.id}">${escapeHtml(a.annee || a.nom)}</option>`;
-                });
+                select.innerHTML = '<option value="">-- Sélectionner --</option>';
+                allAnnees.forEach(a => { select.innerHTML += `<option value="${a.id}">${escapeHtml(a.annee || a.nom)}</option>`; });
             }
         }
         
@@ -1542,9 +1851,7 @@ async refreshCollection(collectionName) {
             const select = document.getElementById('rapportPromotion');
             if(select) {
                 select.innerHTML = '<option value="">Toutes promotions</option>';
-                allPromotions.forEach(p => {
-                    select.innerHTML += `<option value="${p.id}">${escapeHtml(p.nom)}</option>`;
-                });
+                allPromotions.forEach(p => { select.innerHTML += `<option value="${p.id}">${escapeHtml(p.nom)}</option>`; });
             }
         }
         
@@ -1552,9 +1859,7 @@ async refreshCollection(collectionName) {
             const select = document.getElementById('rapportFiche');
             if(select) {
                 select.innerHTML = '<option value="">Toutes fiches</option>';
-                allFiches.forEach(f => {
-                    select.innerHTML += `<option value="${f.id}">${escapeHtml(f.nom)} - ${(f.montant || 0).toLocaleString()} FC</option>`;
-                });
+                allFiches.forEach(f => { select.innerHTML += `<option value="${f.id}">${escapeHtml(f.nom)} - ${(f.montant || 0).toLocaleString()} FC</option>`; });
             }
         }
         
@@ -1565,293 +1870,273 @@ async refreshCollection(collectionName) {
             const statut = document.getElementById('rapportStatut').value;
             const dateDebut = document.getElementById('rapportDateDebut').value;
             const dateFin = document.getElementById('rapportDateFin').value;
-            
-            if(!anneeId) { alert('Veuillez sélectionner une année académique'); return; }
-            
+            if(!anneeId) { alert('Sélectionnez une année'); return; }
             const anneeSelectionnee = allAnnees.find(a => a.id === anneeId);
             if(!anneeSelectionnee) { alert('Année non trouvée'); return; }
-            
-            let etudiantsFiltres = [];
-            if(promotionId) {
-                etudiantsFiltres = allEtudiants.filter(e => e.promotion === promotionId);
-            } else {
-                etudiantsFiltres = [...allEtudiants];
-            }
-            
+            let etudiantsFiltres = promotionId ? allEtudiants.filter(e => e.promotion === promotionId) : [...allEtudiants];
             if(etudiantsFiltres.length === 0) {
-                document.getElementById('rapportResultat').innerHTML = `<div class="alert alert-warning">Aucun étudiant trouvé pour la sélection</div>`;
+                document.getElementById('rapportResultat').innerHTML = `<div class="alert alert-warning">Aucun étudiant</div>`;
                 return;
             }
-            
             let transactionsFiltrees = allTransactions.filter(t => t.anneeAcademiqueId === anneeId);
-            
-            if(dateDebut) {
-                const debut = new Date(dateDebut);
-                debut.setHours(0,0,0,0);
-                transactionsFiltrees = transactionsFiltrees.filter(t => t.date?.toDate() >= debut);
-            }
-            if(dateFin) {
-                const fin = new Date(dateFin);
-                fin.setHours(23,59,59,999);
-                transactionsFiltrees = transactionsFiltrees.filter(t => t.date?.toDate() <= fin);
-            }
-            
+            if(dateDebut) { const debut = new Date(dateDebut); debut.setHours(0,0,0,0); transactionsFiltrees = transactionsFiltrees.filter(t => t.date?.toDate() >= debut); }
+            if(dateFin) { const fin = new Date(dateFin); fin.setHours(23,59,59,999); transactionsFiltrees = transactionsFiltrees.filter(t => t.date?.toDate() <= fin); }
             let ficheSelectionnee = null;
             if(ficheId) {
                 ficheSelectionnee = allFiches.find(f => f.id === ficheId);
-                if(ficheSelectionnee) {
-                    transactionsFiltrees = transactionsFiltrees.filter(t => {
-                        if(t.fiches) return t.fiches.some(f => f.id === ficheId);
-                        return false;
-                    });
-                }
+                if(ficheSelectionnee) { transactionsFiltrees = transactionsFiltrees.filter(t => t.fiches?.some(f => f.id === ficheId)); }
             }
-            
             const paiementsParEtudiant = {};
-            transactionsFiltrees.forEach(t => {
-                if(!paiementsParEtudiant[t.etudiantId]) paiementsParEtudiant[t.etudiantId] = 0;
-                paiementsParEtudiant[t.etudiantId] += t.montantTotal || 0;
-            });
-            
-            let resultatsBruts = [];
-            const promotionMap = {};
-            allPromotions.forEach(p => promotionMap[p.id] = p.nom);
-            
-            for(const etudiant of etudiantsFiltres) {
-                let montantDu = 0;
-                
-                if(ficheSelectionnee) {
-                    montantDu = ficheSelectionnee.montant || 0;
-                } else {
-                    const fichesConcernantPromo = allFiches.filter(fiche => {
-                        const promotionsFiche = fiche.promotions || (fiche.promotion ? [fiche.promotion] : []);
-                        return promotionsFiche.includes(etudiant.promotion);
-                    });
-                    montantDu = fichesConcernantPromo.reduce((sum, f) => sum + (f.montant || 0), 0);
+            transactionsFiltrees.forEach(t => { if(!paiementsParEtudiant[t.etudiantId]) paiementsParEtudiant[t.etudiantId] = 0; paiementsParEtudiant[t.etudiantId] += t.montantTotal || 0; });
+            // À l'intérieur de la fonction d'affichage du rapport, remplacez le calcul des résultats :
+
+let resultatsBruts = [];
+const promotionMap = {};
+allPromotions.forEach(p => promotionMap[p.id] = p.nom);
+
+for(const etudiant of etudiantsFiltres) {
+    let montantFicheActuelle = 0;
+    let payePourFiche = 0;
+    
+    if(ficheSelectionnee) {
+        montantFicheActuelle = ficheSelectionnee.montant || 0;
+        // Calculer le montant payé UNIQUEMENT pour cette fiche spécifique
+        transactionsFiltrees.forEach(t => {
+            if(t.etudiantId === etudiant.id && t.fiches) {
+                const ficheDansTransaction = t.fiches.find(f => f.id === ficheId);
+                if(ficheDansTransaction) {
+                    payePourFiche += ficheDansTransaction.montantPaye || ficheDansTransaction.montant || 0;
                 }
-                
-                const paye = paiementsParEtudiant[etudiant.id] || 0;
-                const reste = montantDu - paye;
-                const estOrdon = paye >= montantDu && montantDu > 0;
-                
-                if(statut === 'ordon' && !estOrdon) continue;
-                if(statut === 'nonordon' && estOrdon) continue;
-                
-                resultatsBruts.push({
-                    id: etudiant.id,
-                    matricule: etudiant.matricule || etudiant.id.substring(0,8),
-                    nom: etudiant.nom,
-                    promotion: promotionMap[etudiant.promotion] || '-',
-                    promotionId: etudiant.promotion,
-                    montantDu: montantDu,
-                    paye: paye,
-                    reste: reste,
-                    statut: estOrdon
-                });
             }
-            
-            resultatsBruts.sort((a, b) => {
-                if(a.statut === b.statut) return b.reste - a.reste;
-                return a.statut ? 1 : -1;
-            });
-            
-            if(resultatsBruts.length === 0) {
-                document.getElementById('rapportResultat').innerHTML = `<div class="alert alert-info">Aucun résultat pour les critères sélectionnés</div>`;
-                return;
-            }
-            
-            const totalDu = resultatsBruts.reduce((sum, r) => sum + r.montantDu, 0);
-            const totalPaye = resultatsBruts.reduce((sum, r) => sum + r.paye, 0);
-            const totalReste = resultatsBruts.reduce((sum, r) => sum + r.reste, 0);
-            const nbEnOrdre = resultatsBruts.filter(r => r.statut).length;
-            const nbNonEnOrdre = resultatsBruts.filter(r => !r.statut).length;
-            
-            let html = `<div class="rapport-summary">
-                <div class="row text-center">
-                    <div class="col-md-3"><strong>📊 Total étudiants:</strong><br><span class="fs-4">${resultatsBruts.length}</span></div>
-                    <div class="col-md-3"><strong>💰 Total dû:</strong><br><span class="fs-4">${totalDu.toLocaleString()} FC</span></div>
-                    <div class="col-md-3"><strong>✅ Total payé:</strong><br><span class="fs-4 text-success">${totalPaye.toLocaleString()} FC</span></div>
-                    <div class="col-md-3"><strong>⚠️ Reste à payer:</strong><br><span class="fs-4 text-danger">${totalReste.toLocaleString()} FC</span></div>
-                </div>
-                <hr>
-                <div class="row text-center">
-                    <div class="col-md-6"><strong>✓ En ordre:</strong> <span class="text-success">${nbEnOrdre}</span> étudiants</div>
-                    <div class="col-md-6"><strong>✗ Non en ordre:</strong> <span class="text-danger">${nbNonEnOrdre}</span> étudiants</div>
-                </div>
-            </div>
-            <div class="search-export-bar" style="margin-top: 20px;">
-                <div class="search-group" style="flex:2;">
-                    <label><i class="bi bi-search"></i> Rechercher un étudiant</label>
-                    <div class="search-input-group">
-                        <i class="bi bi-search"></i>
-                        <input type="text" class="form-control" id="rapportSearchInput" placeholder="Nom, matricule...">
-                        <i class="bi bi-x-circle-fill clear-search" id="rapportClearSearch" style="cursor:pointer;display:none;"></i>
-                    </div>
-                </div>
-                <div class="export-group">
-                    <button class="export-btn" id="rapportExportExcel"><i class="bi bi-file-excel"></i> Excel</button>
-                    <button class="export-btn" id="rapportExportCsv" style="background:#28a745;"><i class="bi bi-file-text"></i> CSV</button>
-                </div>
-            </div>
-            <div id="rapportTableContainer"></div>
-            <div class="text-muted mt-3 small">Année: ${escapeHtml(anneeSelectionnee.annee)} | Généré le ${new Date().toLocaleString()}</div>`;
-            
-            document.getElementById('rapportResultat').innerHTML = html;
-            
-            function afficherTableRapport(data) {
-                if(data.length === 0) {
-                    document.getElementById('rapportTableContainer').innerHTML = '<div class="alert alert-info">Aucun étudiant trouvé</div>';
-                    return;
-                }
-                let tableHtml = `<div class="table-responsive"><table class="rapport-table" id="rapportTable"><thead><tr><th>N°</th><th>Matricule</th><th>Étudiant</th><th>Promotion</th><th class="text-end">Montant dû</th><th class="text-end">Payé</th><th class="text-end">Reste</th><th class="text-center">Statut</th></tr></thead><tbody>`;
-                data.forEach((r, idx) => {
-                    const statutClass = r.statut ? 'statut-ordon' : 'statut-nonordon';
-                    const statutText = r.statut ? '✓ En ordre' : '✗ Non en ordre';
-                    tableHtml += `<tr><td>${idx+1}</td><td><span style="font-family:monospace;">${escapeHtml(r.matricule)}</span></td><td><strong>${escapeHtml(r.nom)}</strong></td><td>${escapeHtml(r.promotion)}</td><td class="text-end">${r.montantDu.toLocaleString()}</td><td class="text-end ${r.paye >= r.montantDu ? 'text-success' : 'text-warning'}">${r.paye.toLocaleString()}</td><td class="text-end ${r.reste > 0 ? 'text-danger' : 'text-success'}">${r.reste.toLocaleString()}</td><td class="text-center"><span class="${statutClass}">${statutText}</span></td></tr>`;
-                });
-                tableHtml += `</tbody></table></div><div class="mt-2 text-muted small">${data.length} étudiant(s) affiché(s)</div>`;
-                document.getElementById('rapportTableContainer').innerHTML = tableHtml;
-            }
-            
-            afficherTableRapport(resultatsBruts);
-            
-            const searchInput = document.getElementById('rapportSearchInput');
-            const clearBtn = document.getElementById('rapportClearSearch');
-            searchInput?.addEventListener('input', (e) => {
-                const term = e.target.value.toLowerCase().trim();
-                clearBtn.style.display = term ? 'block' : 'none';
-                if(!term) { afficherTableRapport(resultatsBruts); return; }
-                const filtres = resultatsBruts.filter(r => r.nom.toLowerCase().includes(term) || r.matricule.toLowerCase().includes(term));
-                afficherTableRapport(filtres);
-            });
-            clearBtn?.addEventListener('click', () => {
-                if(searchInput) { searchInput.value = ''; clearBtn.style.display = 'none'; afficherTableRapport(resultatsBruts); }
-            });
-            
-            document.getElementById('rapportExportExcel')?.addEventListener('click', () => {
-                const ws = XLSX.utils.json_to_sheet(resultatsBruts.map(r => ({ Matricule: r.matricule, Étudiant: r.nom, Promotion: r.promotion, 'Montant dû': r.montantDu, Payé: r.paye, Reste: r.reste, Statut: r.statut ? 'En ordre' : 'Non en ordre' })));
-                const wb = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(wb, ws, 'Rapport');
-                XLSX.writeFile(wb, `rapport_paiements_${new Date().toISOString().slice(0,19)}.xlsx`);
-                showToast('Rapport exporté', 'success');
-            });
-            
+        });
+    } else {
+        // Si aucune fiche sélectionnée, prendre le montant total de toutes les fiches de la promotion
+        const fichesConcernantPromo = allFiches.filter(fiche => {
+            const promotionsFiche = fiche.promotions || (fiche.promotion ? [fiche.promotion] : []);
+            return promotionsFiche.includes(etudiant.promotion);
+        });
+        montantFicheActuelle = fichesConcernantPromo.reduce((sum, f) => sum + (f.montant || 0), 0);
+        
+        // Calculer le montant total payé (toutes fiches confondues)
+        payePourFiche = paiementsParEtudiant[etudiant.id] || 0;
+    }
+    
+    const reste = montantFicheActuelle - payePourFiche;
+    const estOrdon = payePourFiche >= montantFicheActuelle && montantFicheActuelle > 0;
+    
+    if(statut === 'ordon' && !estOrdon) continue;
+    if(statut === 'nonordon' && estOrdon) continue;
+    
+    resultatsBruts.push({ 
+        id: etudiant.id, 
+        matricule: etudiant.matricule || etudiant.id.substring(0,8), 
+        nom: etudiant.nom, 
+        promotion: promotionMap[etudiant.promotion] || '-', 
+        montantDu: montantFicheActuelle, 
+        paye: payePourFiche, 
+        statut: estOrdon 
+    });
+}
+
+resultatsBruts.sort((a, b) => { 
+    if(a.statut === b.statut) return 0; 
+    return a.statut ? 1 : -1; 
+});
+
+// Calcul des totaux (sans le reste)
+const totalDu = resultatsBruts.reduce((sum, r) => sum + r.montantDu, 0);
+const totalPaye = resultatsBruts.reduce((sum, r) => sum + r.paye, 0);
+const nbEnOrdre = resultatsBruts.filter(r => r.statut).length;
+const nbNonEnOrdre = resultatsBruts.filter(r => !r.statut).length;
+
+// Affichage du résumé (sans le reste)
+let html = `<div class="rapport-summary"><div class="row text-center">
+    <div class="col-md-4"><strong>📊 Total étudiants:</strong><br><span class="fs-4">${resultatsBruts.length}</span></div>
+    <div class="col-md-4"><strong>💰 Total dû:</strong><br><span class="fs-4">${totalDu.toLocaleString()} FC</span></div>
+    <div class="col-md-4"><strong>✅ Total payé:</strong><br><span class="fs-4 text-success">${totalPaye.toLocaleString()} FC</span></div>
+</div><hr><div class="row text-center">
+    <div class="col-md-6"><strong>✓ En ordre:</strong> ${nbEnOrdre}</div>
+    <div class="col-md-6"><strong>✗ Non en ordre:</strong> ${nbNonEnOrdre}</div>
+</div></div>`;
+
+// Ajout de la barre de recherche et des boutons d'export
+html += `<div class="search-export-bar">
+    <div class="search-group">
+        <label><i class="bi bi-search"></i> Rechercher</label>
+        <div class="search-input-group">
+            <i class="bi bi-search"></i>
+            <input type="text" class="form-control" id="rapportSearchInput" placeholder="Nom...">
+            <i class="bi bi-x-circle-fill clear-search" id="rapportClearSearch" style="cursor:pointer;display:none;"></i>
+        </div>
+    </div>
+    <div>
+        <button class="export-btn" id="rapportExportExcel"><i class="bi bi-file-excel"></i> Excel</button>
+        <button class="export-btn" id="rapportExportCsv" style="background:#28a745;"><i class="bi bi-file-text"></i> CSV</button>
+    </div>
+</div>
+<div id="rapportTableContainer"></div>`;
+
+document.getElementById('rapportResultat').innerHTML = html;
+
+// Fonction d'affichage du tableau SANS la colonne "Reste"
+function afficherTableRapport(data) {
+    if(data.length === 0) { 
+        document.getElementById('rapportTableContainer').innerHTML = '<div class="alert alert-info">Aucun étudiant trouvé</div>'; 
+        return; 
+    }
+    let tableHtml = `<div class="table-responsive">
+        <table class="rapport-table">
+            <thead>
+                <tr>
+                    <th>N°</th>
+                    <th>Matricule</th>
+                    <th>Étudiant</th>
+                    <th>Promotion</th>
+                    <th class="text-end">Montant dû</th>
+                    <th class="text-end">Montant payé</th>
+                    <th class="text-center">Statut</th>
+                </tr>
+            </thead>
+            <tbody>`;
+    
+    data.forEach((r, idx) => {
+        tableHtml += `<tr>
+            <td class="text-center">${idx+1}</td>
+            <td>${escapeHtml(r.matricule)}</td>
+            <td><strong>${escapeHtml(r.nom)}</strong></td>
+            <td>${escapeHtml(r.promotion)}</td>
+            <td class="text-end">${r.montantDu.toLocaleString()} FC</td>
+            <td class="text-end ${r.paye >= r.montantDu ? 'text-success' : 'text-warning'}">${r.paye.toLocaleString()} FC</td>
+            <td class="text-center">
+                <span class="${r.statut ? 'statut-ordon' : 'statut-nonordon'}">
+                    ${r.statut ? '✓ En ordre' : '✗ Non en ordre'}
+                </span>
+            </td>
+        </tr>`;
+    });
+    
+    tableHtml += `</tbody>
+        </table>
+    </div>`;
+    
+    document.getElementById('rapportTableContainer').innerHTML = tableHtml;
+}
+
+afficherTableRapport(resultatsBruts);
+
+// Écouteurs de recherche (inchangés)
+const searchInput = document.getElementById('rapportSearchInput');
+const clearBtn = document.getElementById('rapportClearSearch');
+
+if(searchInput) {
+    searchInput.addEventListener('input', (e) => {
+        const term = e.target.value.toLowerCase().trim();
+        if(clearBtn) clearBtn.style.display = term ? 'block' : 'none';
+        if(!term) { 
+            afficherTableRapport(resultatsBruts); 
+            return; 
+        }
+        const filtres = resultatsBruts.filter(r => 
+            r.nom.toLowerCase().includes(term) || 
+            r.matricule.toLowerCase().includes(term)
+        );
+        afficherTableRapport(filtres);
+    });
+}
+
+if(clearBtn) {
+    clearBtn.addEventListener('click', () => { 
+        if(searchInput) { 
+            searchInput.value = ''; 
+            clearBtn.style.display = 'none'; 
+            afficherTableRapport(resultatsBruts); 
+        } 
+    });
+}
+
+// Écouteurs d'export (sans la colonne Reste)
+document.getElementById('rapportExportExcel')?.addEventListener('click', () => {
+    const ws = XLSX.utils.json_to_sheet(resultatsBruts.map(r => ({ 
+        Matricule: r.matricule, 
+        Étudiant: r.nom, 
+        Promotion: r.promotion, 
+        'Montant dû': r.montantDu, 
+        'Montant payé': r.paye, 
+        Statut: r.statut ? 'En ordre' : 'Non en ordre' 
+    })));
+    const wb = XLSX.utils.book_new(); 
+    XLSX.utils.book_append_sheet(wb, ws, 'Rapport'); 
+    XLSX.writeFile(wb, `rapport_${new Date().toISOString().slice(0,19)}.xlsx`);
+    showToast('Rapport exporté', 'success');
+});
+
+document.getElementById('rapportExportCsv')?.addEventListener('click', () => {
+    const csv = resultatsBruts.map(r => `"${r.matricule}","${r.nom}","${r.promotion}",${r.montantDu},${r.paye},"${r.statut ? 'En ordre' : 'Non en ordre'}"`).join('\n');
+    const blob = new Blob(['\uFEFFMatricule,Étudiant,Promotion,Montant dû,Montant payé,Statut\n' + csv], { type: 'text/csv' });
+    const a = document.createElement('a'); 
+    a.href = URL.createObjectURL(blob); 
+    a.download = `rapport_${new Date().toISOString().slice(0,19)}.csv`; 
+    a.click(); 
+    URL.revokeObjectURL(blob);
+    showToast('Rapport exporté', 'success');
+});
             document.getElementById('rapportExportCsv')?.addEventListener('click', () => {
                 const csv = resultatsBruts.map(r => `"${r.matricule}","${r.nom}","${r.promotion}",${r.montantDu},${r.paye},${r.reste},"${r.statut ? 'En ordre' : 'Non en ordre'}"`).join('\n');
                 const blob = new Blob(['\uFEFFMatricule,Étudiant,Promotion,Montant dû,Payé,Reste,Statut\n' + csv], { type: 'text/csv' });
-                const a = document.createElement('a');
-                a.href = URL.createObjectURL(blob);
-                a.download = `rapport_paiements_${new Date().toISOString().slice(0,19)}.csv`;
-                a.click();
-                URL.revokeObjectURL(blob);
-                showToast('Rapport exporté CSV', 'success');
+                const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `rapport_${new Date().toISOString().slice(0,19)}.csv`; a.click(); URL.revokeObjectURL(blob);
+                showToast('Rapport exporté', 'success');
             });
         });
         
         // ========== VÉRIFICATION BORDEREAU ==========
         document.getElementById('verifierBordereauBtn')?.addEventListener('click', async () => {
             const numero = document.getElementById('bordereauNumero').value.trim();
-            if(!numero) { alert('Veuillez entrer un numéro de reçu'); return; }
-            
+            if(!numero) { alert('Entrez un numéro'); return; }
             const transaction = allTransactions.find(t => t.numeroRecu === numero || t.id === numero);
             const resultDiv = document.getElementById('bordereauResultat');
-            
             if(!transaction) {
                 resultDiv.style.display = 'block';
-                resultDiv.innerHTML = `<div class="bordereau-result text-center"><div class="authentic-false authentic-badge"><i class="bi bi-x-octagon-fill" style="font-size:48px;"></i><h3>Reçu NON authentique</h3><p>Aucun reçu trouvé avec le numéro: <strong>${escapeHtml(numero)}</strong></p></div></div>`;
+                resultDiv.innerHTML = `<div class="bordereau-result text-center"><div class="authentic-false"><i class="bi bi-x-octagon-fill" style="font-size:48px;"></i><h3>Reçu NON authentique</h3><p>Numéro: ${escapeHtml(numero)}</p></div></div>`;
                 return;
             }
-            
-            const anneeNom = allAnnees.find(a => a.id === transaction.anneeAcademiqueId)?.annee || transaction.anneeAcademiqueNom || '-';
+            const anneeNom = allAnnees.find(a => a.id === transaction.anneeAcademiqueId)?.annee || '-';
             const promoNom = transaction.promotionNom || (transaction.promotion ? (allPromotions.find(p => p.id === transaction.promotion)?.nom || '-') : '-');
             const fichesNoms = transaction.fiches?.map(f => f.nom).join(', ') || '-';
             const dateTransaction = transaction.date ? new Date(transaction.date.toDate()).toLocaleString('fr-FR') : '-';
-            
             resultDiv.style.display = 'block';
-            resultDiv.innerHTML = `<div class="bordereau-result"><div class="authentic-true authentic-badge text-center mb-3"><i class="bi bi-check-circle-fill" style="font-size:48px;"></i><h3>✓ Reçu AUTHENTIQUE</h3></div>
-                <div class="row"><div class="col-md-6"><div class="receipt-info"><strong><i class="bi bi-upc-scan"></i> Numéro reçu:</strong> ${escapeHtml(transaction.numeroRecu || transaction.id)}</div>
-                <div class="receipt-info"><strong><i class="bi bi-calendar"></i> Date paiement:</strong> ${dateTransaction}</div>
-                <div class="receipt-info"><strong><i class="bi bi-person-circle"></i> Étudiant:</strong> ${escapeHtml(transaction.etudiantNom)}</div>
-                <div class="receipt-info"><strong><i class="bi bi-card-list"></i> Matricule:</strong> ${escapeHtml(transaction.etudiantMatricule || transaction.etudiantId)}</div></div>
-                <div class="col-md-6"><div class="receipt-info"><strong><i class="bi bi-trophy"></i> Promotion:</strong> ${escapeHtml(promoNom)}</div>
-                <div class="receipt-info"><strong><i class="bi bi-calendar-week"></i> Année académique:</strong> ${escapeHtml(anneeNom)}</div>
-                <div class="receipt-info"><strong><i class="bi bi-file-text"></i> Fiches payées:</strong> ${escapeHtml(fichesNoms)}</div>
-                <div class="receipt-info"><strong><i class="bi bi-cash-stack"></i> Montant:</strong> <span style="font-size:18px;color:#28a745;">${(transaction.montantTotal || 0).toLocaleString()} FC</span></div></div></div>
-                <div class="receipt-info mt-3"><strong><i class="bi bi-person-badge"></i> Comptable:</strong> ${escapeHtml(transaction.comptable || '-')}</div>
-                <div class="text-muted mt-3 small text-center"><i class="bi bi-shield-check"></i> Document certifié conforme</div></div>`;
+            resultDiv.innerHTML = `<div class="bordereau-result"><div class="authentic-true text-center"><i class="bi bi-check-circle-fill" style="font-size:48px;"></i><h3>✓ Reçu AUTHENTIQUE</h3></div>
+                <div class="row"><div class="col-md-6"><div class="receipt-info"><strong>N° Reçu:</strong> ${escapeHtml(transaction.numeroRecu || transaction.id)}</div>
+                <div class="receipt-info"><strong>Date:</strong> ${dateTransaction}</div>
+                <div class="receipt-info"><strong>Étudiant:</strong> ${escapeHtml(transaction.etudiantNom)}</div>
+                <div class="receipt-info"><strong>Matricule:</strong> ${escapeHtml(transaction.etudiantMatricule || transaction.etudiantId)}</div></div>
+                <div class="col-md-6"><div class="receipt-info"><strong>Promotion:</strong> ${escapeHtml(promoNom)}</div>
+                <div class="receipt-info"><strong>Année:</strong> ${escapeHtml(anneeNom)}</div>
+                <div class="receipt-info"><strong>Fiches:</strong> ${escapeHtml(fichesNoms)}</div>
+                <div class="receipt-info"><strong>Montant:</strong> <span style="color:#28a745;">${(transaction.montantTotal || 0).toLocaleString()} FC</span></div></div></div>
+                <div class="receipt-info mt-3"><strong>Comptable:</strong> ${escapeHtml(transaction.comptable || '-')}</div></div>`;
         });
         
         // ========== NOTIFICATIONS ==========
         let notificationSound = null;
-        
-        function initNotificationSound() {
-            try {
-                notificationSound = new Audio();
-                notificationSound.src = 'data:audio/wav;base64,U3RlYWx0aCBzb3VuZA==';
-            } catch(e) {}
-        }
-        
+        function initNotificationSound() { try { notificationSound = new Audio(); notificationSound.src = 'data:audio/wav;base64,U3RlYWx0aCBzb3VuZA=='; } catch(e) {} }
         function showRealTimeNotification(transaction) {
             const montant = (transaction.montantTotal || 0).toLocaleString();
             const etudiant = transaction.etudiantNom || 'Un étudiant';
-            
-            let fichesText = '';
-            if (transaction.fiches && Array.isArray(transaction.fiches) && transaction.fiches.length > 0) {
-                const fichesNoms = transaction.fiches.map(f => f.nom || f.id).filter(n => n);
-                if (fichesNoms.length > 0) {
-                    const fichesAffichees = fichesNoms.slice(0, 3);
-                    fichesText = `\n📋 ${fichesAffichees.join(', ')}`;
-                    if (fichesNoms.length > 3) {
-                        fichesText += ` et ${fichesNoms.length - 3} autre(s)`;
-                    }
-                }
-            }
-            
-            const messageToast = `💰 ${etudiant} a payé ${montant} FC${fichesText ? '\n' + fichesText : ''}`;
-            showToast(messageToast, 'success');
-            
-            if (Notification.permission === 'granted') {
-                new Notification('Nouveau paiement', { 
-                    body: `💰 ${etudiant} a payé ${montant} FC`, 
-                    icon: '/icon-192x192.png', 
-                    vibrate: [200, 100, 200]
-                });
-            }
-            
+            showToast(`💰 ${etudiant} a payé ${montant} FC`, 'success');
+            if (Notification.permission === 'granted') { new Notification('Nouveau paiement', { body: `💰 ${etudiant} a payé ${montant} FC`, icon: '/icon-192x192.png' }); }
             if (notificationSound) notificationSound.play().catch(e => console.log('Son non joué'));
         }
-        
         function requestNotificationPermission() {
             if ('Notification' in window && Notification.permission === 'default') {
                 const banner = document.createElement('div');
-                banner.style.cssText = 'position:fixed;bottom:80px;right:20px;background:#003366;color:white;padding:15px 20px;border-radius:15px;z-index:1000;box-shadow:0 5px 20px rgba(0,0,0,0.3);max-width:300px;';
-                banner.innerHTML = `<i class="bi bi-bell-fill"></i> <strong>Activer les notifications</strong><br><small>Recevez les alertes des nouveaux paiements</small><br>
-                    <button id="enableNotifBtn" style="background:#ffb347;color:#003366;border:none;padding:8px 15px;border-radius:8px;margin-top:10px;font-weight:bold;cursor:pointer;">Activer</button>
-                    <button id="laterNotifBtn" style="background:transparent;color:#ccc;border:none;padding:8px 15px;margin-top:10px;cursor:pointer;">Plus tard</button>`;
+                banner.style.cssText = 'position:fixed;bottom:80px;right:20px;background:#003366;color:white;padding:15px;border-radius:15px;z-index:1000;max-width:300px;';
+                banner.innerHTML = `<i class="bi bi-bell-fill"></i> <strong>Activer notifications</strong><br><small>Alertes nouveaux paiements</small><br><button id="enableNotifBtn" style="background:#ffb347;color:#003366;border:none;padding:8px 15px;border-radius:8px;margin-top:10px;cursor:pointer;">Activer</button>`;
                 document.body.appendChild(banner);
                 document.getElementById('enableNotifBtn')?.addEventListener('click', () => { Notification.requestPermission(); banner.remove(); });
-                document.getElementById('laterNotifBtn')?.addEventListener('click', () => banner.remove());
             }
         }
         
-        async function mettreAJourStatsHeader() {
-            try {
-                const aujourdhui = new Date();
-                aujourdhui.setHours(0,0,0,0);
-                const demain = new Date(aujourdhui);
-                demain.setDate(demain.getDate() + 1);
-                const transactionsAujourdhui = allTransactions.filter(t => {
-                    if(!t.date) return false;
-                    const tDate = t.date.toDate();
-                    return tDate >= aujourdhui && tDate < demain;
-                });
-                let total = transactionsAujourdhui.reduce((sum, t) => sum + (t.montantTotal || 0), 0);
-                document.getElementById('todayMontantHeader').textContent = total.toLocaleString() + ' FC';
-                document.getElementById('todayCountHeader').textContent = transactionsAujourdhui.length;
-            } catch(e) { console.error(e); }
-        }
-        
-        // ========== FONCTIONS D'ACTUALISATION PAR COLLECTION ==========
+        // ========== FONCTIONS D'ACTUALISATION ==========
         async function refreshAnnees() {
             const btn = document.getElementById('refreshAnneesBtn');
             if(btn) { btn.disabled = true; btn.innerHTML = '<div class="loading-spinner" style="width:16px;height:16px;"></div>'; }
@@ -1862,14 +2147,13 @@ async refreshCollection(collectionName) {
                 chargerAnneesSelect();
                 chargerJournalierAnneesSelect();
                 updateLastUpdateDisplay('annee');
-                showToast('✅ Années académiques actualisées', 'success');
-            } catch(e) { showToast('Erreur lors de l\'actualisation', 'error'); }
+                showToast('✅ Années actualisées', 'success');
+            } catch(e) { showToast('Erreur', 'error'); }
             finally { if(btn) { btn.disabled = false; btn.innerHTML = '<i class="bi bi-arrow-repeat"></i> Actualiser'; } }
         }
-        
         async function refreshComptes() {
             const btn = document.getElementById('refreshComptesBtn');
-            if(btn) { btn.disabled = true; btn.innerHTML = '<div class="loading-spinner" style="width:16px;height:16px;"></div>'; }
+            if(btn) { btn.disabled = true; btn.innerHTML = '<div class="loading-spinner"></div>'; }
             try {
                 const data = await staticCache.refreshCollection('utilisateurs');
                 allUtilisateurs = data.filter(u => u.role === 'comptabilite');
@@ -1877,13 +2161,12 @@ async refreshCollection(collectionName) {
                 chargerComptesListe();
                 updateLastUpdateDisplay('compte');
                 showToast('✅ Comptes actualisés', 'success');
-            } catch(e) { showToast('Erreur lors de l\'actualisation', 'error'); }
+            } catch(e) { showToast('Erreur', 'error'); }
             finally { if(btn) { btn.disabled = false; btn.innerHTML = '<i class="bi bi-arrow-repeat"></i> Actualiser'; } }
         }
-        
         async function refreshPromotions() {
             const btn = document.getElementById('refreshPromotionsBtn');
-            if(btn) { btn.disabled = true; btn.innerHTML = '<div class="loading-spinner" style="width:16px;height:16px;"></div>'; }
+            if(btn) { btn.disabled = true; btn.innerHTML = '<div class="loading-spinner"></div>'; }
             try {
                 allPromotions = await staticCache.refreshCollection('promotions');
                 lastUpdates.promotions = Date.now();
@@ -1892,13 +2175,12 @@ async refreshCollection(collectionName) {
                 afficherBoutonsPromotions();
                 updateLastUpdateDisplay('promotion');
                 showToast('✅ Promotions actualisées', 'success');
-            } catch(e) { showToast('Erreur lors de l\'actualisation', 'error'); }
+            } catch(e) { showToast('Erreur', 'error'); }
             finally { if(btn) { btn.disabled = false; btn.innerHTML = '<i class="bi bi-arrow-repeat"></i> Actualiser'; } }
         }
-        
         async function refreshFiches() {
             const btn = document.getElementById('refreshFichesBtn');
-            if(btn) { btn.disabled = true; btn.innerHTML = '<div class="loading-spinner" style="width:16px;height:16px;"></div>'; }
+            if(btn) { btn.disabled = true; btn.innerHTML = '<div class="loading-spinner"></div>'; }
             try {
                 allFiches = await staticCache.refreshCollection('fiches');
                 lastUpdates.fiches = Date.now();
@@ -1906,13 +2188,12 @@ async refreshCollection(collectionName) {
                 chargerFichesSelect();
                 updateLastUpdateDisplay('fiche');
                 showToast('✅ Fiches actualisées', 'success');
-            } catch(e) { showToast('Erreur lors de l\'actualisation', 'error'); }
+            } catch(e) { showToast('Erreur', 'error'); }
             finally { if(btn) { btn.disabled = false; btn.innerHTML = '<i class="bi bi-arrow-repeat"></i> Actualiser'; } }
         }
-        
         async function refreshEtudiants() {
             const btn = document.getElementById('refreshEtudiantsBtn');
-            if(btn) { btn.disabled = true; btn.innerHTML = '<div class="loading-spinner" style="width:16px;height:16px;"></div>'; }
+            if(btn) { btn.disabled = true; btn.innerHTML = '<div class="loading-spinner"></div>'; }
             try {
                 allEtudiants = await staticCache.refreshCollection('etudiants');
                 lastUpdates.etudiants = Date.now();
@@ -1921,188 +2202,98 @@ async refreshCollection(collectionName) {
                 chargerPromotionsListe();
                 updateLastUpdateDisplay('etudiant');
                 showToast('✅ Étudiants actualisés', 'success');
-            } catch(e) { showToast('Erreur lors de l\'actualisation', 'error'); }
+            } catch(e) { showToast('Erreur', 'error'); }
             finally { if(btn) { btn.disabled = false; btn.innerHTML = '<i class="bi bi-arrow-repeat"></i> Actualiser'; } }
+        }
+        async function refreshFinance() {
+            await calculerTotauxFinanciers();
+            const dateDebut = document.getElementById('financeDateDebut')?.value;
+            const dateFin = document.getElementById('financeDateFin')?.value;
+            await chargerDepenses(dateDebut, dateFin);
+            showToast('✅ Données financières actualisées', 'success');
         }
         
         // ========== SETUP DES ÉCOUTEURS ==========
         function setupRealtimeListeners() {
-            // ✅ TRANSACTIONS - GARDER onSnapshot (TEMPS RÉEL)
             db.collection('transactions').orderBy('date', 'desc').limit(50).onSnapshot((snapshot) => {
                 allTransactions = [];
                 snapshot.forEach(doc => allTransactions.push({ id: doc.id, ...doc.data() }));
                 mettreAJourStatsHeader();
-                
+                calculerTotauxFinanciers();
                 snapshot.docChanges().forEach((change) => {
                     if (change.type === 'added') {
                         const transaction = change.doc.data();
                         const transactionId = change.doc.id;
-                        const notifKey = `notif_${transactionId}`;
-                        const alreadyShown = localStorage.getItem(notifKey);
+                        const alreadyShown = localStorage.getItem(`notif_${transactionId}`);
                         const transactionDate = transaction.date?.toDate() || new Date();
                         const diffMinutes = (new Date() - transactionDate) / 1000 / 60;
                         if (!alreadyShown && diffMinutes < 2) {
-                            localStorage.setItem(notifKey, Date.now().toString());
+                            localStorage.setItem(`notif_${transactionId}`, Date.now().toString());
                             showRealTimeNotification(transaction);
                         }
                     }
                 });
-                
                 const paiementsPanel = document.getElementById('panel-paiementsRecents');
-                if(paiementsPanel && paiementsPanel.classList.contains('active')) {
-                    chargerPaiementsRecents();
+                if(paiementsPanel && paiementsPanel.classList.contains('active')) chargerPaiementsRecents();
+                const rapportJournalierPanel = document.getElementById('panel-rapportJournalier');
+                if(rapportJournalierPanel && rapportJournalierPanel.classList.contains('active')) {
+                    const anneeId = document.getElementById('journalierAnnee')?.value;
+                    if(anneeId && document.getElementById('journalierDateDebut')?.value && document.getElementById('journalierDateFin')?.value) {
+                        document.getElementById('afficherJournalier')?.click();
+                    }
                 }
-            }, (error) => console.error('Erreur écoute transactions:', error));
+            }, (error) => console.error('Erreur transactions:', error));
             
-            // ✅ DONNÉES STATIQUES - Chargement initial depuis cache
-            staticCache.getCollection('anneesAcademiques').then(data => {
-                allAnnees = data;
-                lastUpdates.annees = Date.now();
-                chargerAnneesListe();
-                chargerAnneesSelect();
-                chargerJournalierAnneesSelect();
+            db.collection('depenses').orderBy('date', 'desc').limit(50).onSnapshot((snapshot) => {
+                allDepenses = [];
+                snapshot.forEach(doc => allDepenses.push({ id: doc.id, ...doc.data() }));
+                calculerTotauxFinanciers();
                 mettreAJourStatsHeader();
-                updateLastUpdateDisplay('annee');
-            });
+                const financePanel = document.getElementById('panel-finance');
+                if(financePanel && financePanel.classList.contains('active')) {
+                    const dateDebut = document.getElementById('financeDateDebut')?.value;
+                    const dateFin = document.getElementById('financeDateFin')?.value;
+                    chargerDepenses(dateDebut, dateFin);
+                }
+                const rapportJournalierPanel = document.getElementById('panel-rapportJournalier');
+                if(rapportJournalierPanel && rapportJournalierPanel.classList.contains('active')) {
+                    const anneeId = document.getElementById('journalierAnnee')?.value;
+                    if(anneeId && document.getElementById('journalierDateDebut')?.value && document.getElementById('journalierDateFin')?.value) {
+                        document.getElementById('afficherJournalier')?.click();
+                    }
+                }
+            }, (error) => console.error('Erreur dépenses:', error));
             
-            staticCache.getCollection('promotions').then(data => {
-                allPromotions = data;
-                lastUpdates.promotions = Date.now();
-                chargerPromotionsSelects();
-                chargerPromotionsListe();
-                afficherBoutonsPromotions();
-                updateLastUpdateDisplay('promotion');
-            });
-            
-            staticCache.getCollection('fiches').then(data => {
-                allFiches = data;
-                lastUpdates.fiches = Date.now();
-                chargerFichesListe();
-                chargerFichesSelect();
-                updateLastUpdateDisplay('fiche');
-            });
-            
-            staticCache.getCollection('etudiants').then(data => {
-                allEtudiants = data;
-                lastUpdates.etudiants = Date.now();
-                afficherBoutonsPromotions();
-                if(currentSelectedPromotion) afficherEtudiantsParPromotion(currentSelectedPromotion);
-                chargerPromotionsListe();
-                updateLastUpdateDisplay('etudiant');
-            });
-            
-            staticCache.getCollection('utilisateurs').then(data => {
-                allUtilisateurs = data.filter(u => u.role === 'comptabilite');
-                lastUpdates.comptes = Date.now();
-                chargerComptesListe();
-                updateLastUpdateDisplay('compte');
-            });
+            staticCache.getCollection('anneesAcademiques').then(data => { allAnnees = data; lastUpdates.annees = Date.now(); chargerAnneesListe(); chargerAnneesSelect(); chargerJournalierAnneesSelect(); mettreAJourStatsHeader(); updateLastUpdateDisplay('annee'); });
+            staticCache.getCollection('promotions').then(data => { allPromotions = data; lastUpdates.promotions = Date.now(); chargerPromotionsSelects(); chargerPromotionsListe(); afficherBoutonsPromotions(); updateLastUpdateDisplay('promotion'); });
+            staticCache.getCollection('fiches').then(data => { allFiches = data; lastUpdates.fiches = Date.now(); chargerFichesListe(); chargerFichesSelect(); updateLastUpdateDisplay('fiche'); });
+            staticCache.getCollection('etudiants').then(data => { allEtudiants = data; lastUpdates.etudiants = Date.now(); afficherBoutonsPromotions(); if(currentSelectedPromotion) afficherEtudiantsParPromotion(currentSelectedPromotion); chargerPromotionsListe(); updateLastUpdateDisplay('etudiant'); });
+            staticCache.getCollection('utilisateurs').then(data => { allUtilisateurs = data.filter(u => u.role === 'comptabilite'); lastUpdates.comptes = Date.now(); chargerComptesListe(); updateLastUpdateDisplay('compte'); });
         }
         
         // ========== CONFIGURATION DES RECHERCHES ==========
-        document.getElementById('searchAnnee')?.addEventListener('input', (e) => {
-            anneeSearchTerm = e.target.value;
-            document.getElementById('clearSearchAnnee').style.display = anneeSearchTerm ? 'block' : 'none';
-            chargerAnneesListe();
-        });
-        document.getElementById('clearSearchAnnee')?.addEventListener('click', () => {
-            document.getElementById('searchAnnee').value = '';
-            anneeSearchTerm = '';
-            document.getElementById('clearSearchAnnee').style.display = 'none';
-            chargerAnneesListe();
-        });
-        
-        document.getElementById('searchCompte')?.addEventListener('input', (e) => {
-            compteSearchTerm = e.target.value;
-            document.getElementById('clearSearchCompte').style.display = compteSearchTerm ? 'block' : 'none';
-            chargerComptesListe();
-        });
-        document.getElementById('clearSearchCompte')?.addEventListener('click', () => {
-            document.getElementById('searchCompte').value = '';
-            compteSearchTerm = '';
-            document.getElementById('clearSearchCompte').style.display = 'none';
-            chargerComptesListe();
-        });
-        
-        document.getElementById('searchPromotion')?.addEventListener('input', (e) => {
-            promotionSearchTerm = e.target.value;
-            document.getElementById('clearSearchPromotion').style.display = promotionSearchTerm ? 'block' : 'none';
-            chargerPromotionsListe();
-        });
-        document.getElementById('clearSearchPromotion')?.addEventListener('click', () => {
-            document.getElementById('searchPromotion').value = '';
-            promotionSearchTerm = '';
-            document.getElementById('clearSearchPromotion').style.display = 'none';
-            chargerPromotionsListe();
-        });
-        
-        document.getElementById('searchFiche')?.addEventListener('input', (e) => {
-            ficheSearchTerm = e.target.value;
-            document.getElementById('clearSearchFiche').style.display = ficheSearchTerm ? 'block' : 'none';
-            chargerFichesListe();
-        });
-        document.getElementById('clearSearchFiche')?.addEventListener('click', () => {
-            document.getElementById('searchFiche').value = '';
-            ficheSearchTerm = '';
-            document.getElementById('clearSearchFiche').style.display = 'none';
-            chargerFichesListe();
-        });
-        
-        document.getElementById('searchEtudiant')?.addEventListener('input', (e) => {
-            currentSearchTerm = e.target.value;
-            document.getElementById('clearSearch').style.display = currentSearchTerm ? 'block' : 'none';
-            afficherEtudiantsParPromotion(currentSelectedPromotion);
-        });
-        document.getElementById('clearSearch')?.addEventListener('click', () => {
-            document.getElementById('searchEtudiant').value = '';
-            currentSearchTerm = '';
-            document.getElementById('clearSearch').style.display = 'none';
-            afficherEtudiantsParPromotion(currentSelectedPromotion);
-        });
+        document.getElementById('searchAnnee')?.addEventListener('input', (e) => { anneeSearchTerm = e.target.value; document.getElementById('clearSearchAnnee').style.display = anneeSearchTerm ? 'block' : 'none'; chargerAnneesListe(); });
+        document.getElementById('clearSearchAnnee')?.addEventListener('click', () => { document.getElementById('searchAnnee').value = ''; anneeSearchTerm = ''; document.getElementById('clearSearchAnnee').style.display = 'none'; chargerAnneesListe(); });
+        document.getElementById('searchCompte')?.addEventListener('input', (e) => { compteSearchTerm = e.target.value; document.getElementById('clearSearchCompte').style.display = compteSearchTerm ? 'block' : 'none'; chargerComptesListe(); });
+        document.getElementById('clearSearchCompte')?.addEventListener('click', () => { document.getElementById('searchCompte').value = ''; compteSearchTerm = ''; document.getElementById('clearSearchCompte').style.display = 'none'; chargerComptesListe(); });
+        document.getElementById('searchPromotion')?.addEventListener('input', (e) => { promotionSearchTerm = e.target.value; document.getElementById('clearSearchPromotion').style.display = promotionSearchTerm ? 'block' : 'none'; chargerPromotionsListe(); });
+        document.getElementById('clearSearchPromotion')?.addEventListener('click', () => { document.getElementById('searchPromotion').value = ''; promotionSearchTerm = ''; document.getElementById('clearSearchPromotion').style.display = 'none'; chargerPromotionsListe(); });
+        document.getElementById('searchFiche')?.addEventListener('input', (e) => { ficheSearchTerm = e.target.value; document.getElementById('clearSearchFiche').style.display = ficheSearchTerm ? 'block' : 'none'; chargerFichesListe(); });
+        document.getElementById('clearSearchFiche')?.addEventListener('click', () => { document.getElementById('searchFiche').value = ''; ficheSearchTerm = ''; document.getElementById('clearSearchFiche').style.display = 'none'; chargerFichesListe(); });
+        document.getElementById('searchEtudiant')?.addEventListener('input', (e) => { currentSearchTerm = e.target.value; document.getElementById('clearSearch').style.display = currentSearchTerm ? 'block' : 'none'; afficherEtudiantsParPromotion(currentSelectedPromotion); });
+        document.getElementById('clearSearch')?.addEventListener('click', () => { document.getElementById('searchEtudiant').value = ''; currentSearchTerm = ''; document.getElementById('clearSearch').style.display = 'none'; afficherEtudiantsParPromotion(currentSelectedPromotion); });
+        document.getElementById('filtrerDepensesBtn')?.addEventListener('click', () => { const dateDebut = document.getElementById('financeDateDebut').value; const dateFin = document.getElementById('financeDateFin').value; chargerDepenses(dateDebut, dateFin); });
+        document.getElementById('refreshFinanceBtn')?.addEventListener('click', refreshFinance);
         
         // ========== EXPORTS ==========
-        document.getElementById('exportAnneeExcelBtn')?.addEventListener('click', () => {
-            let data = [...allAnnees];
-            if(anneeSearchTerm) {
-                const term = anneeSearchTerm.toLowerCase();
-                data = data.filter(a => (a.annee || a.nom || '').toLowerCase().includes(term));
-            }
-            exporterListe(data.map(a => ({ 'Année': a.annee || a.nom, 'Statut': a.statut === 'active' ? 'Active' : 'Inactive' })), 'annees_academiques');
-        });
-        
-        document.getElementById('exportCompteExcelBtn')?.addEventListener('click', () => {
-            let data = [...allUtilisateurs];
-            if(compteSearchTerm) {
-                const term = compteSearchTerm.toLowerCase();
-                data = data.filter(c => (c.nomComplet || '').toLowerCase().includes(term) || (c.email || '').toLowerCase().includes(term));
-            }
-            exporterListe(data.map(c => ({ 'Nom complet': c.nomComplet, 'Email': c.email, 'Date création': c.dateCreation ? new Date(c.dateCreation.toDate()).toLocaleDateString() : '-' })), 'comptes_comptabilite');
-        });
-        
-        document.getElementById('exportPromotionExcelBtn')?.addEventListener('click', () => {
-            let data = [...allPromotions];
-            if(promotionSearchTerm) {
-                const term = promotionSearchTerm.toLowerCase();
-                data = data.filter(p => (p.nom || '').toLowerCase().includes(term));
-            }
-            exporterListe(data.map(p => ({ 'Nom': p.nom, 'Capacité': p.capacite || '-', 'Étudiants': allEtudiants.filter(e => e.promotion === p.id).length })), 'promotions');
-        });
-        
-        document.getElementById('exportFicheExcelBtn')?.addEventListener('click', () => {
-            let data = [...allFiches];
-            if(ficheSearchTerm) {
-                const term = ficheSearchTerm.toLowerCase();
-                data = data.filter(f => (f.nom || '').toLowerCase().includes(term));
-            }
-            const promoMap = {};
-            allPromotions.forEach(p => promoMap[p.id] = p.nom);
-            exporterListe(data.map(f => ({ 'Nom': f.nom, 'Montant': f.montant || 0, 'Promotions': (f.promotions || []).map(pid => promoMap[pid] || pid).join(', ') })), 'fiches');
-        });
-        
+        document.getElementById('exportAnneeExcelBtn')?.addEventListener('click', () => { let data = [...allAnnees]; if(anneeSearchTerm) { const term = anneeSearchTerm.toLowerCase(); data = data.filter(a => (a.annee || a.nom || '').toLowerCase().includes(term)); } exporterListe(data.map(a => ({ 'Année': a.annee || a.nom, 'Statut': a.statut === 'active' ? 'Active' : 'Inactive' })), 'annees_academiques'); });
+        document.getElementById('exportCompteExcelBtn')?.addEventListener('click', () => { let data = [...allUtilisateurs]; if(compteSearchTerm) { const term = compteSearchTerm.toLowerCase(); data = data.filter(c => (c.nomComplet || '').toLowerCase().includes(term) || (c.email || '').toLowerCase().includes(term)); } exporterListe(data.map(c => ({ 'Nom complet': c.nomComplet, 'Email': c.email, 'Date création': c.dateCreation ? new Date(c.dateCreation.toDate()).toLocaleDateString() : '-' })), 'comptes_comptabilite'); });
+        document.getElementById('exportPromotionExcelBtn')?.addEventListener('click', () => { let data = [...allPromotions]; if(promotionSearchTerm) { const term = promotionSearchTerm.toLowerCase(); data = data.filter(p => (p.nom || '').toLowerCase().includes(term)); } exporterListe(data.map(p => ({ 'Nom': p.nom, 'Capacité': p.capacite || '-', 'Étudiants': allEtudiants.filter(e => e.promotion === p.id).length })), 'promotions'); });
+        document.getElementById('exportFicheExcelBtn')?.addEventListener('click', () => { let data = [...allFiches]; if(ficheSearchTerm) { const term = ficheSearchTerm.toLowerCase(); data = data.filter(f => (f.nom || '').toLowerCase().includes(term)); } const promoMap = {}; allPromotions.forEach(p => promoMap[p.id] = p.nom); exporterListe(data.map(f => ({ 'Nom': f.nom, 'Montant': f.montant || 0, 'Promotions': (f.promotions || []).map(pid => promoMap[pid] || pid).join(', ') })), 'fiches'); });
         document.getElementById('exportExcelBtn')?.addEventListener('click', () => exporterEtudiants('excel'));
         document.getElementById('exportCsvBtn')?.addEventListener('click', () => exporterEtudiants('csv'));
         
-        // ========== BOUTONS D'ACTUALISATION ==========
+        // ========== BOUTONS ==========
         document.getElementById('refreshAnneesBtn')?.addEventListener('click', refreshAnnees);
         document.getElementById('refreshComptesBtn')?.addEventListener('click', refreshComptes);
         document.getElementById('refreshPromotionsBtn')?.addEventListener('click', refreshPromotions);
@@ -2122,9 +2313,14 @@ async refreshCollection(collectionName) {
                 if(card.dataset.menu === 'compta') chargerComptesListe();
                 if(card.dataset.menu === 'promotion') chargerPromotionsListe();
                 if(card.dataset.menu === 'fiche') chargerFichesListe();
+                if(card.dataset.menu === 'finance') refreshFinance();
+                if(card.dataset.menu === 'rapportJournalier') {
+                    if(document.getElementById('journalierAnnee')?.value && document.getElementById('journalierDateDebut')?.value && document.getElementById('journalierDateFin')?.value) {
+                        document.getElementById('afficherJournalier')?.click();
+                    }
+                }
             });
         });
-        
         document.getElementById('homeBrand')?.addEventListener('click', (e) => { e.preventDefault(); goHome(); });
         
         // ========== SESSION & PROFIL ==========
@@ -2133,7 +2329,6 @@ async refreshCollection(collectionName) {
         const sessionData = JSON.parse(session);
         if(Date.now() > sessionData.expires) { localStorage.removeItem('session_doyen'); window.location.href = 'login-doyen.html'; }
         let currentMatricule = sessionData.matricule;
-        
         document.getElementById('profileBtn')?.addEventListener('click', async () => {
             const doc = await db.collection('utilisateurs').doc(currentMatricule).get();
             const userData = doc.data();
@@ -2144,9 +2339,7 @@ async refreshCollection(collectionName) {
             }
             document.getElementById('profileModal').style.display = 'flex';
         });
-        
         window.closeProfileModal = () => document.getElementById('profileModal').style.display = 'none';
-        
         document.getElementById('changePasswordBtn')?.addEventListener('click', async () => {
             const np = document.getElementById('newPassword').value;
             const cp = document.getElementById('confirmNewPassword').value;
@@ -2156,27 +2349,16 @@ async refreshCollection(collectionName) {
             alert('Mot de passe modifié');
             closeProfileModal();
         });
-        
-        document.getElementById('logoutBtn')?.addEventListener('click', () => {
-            localStorage.removeItem('session_doyen');
-            window.location.href = 'login-doyen.html';
-        });
+        document.getElementById('logoutBtn')?.addEventListener('click', () => { localStorage.removeItem('session_doyen'); window.location.href = 'login-doyen.html'; });
         
         // ========== INITIALISATION ==========
         initNotificationSound();
         setupRealtimeListeners();
-        
         setTimeout(() => requestNotificationPermission(), 5000);
-        
         if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js').then(reg => {
-                    console.log('Service Worker enregistré:', reg.scope);
-                }).catch(err => console.log('Erreur Service Worker:', err));
-            });
+            window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').then(reg => console.log('SW:', reg.scope)).catch(err => console.log('SW error:', err)); });
         }
-        
-        console.log('✅ Dashboard Doyen - Version optimisée avec cache et boutons d\'actualisation par collection');
+        console.log('✅ Dashboard Doyen - Version avec gestion financière complète');
     </script>
 </body>
 </html>
