@@ -2246,45 +2246,40 @@
         // ========== SETUP DES ÉCOUTEURS TEMPS RÉEL ==========
         function setupRealtimeListeners() {
             // Écouteur pour les transactions
-            // ========== ÉCOUTEUR TRANSACTIONS SANS LIMITE ==========
-// Supprimez .limit(50) ou .limit(100) pour charger TOUTES les transactions
+ // Supprimer l'écouteur limité et le remplacer par un chargement complet avec snapshot
 db.collection('transactions').onSnapshot((snapshot) => {
     allTransactions = [];
-    snapshot.forEach(doc => {
-        const data = doc.data();
-        allTransactions.push({ id: doc.id, ...data });
-    });
-    
-    console.log(`📊 TOTAL TRANSACTIONS CHARGÉES: ${allTransactions.length}`);
-    
-    // Calculer le total des entrées comme en comptabilité
-    let totalEntreesCalc = 0;
-    allTransactions.forEach(t => {
-        if (t.isDuplicata) {
-            totalEntreesCalc += t.dernierFraisDuplicata || t.duplicataFrais || 0;
-        } else {
-            totalEntreesCalc += t.montantTotal || 0;
-        }
-    });
-    console.log(`💰 TOTAL ENTRÉES CALCULÉ: ${totalEntreesCalc.toLocaleString()} FC`);
-    
+    snapshot.forEach(doc => allTransactions.push({ id: doc.id, ...doc.data() }));
+    console.log(`📊 ${allTransactions.length} transactions chargées (temps réel)`);
     mettreAJourStatsHeader();
     calculerTotauxFinanciers();
     
-    // Notifications...
+    // Gérer les notifications pour les nouveaux paiements uniquement
     snapshot.docChanges().forEach((change) => {
         if (change.type === 'added') {
             const transaction = change.doc.data();
-            if (!transaction.isDuplicata) {
+            const transactionId = change.doc.id;
+            const alreadyShown = localStorage.getItem(`notif_${transactionId}`);
+            const transactionDate = transaction.date?.toDate() || new Date();
+            const diffMinutes = (new Date() - transactionDate) / 1000 / 60;
+            if (!alreadyShown && diffMinutes < 2) {
+                localStorage.setItem(`notif_${transactionId}`, Date.now().toString());
                 showRealTimeNotification(transaction);
             }
         }
     });
     
-    // Rafraîchir les panels
+    // Rafraîchir les panels si actifs
     const paiementsPanel = document.getElementById('panel-paiementsRecents');
     if(paiementsPanel && paiementsPanel.classList.contains('active')) chargerPaiementsRecents();
     
+    const rapportJournalierPanel = document.getElementById('panel-rapportJournalier');
+    if(rapportJournalierPanel && rapportJournalierPanel.classList.contains('active')) {
+        const anneeId = document.getElementById('journalierAnnee')?.value;
+        if(anneeId && document.getElementById('journalierDateDebut')?.value && document.getElementById('journalierDateFin')?.value) {
+            document.getElementById('afficherJournalier')?.click();
+        }
+    }
 }, (error) => console.error('Erreur écouteur transactions:', error));
             
             // Écouteur pour les dépenses
