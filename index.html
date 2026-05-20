@@ -2283,25 +2283,26 @@ db.collection('transactions').onSnapshot((snapshot) => {
 }, (error) => console.error('Erreur écouteur transactions:', error));
             
             // Écouteur pour les dépenses
-            db.collection('depenses').orderBy('date', 'desc').limit(50).onSnapshot((snapshot) => {
-                allDepenses = [];
-                snapshot.forEach(doc => allDepenses.push({ id: doc.id, ...doc.data() }));
-                calculerTotauxFinanciers();
-                mettreAJourStatsHeader();
-                const financePanel = document.getElementById('panel-finance');
-                if(financePanel && financePanel.classList.contains('active')) {
-                    const dateDebut = document.getElementById('financeDateDebut')?.value;
-                    const dateFin = document.getElementById('financeDateFin')?.value;
-                    chargerDepenses(dateDebut, dateFin);
-                }
-                const rapportJournalierPanel = document.getElementById('panel-rapportJournalier');
-                if(rapportJournalierPanel && rapportJournalierPanel.classList.contains('active')) {
-                    const anneeId = document.getElementById('journalierAnnee')?.value;
-                    if(anneeId && document.getElementById('journalierDateDebut')?.value && document.getElementById('journalierDateFin')?.value) {
-                        document.getElementById('afficherJournalier')?.click();
-                    }
-                }
-            }, (error) => console.error('Erreur écouteur dépenses:', error));
+            db.collection('depenses').onSnapshot((snapshot) => {
+    allDepenses = [];
+    snapshot.forEach(doc => allDepenses.push({ id: doc.id, ...doc.data() }));
+    console.log(`📊 ${allDepenses.length} dépenses chargées (temps réel)`);
+    calculerTotauxFinanciers();
+    mettreAJourStatsHeader();
+    const financePanel = document.getElementById('panel-finance');
+    if(financePanel && financePanel.classList.contains('active')) {
+        const dateDebut = document.getElementById('financeDateDebut')?.value;
+        const dateFin = document.getElementById('financeDateFin')?.value;
+        chargerDepenses(dateDebut, dateFin);
+    }
+    const rapportJournalierPanel = document.getElementById('panel-rapportJournalier');
+    if(rapportJournalierPanel && rapportJournalierPanel.classList.contains('active')) {
+        const anneeId = document.getElementById('journalierAnnee')?.value;
+        if(anneeId && document.getElementById('journalierDateDebut')?.value && document.getElementById('journalierDateFin')?.value) {
+            document.getElementById('afficherJournalier')?.click();
+        }
+    }
+}, (error) => console.error('Erreur écouteur dépenses:', error));
             
             // Chargement initial des collections statiques
             chargerCollection('anneesAcademiques').then(data => { 
