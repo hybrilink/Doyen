@@ -216,6 +216,29 @@
         .text-end { text-align: right; }
         .info-text { text-align: center; margin-top: 25px; padding-top: 20px; border-top: 1px solid #e0e0e0; font-size: 13px; color: #888; }
         .info-text img { border-radius: 30px; width: 50px; }
+        .details-fiches-cell { 
+            max-width: 250px;
+            font-size: 12px;
+        }
+        .fiche-detail-item {
+            background: #f0f4ff;
+            padding: 3px 8px;
+            border-radius: 12px;
+            margin: 2px 0;
+            display: inline-block;
+            font-size: 11px;
+            border: 1px solid #d0d8ff;
+        }
+        .fiche-detail-item.paid {
+            background: #d4edda;
+            border-color: #c3e6cb;
+            color: #155724;
+        }
+        .fiche-detail-item.partial {
+            background: #fff3cd;
+            border-color: #ffeaa7;
+            color: #856404;
+        }
     </style>
 </head>
 <body>
@@ -463,8 +486,36 @@
             resDiv.style.display='block';resDiv.innerHTML=`<div class="bordereau-result"><div class="authentic-true text-center"><i class="bi bi-check-circle-fill" style="font-size:48px;"></i><h3>✓ Reçu AUTHENTIQUE</h3></div><div class="row"><div class="col-md-6"><div class="receipt-info"><strong>N° Reçu:</strong> ${escapeHtml(t.numeroRecu||t.id)}</div><div class="receipt-info"><strong>Date:</strong> ${t.date?new Date(t.date.toDate()).toLocaleString('fr-FR'):'-'}</div><div class="receipt-info"><strong>Étudiant:</strong> ${escapeHtml(t.etudiantNom)}</div></div><div class="col-md-6"><div class="receipt-info"><strong>Promotion:</strong> ${escapeHtml(promo)}</div><div class="receipt-info"><strong>Année:</strong> ${escapeHtml(annee)}</div><div class="receipt-info"><strong>Montant:</strong> ${formaterMontant(t.montantTotal||0)}</div></div></div><div class="receipt-info mt-3"><strong>Comptable:</strong> ${escapeHtml(t.comptable||'-')}</div></div>`;
         });
         
-        // ========== RAPPORT JOURNALIER ==========
+        // ========== RAPPORT JOURNALIER (AMÉLIORÉ) ==========
         function chargerJournalierAnnee(){const s=document.getElementById('journalierAnnee');if(s){s.innerHTML='<option value="">-- Sélectionner --</option>';allAnnees.forEach(a=>s.innerHTML+=`<option value="${a.id}">${escapeHtml(a.annee||a.nom)}</option>`);}}
+        
+        /**
+         * Génère le détail des fiches payées pour une transaction
+         */
+        function genererDetailsFiches(transaction) {
+            if (!transaction.fiches || transaction.fiches.length === 0) {
+                return '<span class="text-muted">-</span>';
+            }
+            
+            let detailsHtml = '';
+            transaction.fiches.forEach(f => {
+                const ficheInfo = allFiches.find(fi => fi.id === f.id);
+                const nomFiche = ficheInfo ? ficheInfo.nom : (f.nom || 'Fiche inconnue');
+                const montantFiche = f.montant || (ficheInfo ? ficheInfo.montant : 0);
+                
+                let statutClass = 'paid';
+                if (f.paye !== undefined && f.montant !== undefined) {
+                    statutClass = f.paye >= f.montant ? 'paid' : 'partial';
+                }
+                
+                detailsHtml += `<span class="fiche-detail-item ${statutClass}" title="Montant: ${formaterMontant(montantFiche)}">
+                    📋 ${escapeHtml(nomFiche)}: ${formaterMontant(montantFiche)}
+                </span>`;
+            });
+            
+            return detailsHtml || '<span class="text-muted">-</span>';
+        }
+        
         document.getElementById('afficherJournalier')?.addEventListener('click',()=>{
             const anneeId=document.getElementById('journalierAnnee').value;
             const debut=document.getElementById('journalierDateDebut').value;
@@ -478,8 +529,70 @@
             const totalSorties=depenses.reduce((s,d)=>s+(d.montant||0),0);
             const anneeNom=allAnnees.find(a=>a.id===anneeId)?.annee||'';
             let html=`<div class="rapport-summary"><div class="row text-center"><div class="col-md-3"><strong>Période:</strong><br>${debut.split('-').reverse().join('/')} au ${fin.split('-').reverse().join('/')}</div><div class="col-md-3"><strong>Année:</strong><br>${escapeHtml(anneeNom)}</div><div class="col-md-3"><strong>Entrées:</strong><br><span class="text-success">${formaterMontant(totalEntrees)}</span></div><div class="col-md-3"><strong>Sorties:</strong><br><span class="text-danger">${formaterMontant(totalSorties)}</span></div></div><hr><div class="row text-center"><div class="col-md-12"><strong>Solde période:</strong> <span class="${totalEntrees-totalSorties>=0?'text-success':'text-danger'}">${formaterMontant(totalEntrees-totalSorties)}</span></div></div></div>`;
-            if(transactions.length>0){html+=`<h5 class="mt-3">📋 Paiements (${transactions.length})</h5><div class="table-responsive"><table class="rapport-table"><thead><tr><th>Date</th><th>N° Reçu</th><th>Étudiant</th><th>Montant</th></tr></thead><tbody>`;transactions.forEach(t=>{const dt=t.date?new Date(t.date.toDate()).toLocaleDateString('fr-FR'):'-';html+=`<td><td>${dt}</td><td>${escapeHtml(t.numeroRecu||t.id.substring(0,10))}</td><td>${escapeHtml(t.etudiantNom||'-')}</td><td class="text-end text-success">${formaterMontant(t.montantTotal||0)}</td></tr>`;});html+=`</tbody></table></div>`;}
-            if(depenses.length>0){html+=`<h5 class="mt-3">📤 Dépenses (${depenses.length})</h5><div class="table-responsive"><table class="rapport-table"><thead><tr><th>Date</th><th>Motif</th><th>Comptable</th><th>Montant</th></tr></thead><tbody>`;depenses.forEach(d=>{const dt=d.date?new Date(d.date.toDate()).toLocaleDateString('fr-FR'):'-';html+=`<tr><td>${dt}</td><td>${escapeHtml(d.motif||'-')}</td><td>${escapeHtml(d.comptable||'-')}</td><td class="text-end text-danger">${formaterMontant(d.montant||0)}</td></tr>`;});html+=`</tbody></table></div>`;}
+            
+            // Tableau des paiements avec colonnes correctes
+            if(transactions.length>0){
+                html+=`<h5 class="mt-3">📋 Paiements (${transactions.length})</h5>
+                <div class="table-responsive">
+                    <table class="rapport-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>N° Reçu</th>
+                                <th>Étudiant</th>
+                                <th>Promotion</th>
+                                <th class="text-end">Montant</th>
+                                <th>Détails Fiches</th>
+                            </tr>
+                        </thead>
+                        <tbody>`;
+                
+                transactions.forEach(t=>{
+                    const dt=t.date?new Date(t.date.toDate()).toLocaleDateString('fr-FR'):'-';
+                    const promo=t.promotionNom||(t.promotion?allPromotions.find(p=>p.id===t.promotion)?.nom:'-');
+                    const detailsFiches = genererDetailsFiches(t);
+                    
+                    html+=`<tr>
+                        <td>${dt}</td>
+                        <td><span class="paiement-numero">${escapeHtml(t.numeroRecu||t.id.substring(0,10))}</span></td>
+                        <td><strong>${escapeHtml(t.etudiantNom||'-')}</strong></td>
+                        <td>${escapeHtml(promo||'-')}</td>
+                        <td class="text-end text-success fw-bold">${formaterMontant(t.montantTotal||0)}</td>
+                        <td class="details-fiches-cell">${detailsFiches}</td>
+                    </tr>`;
+                });
+                
+                html+=`</tbody></table></div>`;
+            }
+            
+            // Tableau des dépenses
+            if(depenses.length>0){
+                html+=`<h5 class="mt-3">📤 Dépenses (${depenses.length})</h5>
+                <div class="table-responsive">
+                    <table class="rapport-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Motif</th>
+                                <th>Comptable</th>
+                                <th class="text-end">Montant</th>
+                            </tr>
+                        </thead>
+                        <tbody>`;
+                
+                depenses.forEach(d=>{
+                    const dt=d.date?new Date(d.date.toDate()).toLocaleDateString('fr-FR'):'-';
+                    html+=`<tr>
+                        <td>${dt}</td>
+                        <td>${escapeHtml(d.motif||'-')}</td>
+                        <td>${escapeHtml(d.comptable||'-')}</td>
+                        <td class="text-end text-danger fw-bold">${formaterMontant(d.montant||0)}</td>
+                    </tr>`;
+                });
+                
+                html+=`</tbody></table></div>`;
+            }
+            
             document.getElementById('journalierResultat').innerHTML=html||'<div class="empty-state-mystic"><i class="bi bi-inbox"></i><h5>Aucune donnée</h5></div>';
         });
         
@@ -528,5 +641,5 @@
         else if(deviseActuelle==='HYBRID')document.getElementById('rateBadge').textContent='FC + $';
         console.log('✅ Dashboard Doyen avec conversion de devise - Toutes fonctionnalités incluses');
     </script>
-</body>
+</body> 
 </html>
