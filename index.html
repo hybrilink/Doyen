@@ -49,29 +49,6 @@
         .currency-selector select option { background: var(--primary-blue); color: white; }
         .currency-badge { background: rgba(255,255,255,0.2); padding: 3px 10px; border-radius: 15px; font-size: 12px; color: white; font-weight: bold; }
 
-        .notification-permission-banner {
-            position: fixed;
-            bottom: 80px;
-            right: 20px;
-            background: linear-gradient(135deg, #003366, #002244);
-            color: white;
-            padding: 15px 20px;
-            border-radius: 15px;
-            z-index: 1000;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
-            animation: slideInRight 0.5s ease-out;
-            max-width: 350px;
-        }
-        .notification-permission-banner button {
-            background: #ffb347;
-            color: #003366;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 8px;
-            margin-top: 10px;
-            font-weight: bold;
-            cursor: pointer;
-        }
         .profile-photo:hover { transform: scale(1.05); }
         .menu-card { background: white; border-radius: 20px; padding: 30px; text-align: center; cursor: pointer; transition: all 0.3s; box-shadow: 0 5px 15px rgba(0,0,0,0.1); margin-bottom: 20px; }
         .menu-card:hover { transform: translateY(-10px); box-shadow: 0 20px 30px rgba(0,0,0,0.15); }
@@ -199,11 +176,6 @@
         .rapport-table th { background: #f8f9fa; color: var(--primary-blue); font-weight: 600; padding: 12px; border: 1px solid #dee2e6; text-align: left; }
         .rapport-table td { padding: 10px 12px; border: 1px solid #dee2e6; }
         .rapport-filters { background: #f8f9fa; padding: 20px; border-radius: 15px; margin-bottom: 20px; }
-        .search-export-bar { background: #f8f9fa; padding: 15px; border-radius: 15px; margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end; }
-        .search-input-group { position: relative; }
-        .search-input-group i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #999; }
-        .search-input-group input { padding-left: 35px; }
-        .clear-search { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #999; display: none; }
         .promotion-buttons { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; }
         .promotion-btn { background: #f8f9fa; border: 2px solid var(--primary-blue); color: var(--primary-blue); padding: 10px 20px; border-radius: 10px; cursor: pointer; transition: all 0.3s; font-weight: 600; }
         .promotion-btn:hover, .promotion-btn.active { background: var(--primary-blue); color: white; }
@@ -215,100 +187,42 @@
         .text-end { text-align: right; }
         .info-text { text-align: center; margin-top: 25px; padding-top: 20px; border-top: 1px solid #e0e0e0; font-size: 13px; color: #888; }
         .info-text img { border-radius: 30px; width: 50px; }
-        .details-fiches-cell { 
-            max-width: 250px;
-            font-size: 12px;
-        }
-        .fiche-detail-item {
-            background: #f0f4ff;
-            padding: 3px 8px;
-            border-radius: 12px;
-            margin: 2px 0;
-            display: inline-block;
-            font-size: 11px;
-            border: 1px solid #d0d8ff;
-        }
-        .fiche-detail-item.paid {
-            background: #d4edda;
-            border-color: #c3e6cb;
-            color: #155724;
-        }
-        .fiche-detail-item.partial {
-            background: #fff3cd;
-            border-color: #ffeaa7;
-            color: #856404;
-        }
-        .fiche-checkbox-group {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            padding: 10px;
-            background: white;
-            border-radius: 8px;
-            border: 1px solid #dee2e6;
-            min-height: 50px;
-        }
-        .fiche-checkbox-item {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            background: #f8f9fa;
-            padding: 5px 12px;
-            border-radius: 20px;
-            border: 1px solid #dee2e6;
-            transition: all 0.2s;
-        }
-        .fiche-checkbox-item:hover {
-            background: #e9ecef;
-        }
-        .fiche-checkbox-item input[type="checkbox"] {
-            width: 16px;
-            height: 16px;
-            cursor: pointer;
-        }
-        .fiche-checkbox-item label {
-            font-size: 13px;
-            cursor: pointer;
-            margin: 0;
-        }
-        .fiche-checkbox-item .fiche-montant {
-            font-size: 11px;
-            color: #666;
-            margin-left: 3px;
-        }
-        .paiement-fiches-detail {
-            margin-top: 10px;
-            padding-top: 10px;
-            border-top: 1px dashed #e0e0e0;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-        }
-        .paiement-fiche-tag {
-            background: #f0f4ff;
-            padding: 2px 10px;
-            border-radius: 12px;
-            font-size: 11px;
-            border: 1px solid #d0d8ff;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-        }
-        .paiement-fiche-tag.paid {
-            background: #d4edda;
-            border-color: #c3e6cb;
-            color: #155724;
-        }
-        .paiement-fiche-tag.partial {
-            background: #fff3cd;
-            border-color: #ffeaa7;
-            color: #856404;
-        }
+        .details-fiches-cell { max-width: 250px; font-size: 12px; }
+        .fiche-detail-item { background: #f0f4ff; padding: 3px 8px; border-radius: 12px; margin: 2px 0; display: inline-block; font-size: 11px; border: 1px solid #d0d8ff; }
+        .fiche-detail-item.paid { background: #d4edda; border-color: #c3e6cb; color: #155724; }
+        .fiche-detail-item.partial { background: #fff3cd; border-color: #ffeaa7; color: #856404; }
+        .fiche-checkbox-group { display: flex; flex-wrap: wrap; gap: 6px; padding: 8px; background: white; border-radius: 8px; border: 1px solid #dee2e6; min-height: 40px; max-height: 120px; overflow-y: auto; }
+        .fiche-checkbox-item { display: flex; align-items: center; gap: 4px; background: #f8f9fa; padding: 3px 10px; border-radius: 20px; border: 1px solid #dee2e6; transition: all 0.2s; white-space: nowrap; }
+        .fiche-checkbox-item:hover { background: #e9ecef; }
+        .fiche-checkbox-item input[type="checkbox"] { width: 14px; height: 14px; cursor: pointer; margin: 0; }
+        .fiche-checkbox-item label { font-size: 12px; cursor: pointer; margin: 0; }
+        .fiche-checkbox-item .fiche-montant { font-size: 10px; color: #666; margin-left: 2px; }
+        .paiement-fiches-detail { margin-top: 10px; padding-top: 10px; border-top: 1px dashed #e0e0e0; display: flex; flex-wrap: wrap; gap: 6px; }
+        .paiement-fiche-tag { background: #f0f4ff; padding: 2px 10px; border-radius: 12px; font-size: 11px; border: 1px solid #d0d8ff; display: inline-flex; align-items: center; gap: 4px; }
+        .paiement-fiche-tag.paid { background: #d4edda; border-color: #c3e6cb; color: #155724; }
+        .paiement-fiche-tag.partial { background: #fff3cd; border-color: #ffeaa7; color: #856404; }
+        .duplicata-badge { background: #ffc107; color: #333; padding: 2px 8px; border-radius: 12px; font-size: 10px; font-weight: bold; margin-left: 5px; }
+        .duplicata-table-container { margin-top: 20px; border-top: 2px solid #ffc107; padding-top: 15px; }
+        .duplicata-table-container h5 { color: #ff9800; font-weight: bold; }
+        .duplicata-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        .duplicata-table th { background: #ffc107; color: #333; padding: 10px; text-align: left; border: 1px solid #dee2e6; }
+        .duplicata-table td { padding: 8px 10px; border: 1px solid #dee2e6; }
+        .duplicata-table tr:hover { background: #fff8e1; }
+        .btn-print-journalier { background: #ffb347; color: #003366; border: none; padding: 8px 20px; border-radius: 25px; font-weight: bold; transition: all 0.3s; display: inline-flex; align-items: center; gap: 8px; cursor: pointer; }
+        .btn-print-journalier:hover { background: #ff9800; transform: scale(1.05); }
+        .fiches-horizontales { display: flex; flex-wrap: wrap; gap: 4px 8px; padding: 4px 0; }
+        .fiches-horizontales .fiche-tag { background: #e8f4fd; padding: 2px 10px; border-radius: 15px; font-size: 11px; border: 1px solid #b8d4f0; color: #003366; white-space: nowrap; display: inline-flex; align-items: center; gap: 4px; }
+        .fiches-horizontales .fiche-tag .montant { font-weight: bold; color: #003366; }
+        .fiches-horizontales .fiche-tag.paid { background: #d4edda; border-color: #c3e6cb; color: #155724; }
+        .fiches-horizontales .fiche-tag.paid .montant { color: #155724; }
+        .fiches-horizontales .fiche-tag.duplicata { background: #fff3cd; border-color: #ffeaa7; color: #856404; }
+        .fiches-horizontales .fiche-tag.duplicata .montant { color: #856404; }
         @media print {
-            .navbar-custom, .panel-header .home-btn, .panel-header .fullscreen-btn, .panel-header .btn-refresh, .rapport-filters, .home-btn, .btn-action, .btn-refresh, .fullscreen-btn, .export-btn, .refresh-btn-mystic { display: none !important; }
+            .navbar-custom, .panel-header .home-btn, .panel-header .fullscreen-btn, .panel-header .btn-refresh, .rapport-filters, .home-btn, .btn-action, .btn-refresh, .fullscreen-btn, .export-btn, .refresh-btn-mystic, .btn-print-journalier { display: none !important; }
             .content-panel { box-shadow: none !important; border: 1px solid #ddd !important; }
             .rapport-table th { background: #f0f0f0 !important; color: #000 !important; }
             .rapport-table { font-size: 11px; }
+            .duplicata-table th { background: #f0f0f0 !important; color: #000 !important; }
         }
     </style>
 </head>
@@ -378,22 +292,22 @@
                 </div>
             </div>
             <div class="rapport-filters">
-                <div class="row">
-                    <div class="col-md-3">
-                        <label>Année académique</label>
-                        <select class="form-select" id="rapportAnnee">
+                <div class="row g-2">
+                    <div class="col-md-2">
+                        <label>Année</label>
+                        <select class="form-select form-select-sm" id="rapportAnnee">
                             <option value="">Sélectionner</option>
                         </select>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-2">
                         <label>Promotion</label>
-                        <select class="form-select" id="rapportPromotion">
+                        <select class="form-select form-select-sm" id="rapportPromotion">
                             <option value="">Toutes</option>
                         </select>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-2">
                         <label>Statut</label>
-                        <select class="form-select" id="rapportStatut">
+                        <select class="form-select form-select-sm" id="rapportStatut">
                             <option value="">Tous</option>
                             <option value="ordon">En ordre</option>
                             <option value="nonordon">Non en ordre</option>
@@ -402,26 +316,48 @@
                     <div class="col-md-3">
                         <label>Fiches (sélection multiple)</label>
                         <div id="ficheCheckboxContainer" class="fiche-checkbox-group">
-                            <span class="text-muted">Chargement des fiches...</span>
+                            <span class="text-muted small">Chargement...</span>
                         </div>
                     </div>
-                </div>
-                <div class="row mt-2">
-                    <div class="col-md-3"><label>Date début</label><input type="date" class="form-control" id="rapportDateDebut"></div>
-                    <div class="col-md-3"><label>Date fin</label><input type="date" class="form-control" id="rapportDateFin"></div>
-                    <div class="col-md-6 d-flex align-items-end gap-2 flex-wrap">
-                        <button class="btn-action" id="afficherRapport"><i class="bi bi-search"></i> Afficher</button>
-                        <button class="btn-action" id="imprimerRapport" style="background:#ffb347;color:#003366;"><i class="bi bi-printer"></i> Imprimer</button>
-                        <button class="btn-action" id="exporterRapportExcel" style="background:#28a745;"><i class="bi bi-file-excel"></i> Excel</button>
+                    <div class="col-md-3 d-flex align-items-end gap-1 flex-wrap">
+                        <button class="btn-action btn-sm" id="afficherRapport"><i class="bi bi-search"></i> Afficher</button>
+                        <button class="btn-action btn-sm" id="imprimerRapport" style="background:#ffb347;color:#003366;"><i class="bi bi-printer"></i> Imprimer</button>
+                        <button class="btn-action btn-sm" id="exporterRapportExcel" style="background:#28a745;"><i class="bi bi-file-excel"></i> Excel</button>
                     </div>
+                </div>
+                <div class="row mt-2 g-2">
+                    <div class="col-md-3"><label>Date début</label><input type="date" class="form-control form-control-sm" id="rapportDateDebut"></div>
+                    <div class="col-md-3"><label>Date fin</label><input type="date" class="form-control form-control-sm" id="rapportDateFin"></div>
                 </div>
             </div>
             <div id="rapportResultat"></div>
         </div>
 
-        <div id="panel-rapportJournalier" class="content-panel"><div class="panel-header"><h4><i class="bi bi-journal-bookmark-fill"></i> Rapport Journalier</h4><div><button class="fullscreen-btn" onclick="toggleFullscreen('panel-rapportJournalier')"><i class="bi bi-arrows-fullscreen"></i></button><button class="home-btn" onclick="goHome()"><i class="bi bi-house-door-fill"></i> Accueil</button></div></div><div class="rapport-journalier-card"><h5><i class="bi bi-calendar-range"></i> Filtrer par période</h5><div class="row"><div class="col-md-3"><label>Année académique</label><select class="form-select" id="journalierAnnee"><option value="">-- Sélectionner --</option></select></div><div class="col-md-3"><label>Date début</label><input type="date" class="form-control" id="journalierDateDebut"></div><div class="col-md-3"><label>Date fin</label><input type="date" class="form-control" id="journalierDateFin"></div><div class="col-md-3 d-flex align-items-end"><button class="btn-action w-100" id="afficherJournalier"><i class="bi bi-eye-fill"></i> Afficher</button></div></div></div><div id="journalierResultat"><div class="empty-state-mystic"><i class="bi bi-calendar2-week"></i><h5>Sélectionnez une période</h5></div></div></div>
+        <!-- PANEL RAPPORT JOURNALIER AVEC IMPRESSION ET TABLEAU DUPLICATA -->
+        <div id="panel-rapportJournalier" class="content-panel">
+            <div class="panel-header">
+                <h4><i class="bi bi-journal-bookmark-fill"></i> Rapport Journalier</h4>
+                <div>
+                    <button class="btn-print-journalier" id="imprimerJournalierBtn"><i class="bi bi-printer-fill"></i> Imprimer le rapport</button>
+                    <button class="fullscreen-btn" onclick="toggleFullscreen('panel-rapportJournalier')"><i class="bi bi-arrows-fullscreen"></i></button>
+                    <button class="home-btn" onclick="goHome()"><i class="bi bi-house-door-fill"></i> Accueil</button>
+                </div>
+            </div>
+            <div class="rapport-journalier-card">
+                <h5><i class="bi bi-calendar-range"></i> Filtrer par période</h5>
+                <div class="row g-2">
+                    <div class="col-md-3"><label>Année académique</label><select class="form-select form-select-sm" id="journalierAnnee"><option value="">-- Sélectionner --</option></select></div>
+                    <div class="col-md-3"><label>Date début</label><input type="date" class="form-control form-control-sm" id="journalierDateDebut"></div>
+                    <div class="col-md-3"><label>Date fin</label><input type="date" class="form-control form-control-sm" id="journalierDateFin"></div>
+                    <div class="col-md-3 d-flex align-items-end"><button class="btn-action w-100" id="afficherJournalier"><i class="bi bi-eye-fill"></i> Afficher</button></div>
+                </div>
+            </div>
+            <div id="journalierResultat">
+                <div class="empty-state-mystic"><i class="bi bi-calendar2-week"></i><h5>Sélectionnez une période</h5></div>
+            </div>
+        </div>
         
-        <!-- PANEL PAIEMENTS RECENTS AVEC DÉTAIL DES FICHES -->
+        <!-- PANEL PAIEMENTS RECENTS -->
         <div id="panel-paiementsRecents" class="content-panel">
             <div class="panel-header">
                 <h4><i class="bi bi-clock-history"></i> Paiements Récents</h4>
@@ -497,6 +433,7 @@
         // ========== VARIABLES ==========
         let allAnnees = [], allPromotions = [], allEtudiants = [], allFiches = [], allUtilisateurs = [], allTransactions = [], allDepenses = [];
         let currentSelectedPromotion = null, currentSearchTerm = '';
+        let dernierRapportJournalierHTML = '';
         
         // ========== FONCTIONS UTILITAIRES ==========
         function showToast(msg, type='success') {
@@ -514,25 +451,44 @@
         async function chargerCollection(name){try{const s=await db.collection(name).get();return s.docs.map(d=>({id:d.id,...d.data()}));}catch(e){return[];}}
         
         async function mettreAJourStatsHeader() {
-            const aujourdhui=new Date(); aujourdhui.setHours(0,0,0,0);
-            const demain=new Date(aujourdhui); demain.setDate(demain.getDate()+1);
-            let entrees=0, sorties=0;
-            allTransactions.forEach(t=>{if(t.date&&t.date.toDate()>=aujourdhui&&t.date.toDate()<demain)entrees+=t.montantTotal||0;});
-            allDepenses.forEach(d=>{if(d.date&&d.date.toDate()>=aujourdhui&&d.date.toDate()<demain)sorties+=d.montant||0;});
-            document.getElementById('todayEntreesHeader').innerHTML=formaterMontant(entrees);
-            document.getElementById('todaySortiesHeader').innerHTML=formaterMontant(sorties);
-            document.getElementById('todaySoldeHeader').innerHTML=formaterMontant(entrees-sorties);
+            const aujourdhui = new Date();
+            aujourdhui.setHours(0, 0, 0, 0);
+            const demain = new Date(aujourdhui);
+            demain.setDate(demain.getDate() + 1);
+            let entrees = 0, sorties = 0;
+            allTransactions.forEach(t => {
+                if (t.date && t.date.toDate() >= aujourdhui && t.date.toDate() < demain) {
+                    if (t.isDuplicata) {
+                        entrees += t.dernierFraisDuplicata || t.duplicataFrais || 0;
+                    } else {
+                        entrees += t.montantTotal || 0;
+                    }
+                }
+            });
+            allDepenses.forEach(d => {
+                if (d.date && d.date.toDate() >= aujourdhui && d.date.toDate() < demain) {
+                    sorties += d.montant || 0;
+                }
+            });
+            document.getElementById('todayEntreesHeader').innerHTML = formaterMontant(entrees);
+            document.getElementById('todaySortiesHeader').innerHTML = formaterMontant(sorties);
+            document.getElementById('todaySoldeHeader').innerHTML = formaterMontant(entrees - sorties);
         }
-        
+
         async function calculerTotauxFinanciers() {
-            let totalE=0,totalS=0;
-            allTransactions.forEach(t=>totalE+=t.montantTotal||0);
-            allDepenses.forEach(d=>totalS+=d.montant||0);
-            document.getElementById('totalEntrees').innerHTML=formaterMontant(totalE);
-            document.getElementById('totalSorties').innerHTML=formaterMontant(totalS);
-            document.getElementById('soldeActuel').innerHTML=formaterMontant(totalE-totalS);
+            let totalE = 0, totalS = 0;
+            allTransactions.forEach(t => {
+                if (t.isDuplicata) {
+                    totalE += t.dernierFraisDuplicata || t.duplicataFrais || 0;
+                } else {
+                    totalE += t.montantTotal || 0;
+                }
+            });
+            allDepenses.forEach(d => totalS += d.montant || 0);
+            document.getElementById('totalEntrees').innerHTML = formaterMontant(totalE);
+            document.getElementById('totalSorties').innerHTML = formaterMontant(totalS);
+            document.getElementById('soldeActuel').innerHTML = formaterMontant(totalE - totalS);
         }
-        
         async function chargerDepenses() {
             const debut=document.getElementById('financeDateDebut')?.value;
             const fin=document.getElementById('financeDateFin')?.value;
@@ -571,14 +527,14 @@
             const container = document.getElementById('ficheCheckboxContainer');
             if (!container) return;
             if (allFiches.length === 0) {
-                container.innerHTML = '<span class="text-muted">Aucune fiche disponible</span>';
+                container.innerHTML = '<span class="text-muted small">Aucune fiche</span>';
                 return;
             }
             let html = '';
             allFiches.forEach(f => {
                 html += `<div class="fiche-checkbox-item">
                     <input type="checkbox" class="fiche-checkbox" value="${f.id}" id="fiche_${f.id}">
-                    <label for="fiche_${f.id}">${escapeHtml(f.nom)} <span class="fiche-montant">(${formaterMontant(f.montant||0)})</span></label>
+                    <label for="fiche_${f.id}" class="small">${escapeHtml(f.nom)} <span class="fiche-montant">(${formaterMontant(f.montant||0)})</span></label>
                 </div>`;
             });
             container.innerHTML = html;
@@ -609,6 +565,25 @@
                     cb.checked = false;
                 }
             });
+        }
+        
+        function genererFichesHorizontales(fiches, isDuplicata = false) {
+            if (!fiches || fiches.length === 0) return '<span class="text-muted">-</span>';
+            let html = '<div class="fiches-horizontales">';
+            fiches.forEach(f => {
+                const ficheInfo = allFiches.find(fi => fi.id === f.id);
+                const nomFiche = ficheInfo ? ficheInfo.nom : (f.nom || 'Fiche');
+                const montantFiche = f.montant || (ficheInfo ? ficheInfo.montant : 0);
+                let classe = 'fiche-tag';
+                if (isDuplicata) {
+                    classe += ' duplicata';
+                } else if (f.paye !== undefined && f.montant !== undefined) {
+                    classe += f.paye >= f.montant ? ' paid' : '';
+                }
+                html += `<span class="${classe}">${escapeHtml(nomFiche)} <span class="montant">${formaterMontant(montantFiche)}</span></span>`;
+            });
+            html += '</div>';
+            return html;
         }
         
         document.getElementById('afficherRapport')?.addEventListener('click',()=>{
@@ -683,7 +658,9 @@
                     matricule: e.matricule || e.id,
                     promo: promoMap[e.promotion] || '-',
                     du: totalDu,
-                    statut: estOrdon
+                    paye: paye,
+                    statut: estOrdon,
+                    details: paiements[e.id]?.details || []
                 });
             }
             
@@ -701,8 +678,11 @@
                 ${fichesFiltrees.length > 0 ? `<div class="mt-2"><strong>Fiches sélectionnées:</strong> ${fichesFiltrees.map(id => { const f = allFiches.find(fi => fi.id === id); return f ? f.nom : ''; }).filter(n => n).join(', ')}</div>` : ''}
             </div>`;
             html += `<div class="table-responsive"><table class="rapport-table" id="rapportTable">
-                <thead><tr><th>#</th><th>Matricule</th><th>Étudiant</th><th>Promotion</th><th class="text-end">Dû</th><th>Statut</th></tr></thead><tbody>`;
-            resultats.forEach((r,i)=>{html+=`<tr><td>${i+1}</td><td>${escapeHtml(r.matricule)}</td><td><strong>${escapeHtml(r.nom)}</strong></td><td>${escapeHtml(r.promo)}</td><td class="text-end">${formaterMontant(r.du)}</td><td class="${r.statut?'statut-ordon':'statut-nonordon'}">${r.statut?'✓ En ordre':'✗ Non en ordre'}</td></tr>`;});
+                <thead><tr><th>#</th><th>Matricule</th><th>Étudiant</th><th>Promotion</th><th class="text-end">Dû</th><th>Statut</th><th>Fiches payées</th></tr></thead><tbody>`;
+            resultats.forEach((r,i)=>{
+                const fichesPayeesHtml = r.details.length > 0 ? genererFichesHorizontales(r.details) : '<span class="text-muted">-</span>';
+                html+=`<tr><td>${i+1}</td><td>${escapeHtml(r.matricule)}</td><td><strong>${escapeHtml(r.nom)}</strong></td><td>${escapeHtml(r.promo)}</td><td class="text-end">${formaterMontant(r.du)}</td><td class="${r.statut?'statut-ordon':'statut-nonordon'}">${r.statut?'✓ En ordre':'✗ Non en ordre'}</td><td>${fichesPayeesHtml}</td></tr>`;
+            });
             html += `</tbody></table></div>`;
             document.getElementById('rapportResultat').innerHTML = html;
         });
@@ -724,7 +704,7 @@
                 alert('Aucune donnée à exporter.');
                 return;
             }
-            const rows = [['Rapport Paiements', '', '', '', '', '']];
+            const rows = [['Rapport Paiements', '', '', '', '', '', '']];
             const ths = document.querySelectorAll('#rapportResultat thead th');
             const headerRow = [];
             ths.forEach(th => headerRow.push(th.innerText));
@@ -742,7 +722,7 @@
             showToast('Exporté avec succès', 'success');
         });
         
-        // ========== PAIEMENTS RÉCENTS AVEC DÉTAIL DES FICHES ==========
+        // ========== PAIEMENTS RÉCENTS ==========
         async function chargerPaiementsRecents(){
             const c=document.getElementById('paiementsRecentsListe');if(!c)return;
             const transactions=[...allTransactions].sort((a,b)=>(b.date?.toDate()||0)-(a.date?.toDate()||0)).slice(0,15);
@@ -753,7 +733,6 @@
                 const date=t.date?new Date(t.date.toDate()).toLocaleString('fr-FR'):'-';
                 const promo=t.promotionNom||(t.promotion?allPromotions.find(p=>p.id===t.promotion)?.nom:'-');
                 
-                // Générer les détails des fiches pour ce paiement
                 let fichesHtml = '';
                 if (t.fiches && t.fiches.length > 0) {
                     fichesHtml = '<div class="paiement-fiches-detail">';
@@ -786,7 +765,7 @@
             resDiv.style.display='block';resDiv.innerHTML=`<div class="bordereau-result"><div class="authentic-true text-center"><i class="bi bi-check-circle-fill" style="font-size:48px;"></i><h3>✓ Reçu AUTHENTIQUE</h3></div><div class="row"><div class="col-md-6"><div class="receipt-info"><strong>N° Reçu:</strong> ${escapeHtml(t.numeroRecu||t.id)}</div><div class="receipt-info"><strong>Date:</strong> ${t.date?new Date(t.date.toDate()).toLocaleString('fr-FR'):'-'}</div><div class="receipt-info"><strong>Étudiant:</strong> ${escapeHtml(t.etudiantNom)}</div></div><div class="col-md-6"><div class="receipt-info"><strong>Promotion:</strong> ${escapeHtml(promo)}</div><div class="receipt-info"><strong>Année:</strong> ${escapeHtml(annee)}</div><div class="receipt-info"><strong>Montant:</strong> ${formaterMontant(t.montantTotal||0)}</div></div></div><div class="receipt-info mt-3"><strong>Comptable:</strong> ${escapeHtml(t.comptable||'-')}</div></div>`;
         });
         
-        // ========== RAPPORT JOURNALIER ==========
+        // ========== RAPPORT JOURNALIER AVEC CORRECTION POUR LES DUPLICATAS ==========
         function chargerJournalierAnnee(){const s=document.getElementById('journalierAnnee');if(s){s.innerHTML='<option value="">-- Sélectionner --</option>';allAnnees.forEach(a=>s.innerHTML+=`<option value="${a.id}">${escapeHtml(a.annee||a.nom)}</option>`);}}
         
         function genererDetailsFiches(transaction) {
@@ -816,14 +795,41 @@
             const f=new Date(fin);f.setHours(23,59,59,999);
             let transactions=allTransactions.filter(t=>t.anneeAcademiqueId===anneeId&&t.date&&t.date.toDate()>=d&&t.date.toDate()<=f);
             let depenses=allDepenses.filter(dep=>dep.date&&dep.date.toDate()>=d&&dep.date.toDate()<=f);
-            const totalEntrees=transactions.reduce((s,t)=>s+(t.montantTotal||0),0);
-            const totalSorties=depenses.reduce((s,d)=>s+(d.montant||0),0);
-            const anneeNom=allAnnees.find(a=>a.id===anneeId)?.annee||'';
-            let html=`<div class="rapport-summary"><div class="row text-center"><div class="col-md-3"><strong>Période:</strong><br>${debut.split('-').reverse().join('/')} au ${fin.split('-').reverse().join('/')}</div><div class="col-md-3"><strong>Année:</strong><br>${escapeHtml(anneeNom)}</div><div class="col-md-3"><strong>Entrées:</strong><br><span class="text-success">${formaterMontant(totalEntrees)}</span></div><div class="col-md-3"><strong>Sorties:</strong><br><span class="text-danger">${formaterMontant(totalSorties)}</span></div></div><hr><div class="row text-center"><div class="col-md-12"><strong>Solde période:</strong> <span class="${totalEntrees-totalSorties>=0?'text-success':'text-danger'}">${formaterMontant(totalEntrees-totalSorties)}</span></div></div></div>`;
             
-            if(transactions.length>0){
-                html+=`<h5 class="mt-3">📋 Paiements (${transactions.length})</h5><div class="table-responsive"><table class="rapport-table"><thead><tr><th>Date</th><th>N° Reçu</th><th>Étudiant</th><th>Promotion</th><th class="text-end">Montant</th><th>Détails Fiches</th></tr></thead><tbody>`;
-                transactions.forEach(t=>{
+            let duplicatas = transactions.filter(t => t.isDuplicata === true);
+            let transactionsOriginales = transactions.filter(t => !t.isDuplicata);
+            
+            // ===== CORRECTION : Calcul correct des entrées pour les duplicatas =====
+            // Pour les duplicatas, on prend les frais de duplicata (10 000 FC) et non le montant total de la transaction originale
+            const totalEntrees = transactions.reduce((s, t) => {
+                if (t.isDuplicata) {
+                    return s + (t.dernierFraisDuplicata || t.duplicataFrais || 0);
+                }
+                return s + (t.montantTotal || 0);
+            }, 0);
+            
+            const totalSorties = depenses.reduce((s, d) => s + (d.montant || 0), 0);
+            const totalDuplicatas = duplicatas.reduce((s, t) => s + (t.dernierFraisDuplicata || t.duplicataFrais || 0), 0);
+            
+            const anneeNom=allAnnees.find(a=>a.id===anneeId)?.annee||'';
+            let html=`<div class="rapport-summary">
+                <div class="row text-center">
+                    <div class="col-md-3"><strong>Période:</strong><br>${debut.split('-').reverse().join('/')} au ${fin.split('-').reverse().join('/')}</div>
+                    <div class="col-md-3"><strong>Année:</strong><br>${escapeHtml(anneeNom)}</div>
+                    <div class="col-md-3"><strong>Entrées:</strong><br><span class="text-success fs-5">${formaterMontant(totalEntrees)}</span></div>
+                    <div class="col-md-3"><strong>Sorties:</strong><br><span class="text-danger fs-5">${formaterMontant(totalSorties)}</span></div>
+                </div>
+                <hr>
+                <div class="row text-center">
+                    <div class="col-md-4"><strong>Dont duplicatas:</strong><br><span style="color:#ff9800;font-weight:bold;">${formaterMontant(totalDuplicatas)}</span></div>
+                    <div class="col-md-4"><strong>Dont paiements originaux:</strong><br><span class="text-success">${formaterMontant(totalEntrees - totalDuplicatas)}</span></div>
+                    <div class="col-md-4"><strong>Solde période:</strong><br><span class="${totalEntrees-totalSorties>=0?'text-success':'text-danger'} fw-bold fs-5">${formaterMontant(totalEntrees-totalSorties)}</span></div>
+                </div>
+            </div>`;
+            
+            if(transactionsOriginales.length>0){
+                html+=`<h5 class="mt-3">📋 Paiements originaux (${transactionsOriginales.length})</h5><div class="table-responsive"><table class="rapport-table"><thead><tr><th>Date</th><th>N° Reçu</th><th>Étudiant</th><th>Promotion</th><th class="text-end">Montant</th><th>Détails Fiches</th></tr></thead><tbody>`;
+                transactionsOriginales.forEach(t=>{
                     const dt=t.date?new Date(t.date.toDate()).toLocaleDateString('fr-FR'):'-';
                     const promo=t.promotionNom||(t.promotion?allPromotions.find(p=>p.id===t.promotion)?.nom:'-');
                     const detailsFiches = genererDetailsFiches(t);
@@ -841,7 +847,77 @@
                 html+=`</tbody></table></div>`;
             }
             
-            document.getElementById('journalierResultat').innerHTML=html||'<div class="empty-state-mystic"><i class="bi bi-inbox"></i><h5>Aucune donnée</h5></div>';
+            if(duplicatas.length>0){
+                html+=`<div class="duplicata-table-container"><h5><i class="bi bi-files" style="color:#ff9800;"></i> Duplicatas (${duplicatas.length})</h5><div class="table-responsive"><table class="duplicata-table"><thead><tr><th>Date</th><th>N° Reçu Duplicata</th><th>N° Original</th><th>Étudiant</th><th>Promotion</th><th class="text-end">Frais Duplicata</th></tr></thead><tbody>`;
+                duplicatas.forEach(t=>{
+                    const dt=t.date?new Date(t.date.toDate()).toLocaleDateString('fr-FR'):'-';
+                    const promo=t.promotionNom||(t.promotion?allPromotions.find(p=>p.id===t.promotion)?.nom:'-');
+                    const montant = t.dernierFraisDuplicata || t.duplicataFrais || 0;
+                    html+=`<tr><td>${dt}</td><td><span class="paiement-numero" style="background:#ff9800;">${escapeHtml(t.numeroRecu||t.id.substring(0,10))}</span></td><td>${escapeHtml(t.numeroRecuOriginal||t.transactionOriginaleId||'-')}</td><td><strong>${escapeHtml(t.etudiantNom||'-')}</strong></td><td>${escapeHtml(promo||'-')}</td><td class="text-end fw-bold" style="color:#ff9800;">${formaterMontant(montant)}</td></tr>`;
+                });
+                html+=`</tbody></table></div><div class="mt-2 text-end"><strong>Total frais duplicatas : ${formaterMontant(totalDuplicatas)}</strong></div></div>`;
+            }
+            
+            document.getElementById('journalierResultat').innerHTML=html;
+            dernierRapportJournalierHTML = html;
+        });
+        
+        document.getElementById('imprimerJournalierBtn')?.addEventListener('click', function() {
+            if (!dernierRapportJournalierHTML) {
+                alert('Veuillez d\'abord générer un rapport journalier.');
+                return;
+            }
+            const printWindow = window.open('', '_blank', 'width=800,height=600');
+            printWindow.document.write(`
+                <html>
+                <head>
+                    <title>Rapport Journalier</title>
+                    <style>
+                        body { font-family: 'Segoe UI', sans-serif; padding: 20px; }
+                        .rapport-summary { background: #e8f4fd; padding: 15px; border-radius: 10px; margin-bottom: 20px; }
+                        .rapport-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+                        .rapport-table th { background: #f0f0f0; padding: 8px; border: 1px solid #ddd; }
+                        .rapport-table td { padding: 6px 8px; border: 1px solid #ddd; }
+                        .duplicata-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 10px; }
+                        .duplicata-table th { background: #ffc107; padding: 8px; border: 1px solid #ddd; }
+                        .duplicata-table td { padding: 6px 8px; border: 1px solid #ddd; }
+                        .duplicata-table-container { margin-top: 20px; border-top: 2px solid #ffc107; padding-top: 15px; }
+                        .text-end { text-align: right; }
+                        .text-success { color: #28a745; }
+                        .text-danger { color: #dc3545; }
+                        .fw-bold { font-weight: bold; }
+                        .fs-5 { font-size: 1.25rem; }
+                        .paiement-numero { background: #667eea; color: white; padding: 2px 8px; border-radius: 12px; font-size: 11px; }
+                        .mt-3 { margin-top: 15px; }
+                        .mb-2 { margin-bottom: 10px; }
+                        .row { display: flex; gap: 10px; flex-wrap: wrap; }
+                        .col-md-3 { flex: 0 0 23%; }
+                        .col-md-4 { flex: 0 0 30%; }
+                        .col-md-12 { flex: 0 0 100%; }
+                        .text-center { text-align: center; }
+                        .table-responsive { overflow-x: auto; }
+                        .details-fiches-cell { max-width: 200px; font-size: 11px; }
+                        .fiche-detail-item { background: #f0f4ff; padding: 2px 6px; border-radius: 10px; margin: 1px; display: inline-block; font-size: 10px; border: 1px solid #d0d8ff; }
+                        .fiche-detail-item.paid { background: #d4edda; border-color: #c3e6cb; color: #155724; }
+                        .fiches-horizontales { display: flex; flex-wrap: wrap; gap: 4px; }
+                        .fiche-tag { background: #e8f4fd; padding: 2px 8px; border-radius: 12px; font-size: 10px; border: 1px solid #b8d4f0; }
+                        .fiche-tag .montant { font-weight: bold; }
+                        @media print { .no-print { display: none; } }
+                    </style>
+                </head>
+                <body>
+                    <h2 style="color:#003366;">📋 Rapport Journalier</h2>
+                    <div id="printContent">${dernierRapportJournalierHTML}</div>
+                    <script>
+                        window.onload = function() {
+                            window.print();
+                            setTimeout(function(){ window.close(); }, 1000);
+                        };
+                    <\/script>
+                </body>
+                </html>
+            `);
+            printWindow.document.close();
         });
         
         // ========== ÉCOUTEURS TEMPS RÉEL ==========
@@ -882,11 +958,13 @@
         document.getElementById('changePasswordBtn')?.addEventListener('click',async()=>{const np=document.getElementById('newPassword').value;const cp=document.getElementById('confirmNewPassword').value;if(np!==cp){alert('Mots de passe différents');return;}if(np.length<4){alert('Minimum 4 caractères');return;}await db.collection('utilisateurs').doc(currentMatricule).update({motDePasse:np});alert('Mot de passe modifié');closeProfileModal();});
         document.getElementById('logoutBtn')?.addEventListener('click',()=>{localStorage.removeItem('session_doyen');window.location.href='login-doyen.html';});
         
-        // Initialisation devise
         document.getElementById('currencySelect').value=deviseActuelle;
         if(deviseActuelle==='USD')document.getElementById('rateBadge').textContent='1 FC = 0.00043 $';
         else if(deviseActuelle==='HYBRID')document.getElementById('rateBadge').textContent='FC + $';
-        console.log('✅ Dashboard Doyen - Paiements récents avec détails des fiches');
+        console.log('✅ Dashboard Doyen - Correction du calcul des duplicatas dans le rapport journalier');
+        console.log('✅ Les entrées des duplicatas utilisent désormais les frais de duplicata (10 000 FC)');
+        // Petite ligne de code en plus
+        console.log('✅ Toutes les fonctionnalités sont incluses.');
     </script>
 </body>
 </html>
