@@ -218,11 +218,12 @@
         .fiches-horizontales .fiche-tag.duplicata { background: #fff3cd; border-color: #ffeaa7; color: #856404; }
         .fiches-horizontales .fiche-tag.duplicata .montant { color: #856404; }
         @media print {
-            .navbar-custom, .panel-header .home-btn, .panel-header .fullscreen-btn, .panel-header .btn-refresh, .rapport-filters, .home-btn, .btn-action, .btn-refresh, .fullscreen-btn, .export-btn, .refresh-btn-mystic, .btn-print-journalier { display: none !important; }
+            .navbar-custom, .panel-header .home-btn, .panel-header .fullscreen-btn, .panel-header .btn-refresh, .rapport-filters, .home-btn, .btn-action, .btn-refresh, .fullscreen-btn, .export-btn, .refresh-btn-mystic, .btn-print-journalier, .no-print { display: none !important; }
             .content-panel { box-shadow: none !important; border: 1px solid #ddd !important; }
             .rapport-table th { background: #f0f0f0 !important; color: #000 !important; }
             .rapport-table { font-size: 11px; }
             .duplicata-table th { background: #f0f0f0 !important; color: #000 !important; }
+            .etudiants-table th { background: #f0f0f0 !important; color: #000 !important; }
         }
     </style>
 </head>
@@ -266,7 +267,7 @@
                 <div class="col-md-3 col-sm-6"><div class="menu-card" data-menu="promotion"><div class="menu-icon"><i class="bi bi-trophy-fill"></i></div><div class="menu-title">Promotions</div></div></div>
                 <div class="col-md-3 col-sm-6"><div class="menu-card" data-menu="fiche"><div class="menu-icon"><i class="bi bi-file-text-fill"></i></div><div class="menu-title">Fiches</div></div></div>
                 <div class="col-md-3 col-sm-6"><div class="menu-card" data-menu="etudiant"><div class="menu-icon"><i class="bi bi-mortarboard-fill"></i></div><div class="menu-title">Étudiants</div></div></div>
-                <div class="col-md-3 col-sm-6"><div class="menu-card" data-menu="rapport"><div class="menu-icon"><i class="bi bi-graph-up"></i></div><div class="menu-title">Rapports</div></div></div>
+                <!-- Le bouton Rapports a été retiré -->
                 <div class="col-md-3 col-sm-6"><div class="menu-card" data-menu="paiementsRecents"><div class="menu-icon"><i class="bi bi-clock-history"></i></div><div class="menu-title">Paiements Récents</div></div></div>
                 <div class="col-md-3 col-sm-6"><div class="menu-card" data-menu="bordereau"><div class="menu-icon"><i class="bi bi-qr-code-scan"></i></div><div class="menu-title">Vérification Bordereau</div></div></div>
                 <div class="col-md-3 col-sm-6"><div class="menu-card" data-menu="rapportJournalier"><div class="menu-icon"><i class="bi bi-journal-bookmark-fill"></i></div><div class="menu-title">Rapport Journalier</div></div></div>
@@ -280,59 +281,24 @@
         <div id="panel-compta" class="content-panel"><div class="panel-header"><h4><i class="bi bi-person-badge-fill"></i> Comptes Comptabilité</h4><div><button class="btn-refresh" id="refreshComptesBtn"><i class="bi bi-arrow-repeat"></i> Actualiser</button><button class="fullscreen-btn" onclick="toggleFullscreen('panel-compta')"><i class="bi bi-arrows-fullscreen"></i></button><button class="home-btn" onclick="goHome()"><i class="bi bi-house-door-fill"></i> Accueil</button></div></div><div id="comptesListe"><div class="text-center"><div class="loading-spinner"></div> Chargement...</div></div></div>
         <div id="panel-promotion" class="content-panel"><div class="panel-header"><h4><i class="bi bi-trophy-fill"></i> Promotions</h4><div><button class="btn-refresh" id="refreshPromotionsBtn"><i class="bi bi-arrow-repeat"></i> Actualiser</button><button class="fullscreen-btn" onclick="toggleFullscreen('panel-promotion')"><i class="bi bi-arrows-fullscreen"></i></button><button class="home-btn" onclick="goHome()"><i class="bi bi-house-door-fill"></i> Accueil</button></div></div><div id="promotionsListe"><div class="text-center"><div class="loading-spinner"></div> Chargement...</div></div></div>
         <div id="panel-fiche" class="content-panel"><div class="panel-header"><h4><i class="bi bi-file-text-fill"></i> Fiches</h4><div><button class="btn-refresh" id="refreshFichesBtn"><i class="bi bi-arrow-repeat"></i> Actualiser</button><button class="fullscreen-btn" onclick="toggleFullscreen('panel-fiche')"><i class="bi bi-arrows-fullscreen"></i></button><button class="home-btn" onclick="goHome()"><i class="bi bi-house-door-fill"></i> Accueil</button></div></div><div id="fichesListe"><div class="text-center"><div class="loading-spinner"></div> Chargement...</div></div></div>
-        <div id="panel-etudiant" class="content-panel"><div class="panel-header"><h4><i class="bi bi-mortarboard-fill"></i> Étudiants</h4><div><button class="btn-refresh" id="refreshEtudiantsBtn"><i class="bi bi-arrow-repeat"></i> Actualiser</button><button class="fullscreen-btn" onclick="toggleFullscreen('panel-etudiant')"><i class="bi bi-arrows-fullscreen"></i></button><button class="home-btn" onclick="goHome()"><i class="bi bi-house-door-fill"></i> Accueil</button></div></div><div id="promotionButtons" class="promotion-buttons"></div><div id="etudiantsListe"><div class="text-center"><div class="loading-spinner"></div> Chargement...</div></div></div>
-        
-        <!-- PANEL RAPPORT AVEC CHECKBOX POUR FICHES -->
-        <div id="panel-rapport" class="content-panel">
-            <div class="panel-header">
-                <h4><i class="bi bi-graph-up"></i> Rapports paiement</h4>
-                <div>
-                    <button class="fullscreen-btn" onclick="toggleFullscreen('panel-rapport')"><i class="bi bi-arrows-fullscreen"></i></button>
-                    <button class="home-btn" onclick="goHome()"><i class="bi bi-house-door-fill"></i> Accueil</button>
+        <div id="panel-etudiant" class="content-panel"><div class="panel-header"><h4><i class="bi bi-mortarboard-fill"></i> Étudiants</h4><div><button class="btn-refresh" id="refreshEtudiantsBtn"><i class="bi bi-arrow-repeat"></i> Actualiser</button><button class="fullscreen-btn" onclick="toggleFullscreen('panel-etudiant')"><i class="bi bi-arrows-fullscreen"></i></button><button class="home-btn" onclick="goHome()"><i class="bi bi-house-door-fill"></i> Accueil</button></div></div><div id="promotionButtons" class="promotion-buttons"></div>
+            <!-- Barre de recherche et boutons pour la liste des étudiants -->
+            <div class="row g-2 mb-3 no-print">
+                <div class="col-md-6">
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="rechercheEtudiant" placeholder="Rechercher un étudiant...">
+                        <button class="btn btn-action" id="btnRechercherEtudiant"><i class="bi bi-search"></i> Rechercher</button>
+                    </div>
+                </div>
+                <div class="col-md-6 text-end">
+                    <button class="btn btn-action" id="btnImprimerEtudiants" style="background:#ffb347;color:#003366;"><i class="bi bi-printer-fill"></i> Imprimer la liste</button>
                 </div>
             </div>
-            <div class="rapport-filters">
-                <div class="row g-2">
-                    <div class="col-md-2">
-                        <label>Année</label>
-                        <select class="form-select form-select-sm" id="rapportAnnee">
-                            <option value="">Sélectionner</option>
-                        </select>
-                    </div>
-                    <div class="col-md-2">
-                        <label>Promotion</label>
-                        <select class="form-select form-select-sm" id="rapportPromotion">
-                            <option value="">Toutes</option>
-                        </select>
-                    </div>
-                    <div class="col-md-2">
-                        <label>Statut</label>
-                        <select class="form-select form-select-sm" id="rapportStatut">
-                            <option value="">Tous</option>
-                            <option value="ordon">En ordre</option>
-                            <option value="nonordon">Non en ordre</option>
-                        </select>
-                    </div>
-                    <div class="col-md-3">
-                        <label>Fiches (sélection multiple)</label>
-                        <div id="ficheCheckboxContainer" class="fiche-checkbox-group">
-                            <span class="text-muted small">Chargement...</span>
-                        </div>
-                    </div>
-                    <div class="col-md-3 d-flex align-items-end gap-1 flex-wrap">
-                        <button class="btn-action btn-sm" id="afficherRapport"><i class="bi bi-search"></i> Afficher</button>
-                        <button class="btn-action btn-sm" id="imprimerRapport" style="background:#ffb347;color:#003366;"><i class="bi bi-printer"></i> Imprimer</button>
-                        <button class="btn-action btn-sm" id="exporterRapportExcel" style="background:#28a745;"><i class="bi bi-file-excel"></i> Excel</button>
-                    </div>
-                </div>
-                <div class="row mt-2 g-2">
-                    <div class="col-md-3"><label>Date début</label><input type="date" class="form-control form-control-sm" id="rapportDateDebut"></div>
-                    <div class="col-md-3"><label>Date fin</label><input type="date" class="form-control form-control-sm" id="rapportDateFin"></div>
-                </div>
-            </div>
-            <div id="rapportResultat"></div>
+            <div id="etudiantsListe"><div class="text-center"><div class="loading-spinner"></div> Chargement...</div></div>
         </div>
-
+        
+        <!-- PANEL RAPPORT SUPPRIMÉ -->
+        
         <!-- PANEL RAPPORT JOURNALIER AVEC IMPRESSION ET TABLEAU DUPLICATA -->
         <div id="panel-rapportJournalier" class="content-panel">
             <div class="panel-header">
@@ -425,7 +391,6 @@
             calculerTotauxFinanciers();
             if (document.getElementById('panel-paiementsRecents').classList.contains('active')) chargerPaiementsRecents();
             if (document.getElementById('panel-finance').classList.contains('active')) chargerDepenses();
-            if (document.getElementById('panel-rapport').classList.contains('active')) document.getElementById('afficherRapport')?.click();
             if (document.getElementById('panel-rapportJournalier').classList.contains('active')) document.getElementById('afficherJournalier')?.click();
         }
         window.changerDevise = changerDevise;
@@ -511,216 +476,82 @@
         function chargerPromotionsListe(){const c=document.getElementById('promotionsListe');if(!c)return;if(allPromotions.length===0){c.innerHTML='<div class="alert alert-info">Aucune promotion</div>';return;}let html='<table class="table table-bordered"><thead><tr><th>Promotion</th><th>Capacité</th><th>Étudiants</th></tr></thead><tbody>';allPromotions.forEach(p=>{const nb=allEtudiants.filter(e=>e.promotion===p.id).length;html+=`<tr><td><strong>${escapeHtml(p.nom)}</strong></td><td>${p.capacite||'-'}</td><td><span class="badge bg-primary">${nb}</span></td></tr>`;});html+='</tbody></table>';c.innerHTML=html;}
         function chargerFichesListe(){const c=document.getElementById('fichesListe');if(!c)return;if(allFiches.length===0){c.innerHTML='<div class="alert alert-info">Aucune fiche</div>';return;}const promoMap={};allPromotions.forEach(p=>promoMap[p.id]=p.nom);let html='<table class="table table-bordered"><thead><tr><th>Fiche</th><th>Montant</th><th>Promotions</th></tr></thead><tbody>';allFiches.forEach(f=>{let promos='';if(f.promotions)promos=f.promotions.map(pid=>promoMap[pid]).filter(p=>p).join(', ');else if(f.promotion)promos=promoMap[f.promotion]||'';html+=`<tr><td><strong>${escapeHtml(f.nom)}</strong></td><td>${formaterMontant(f.montant||0)}</td><td>${escapeHtml(promos||'-')}</td></tr>`;});html+='</tbody></table>';c.innerHTML=html;}
         
-        function afficherBoutonsPromotions(){const c=document.getElementById('promotionButtons');if(!c)return;let html='';allPromotions.forEach(p=>{const nb=allEtudiants.filter(e=>e.promotion===p.id).length;html+=`<button class="promotion-btn" data-promo="${p.id}">📚 ${escapeHtml(p.nom)} <span class="badge bg-secondary">${nb}</span></button>`;});c.innerHTML=html;document.querySelectorAll('.promotion-btn').forEach(btn=>{btn.addEventListener('click',()=>{document.querySelectorAll('.promotion-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');currentSelectedPromotion=btn.dataset.promo;afficherEtudiantsParPromotion(currentSelectedPromotion);});});}
-        function afficherEtudiantsParPromotion(promoId){if(!promoId){document.getElementById('etudiantsListe').innerHTML='<div class="text-center"><h5>Sélectionnez une promotion</h5></div>';return;}let filtres=allEtudiants.filter(e=>e.promotion===promoId);if(currentSearchTerm)filtres=filtres.filter(e=>e.nom?.toLowerCase().includes(currentSearchTerm.toLowerCase()));const promoMap={};allPromotions.forEach(p=>promoMap[p.id]=p.nom);if(filtres.length===0){document.getElementById('etudiantsListe').innerHTML=`<div class="alert alert-info">Aucun étudiant en ${escapeHtml(promoMap[promoId])}</div>`;return;}let html=`<h5>Promotion: ${escapeHtml(promoMap[promoId])} (${filtres.length} étudiants)</h5><table class="etudiants-table"><thead><tr><th>#</th><th>Matricule</th><th>Nom</th></tr></thead><tbody>`;filtres.forEach((e,idx)=>{html+=`<tr><td>${idx+1}</td><td>${escapeHtml(e.matricule||e.id.substring(0,8))}</td><td><strong>${escapeHtml(e.nom)}</strong></td></tr>`;});html+='</tbody></table>';document.getElementById('etudiantsListe').innerHTML=html;}
+        function afficherBoutonsPromotions(){const c=document.getElementById('promotionButtons');if(!c)return;let html='';allPromotions.forEach(p=>{const nb=allEtudiants.filter(e=>e.promotion===p.id).length;html+=`<button class="promotion-btn" data-promo="${p.id}">📚 ${escapeHtml(p.nom)} <span class="badge bg-secondary">${nb}</span></button>`;});c.innerHTML=html;document.querySelectorAll('.promotion-btn').forEach(btn=>{btn.addEventListener('click',()=>{document.querySelectorAll('.promotion-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');currentSelectedPromotion=btn.dataset.promo;currentSearchTerm = document.getElementById('rechercheEtudiant')?.value || '';afficherEtudiantsParPromotion(currentSelectedPromotion, currentSearchTerm);});});}
         
-        // ========== RAPPORT AVEC CHECKBOX POUR FICHES ==========
-        function chargerSelects(){
-            const as=document.getElementById('rapportAnnee');
-            if(as){as.innerHTML='<option value="">-- Sélectionner --</option>';allAnnees.forEach(a=>as.innerHTML+=`<option value="${a.id}">${escapeHtml(a.annee||a.nom)}</option>`);}
-            const ps=document.getElementById('rapportPromotion');
-            if(ps){ps.innerHTML='<option value="">Toutes promotions</option>';allPromotions.forEach(p=>ps.innerHTML+=`<option value="${p.id}">${escapeHtml(p.nom)}</option>`);}
-            chargerCheckboxesFiches();
+        function afficherEtudiantsParPromotion(promoId, searchTerm = '') {
+            if(!promoId){document.getElementById('etudiantsListe').innerHTML='<div class="text-center"><h5>Sélectionnez une promotion</h5></div>';return;}
+            let filtres=allEtudiants.filter(e=>e.promotion===promoId);
+            if(searchTerm) filtres=filtres.filter(e=>e.nom?.toLowerCase().includes(searchTerm.toLowerCase()) || e.matricule?.toLowerCase().includes(searchTerm.toLowerCase()));
+            const promoMap={};allPromotions.forEach(p=>promoMap[p.id]=p.nom);
+            if(filtres.length===0){document.getElementById('etudiantsListe').innerHTML=`<div class="alert alert-info">Aucun étudiant trouvé en ${escapeHtml(promoMap[promoId])}</div>`;return;}
+            let html=`<h5>Promotion: ${escapeHtml(promoMap[promoId])} (${filtres.length} étudiants)</h5><div class="table-responsive"><table class="etudiants-table" id="etudiantsTable"><thead><tr><th>#</th><th>Matricule</th><th>Nom</th></tr></thead><tbody>`;
+            filtres.forEach((e,idx)=>{html+=`<tr><td>${idx+1}</td><td>${escapeHtml(e.matricule||e.id.substring(0,8))}</td><td><strong>${escapeHtml(e.nom)}</strong></td></tr>`;});
+            html+='</tbody></table></div>';
+            document.getElementById('etudiantsListe').innerHTML=html;
         }
         
-        function chargerCheckboxesFiches() {
-            const container = document.getElementById('ficheCheckboxContainer');
-            if (!container) return;
-            if (allFiches.length === 0) {
-                container.innerHTML = '<span class="text-muted small">Aucune fiche</span>';
-                return;
+        // ========== GESTION DE LA RECHERCHE ET IMPRESSION POUR ÉTUDIANTS ==========
+        document.getElementById('btnRechercherEtudiant')?.addEventListener('click', function() {
+            if (currentSelectedPromotion) {
+                currentSearchTerm = document.getElementById('rechercheEtudiant').value;
+                afficherEtudiantsParPromotion(currentSelectedPromotion, currentSearchTerm);
+            } else {
+                alert('Veuillez d\'abord sélectionner une promotion.');
             }
-            let html = '';
-            allFiches.forEach(f => {
-                html += `<div class="fiche-checkbox-item">
-                    <input type="checkbox" class="fiche-checkbox" value="${f.id}" id="fiche_${f.id}">
-                    <label for="fiche_${f.id}" class="small">${escapeHtml(f.nom)} <span class="fiche-montant">(${formaterMontant(f.montant||0)})</span></label>
-                </div>`;
-            });
-            container.innerHTML = html;
-            
-            document.getElementById('rapportPromotion')?.addEventListener('change', function() {
-                filtrerFichesParPromotion(this.value);
-            });
-        }
-        
-        function filtrerFichesParPromotion(promoId) {
-            const checkboxes = document.querySelectorAll('.fiche-checkbox');
-            if (!promoId) {
-                checkboxes.forEach(cb => {
-                    cb.closest('.fiche-checkbox-item').style.display = '';
-                });
-                return;
-            }
-            const fichesPromo = allFiches.filter(f => {
-                return f.promotions && f.promotions.includes(promoId);
-            });
-            const fichesIds = fichesPromo.map(f => f.id);
-            checkboxes.forEach(cb => {
-                const item = cb.closest('.fiche-checkbox-item');
-                if (fichesIds.includes(cb.value)) {
-                    item.style.display = '';
-                } else {
-                    item.style.display = 'none';
-                    cb.checked = false;
-                }
-            });
-        }
-        
-        function genererFichesHorizontales(fiches, isDuplicata = false) {
-            if (!fiches || fiches.length === 0) return '<span class="text-muted">-</span>';
-            let html = '<div class="fiches-horizontales">';
-            fiches.forEach(f => {
-                const ficheInfo = allFiches.find(fi => fi.id === f.id);
-                const nomFiche = ficheInfo ? ficheInfo.nom : (f.nom || 'Fiche');
-                const montantFiche = f.montant || (ficheInfo ? ficheInfo.montant : 0);
-                let classe = 'fiche-tag';
-                if (isDuplicata) {
-                    classe += ' duplicata';
-                } else if (f.paye !== undefined && f.montant !== undefined) {
-                    classe += f.paye >= f.montant ? ' paid' : '';
-                }
-                html += `<span class="${classe}">${escapeHtml(nomFiche)} <span class="montant">${formaterMontant(montantFiche)}</span></span>`;
-            });
-            html += '</div>';
-            return html;
-        }
-        
-        document.getElementById('afficherRapport')?.addEventListener('click',()=>{
-            const anneeId=document.getElementById('rapportAnnee').value;
-            if(!anneeId){alert('Sélectionnez une année');return;}
-            const promoId=document.getElementById('rapportPromotion').value;
-            const statut=document.getElementById('rapportStatut').value;
-            
-            const fichesSelectionnees = [];
-            document.querySelectorAll('.fiche-checkbox:checked').forEach(cb => {
-                fichesSelectionnees.push(cb.value);
-            });
-            
-            let fichesFiltrees = [...fichesSelectionnees];
-            if (promoId) {
-                const fichesPromo = allFiches.filter(f => f.promotions && f.promotions.includes(promoId));
-                const fichesPromoIds = fichesPromo.map(f => f.id);
-                fichesFiltrees = fichesSelectionnees.filter(id => fichesPromoIds.includes(id));
-                if (fichesFiltrees.length === 0 && fichesSelectionnees.length > 0) {
-                    alert('Les fiches sélectionnées ne sont pas concernées par cette promotion. Veuillez en sélectionner d\'autres.');
-                    return;
-                }
-            }
-            
-            let etudiants = promoId ? allEtudiants.filter(e=>e.promotion===promoId) : [...allEtudiants];
-            let transactions = allTransactions.filter(t=>t.anneeAcademiqueId===anneeId);
-            
-            if (fichesFiltrees.length > 0) {
-                transactions = transactions.filter(t => {
-                    if (!t.fiches) return false;
-                    return t.fiches.some(f => fichesFiltrees.includes(f.id));
-                });
-            }
-            
-            const paiements = {};
-            transactions.forEach(t => {
-                if (!paiements[t.etudiantId]) paiements[t.etudiantId] = { total: 0, details: [] };
-                paiements[t.etudiantId].total += (t.montantTotal || 0);
-                if (t.fiches) {
-                    t.fiches.forEach(f => {
-                        paiements[t.etudiantId].details.push({ id: f.id, montant: f.montant || 0, paye: f.paye || 0 });
-                    });
-                }
-            });
-            
-            const resultats = [];
-            const promoMap = {}; allPromotions.forEach(p=>promoMap[p.id]=p.nom);
-            const fichesParPromo = {};
-            allFiches.forEach(f => {
-                const promos = f.promotions || (f.promotion ? [f.promotion] : []);
-                promos.forEach(pid => {
-                    if (!fichesParPromo[pid]) fichesParPromo[pid] = [];
-                    fichesParPromo[pid].push(f);
-                });
-            });
-            
-            for (const e of etudiants) {
-                let totalDu = 0;
-                if (fichesFiltrees.length > 0) {
-                    const fichesEtudiant = allFiches.filter(f => fichesFiltrees.includes(f.id) && 
-                        (f.promotions?.includes(e.promotion) || f.promotion === e.promotion));
-                    totalDu = fichesEtudiant.reduce((s, f) => s + (f.montant || 0), 0);
-                } else {
-                    const fichesPromo = fichesParPromo[e.promotion] || [];
-                    totalDu = fichesPromo.reduce((s, f) => s + (f.montant || 0), 0);
-                }
-                const paye = paiements[e.id]?.total || 0;
-                const estOrdon = paye >= totalDu && totalDu > 0;
-                if ((statut === 'ordon' && !estOrdon) || (statut === 'nonordon' && estOrdon)) continue;
-                resultats.push({
-                    nom: e.nom,
-                    matricule: e.matricule || e.id,
-                    promo: promoMap[e.promotion] || '-',
-                    du: totalDu,
-                    paye: paye,
-                    statut: estOrdon,
-                    details: paiements[e.id]?.details || []
-                });
-            }
-            
-            resultats.sort((a, b) => a.nom.localeCompare(b.nom));
-            
-            const totalDu = resultats.reduce((s,r)=>s+r.du,0);
-            const totalPaye = resultats.reduce((s,r)=>s+r.paye,0);
-            let html = `<div class="rapport-summary">
-                <div class="row text-center">
-                    <div class="col-md-3"><strong>Total étudiants:</strong><br><span class="fs-4">${resultats.length}</span></div>
-                    <div class="col-md-3"><strong>Total dû:</strong><br><span class="fs-4">${formaterMontant(totalDu)}</span></div>
-                    <div class="col-md-3"><strong>Total payé:</strong><br><span class="fs-4 text-success">${formaterMontant(totalPaye)}</span></div>
-                    <div class="col-md-3"><strong>En ordre:</strong><br><span class="fs-4">${resultats.filter(r=>r.statut).length}</span></div>
-                </div>
-                ${fichesFiltrees.length > 0 ? `<div class="mt-2"><strong>Fiches sélectionnées:</strong> ${fichesFiltrees.map(id => { const f = allFiches.find(fi => fi.id === id); return f ? f.nom : ''; }).filter(n => n).join(', ')}</div>` : ''}
-            </div>`;
-            html += `<div class="table-responsive"><table class="rapport-table" id="rapportTable">
-                <thead><tr><th>#</th><th>Matricule</th><th>Étudiant</th><th>Promotion</th><th class="text-end">Dû</th><th>Statut</th><th>Fiches payées</th></tr></thead><tbody>`;
-            resultats.forEach((r,i)=>{
-                const fichesPayeesHtml = r.details.length > 0 ? genererFichesHorizontales(r.details) : '<span class="text-muted">-</span>';
-                html+=`<tr><td>${i+1}</td><td>${escapeHtml(r.matricule)}</td><td><strong>${escapeHtml(r.nom)}</strong></td><td>${escapeHtml(r.promo)}</td><td class="text-end">${formaterMontant(r.du)}</td><td class="${r.statut?'statut-ordon':'statut-nonordon'}">${r.statut?'✓ En ordre':'✗ Non en ordre'}</td><td>${fichesPayeesHtml}</td></tr>`;
-            });
-            html += `</tbody></table></div>`;
-            document.getElementById('rapportResultat').innerHTML = html;
         });
         
-        // ========== IMPRESSION RAPPORT ==========
-        document.getElementById('imprimerRapport')?.addEventListener('click', function() {
-            const contenu = document.getElementById('rapportResultat');
-            if (!contenu || contenu.innerHTML.trim() === '') {
-                alert('Aucune donnée à imprimer. Veuillez d\'abord afficher un rapport.');
-                return;
+        document.getElementById('rechercheEtudiant')?.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                document.getElementById('btnRechercherEtudiant').click();
             }
-            window.print();
         });
         
-        // ========== EXPORT EXCEL RAPPORT ==========
-        document.getElementById('exporterRapportExcel')?.addEventListener('click', () => {
-            const tbody = document.querySelector('#rapportResultat tbody');
-            if (!tbody || tbody.children.length === 0) {
-                alert('Aucune donnée à exporter.');
+        document.getElementById('btnImprimerEtudiants')?.addEventListener('click', function() {
+            const table = document.getElementById('etudiantsTable');
+            if (!table || table.querySelectorAll('tbody tr').length === 0) {
+                alert('Aucune liste d\'étudiants à imprimer.');
                 return;
             }
-            const rows = [['Rapport Paiements', '', '', '', '', '', '']];
-            const ths = document.querySelectorAll('#rapportResultat thead th');
-            const headerRow = [];
-            ths.forEach(th => headerRow.push(th.innerText));
-            rows.push(headerRow);
-            const trs = tbody.querySelectorAll('tr');
-            trs.forEach(tr => {
-                const row = [];
-                tr.querySelectorAll('td').forEach(td => row.push(td.innerText));
-                rows.push(row);
-            });
-            const ws = XLSX.utils.aoa_to_sheet(rows);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, 'Rapport');
-            XLSX.writeFile(wb, `rapport_${new Date().toISOString().slice(0,19)}.xlsx`);
-            showToast('Exporté avec succès', 'success');
+            const promoNom = document.querySelector('#etudiantsListe h5')?.textContent || 'Liste des étudiants';
+            const printWindow = window.open('', '_blank', 'width=800,height=600');
+            printWindow.document.write(`
+                <html>
+                <head>
+                    <title>Liste des étudiants</title>
+                    <style>
+                        body { font-family: 'Segoe UI', sans-serif; padding: 20px; }
+                        h2 { color: #003366; text-align: center; margin-bottom: 20px; }
+                        table { width: 100%; border-collapse: collapse; font-size: 14px; }
+                        th { background: #003366; color: white; padding: 10px; text-align: left; }
+                        td { padding: 8px 10px; border-bottom: 1px solid #ddd; }
+                        tr:hover { background: #f5f5f5; }
+                        .text-center { text-align: center; }
+                        .footer { margin-top: 30px; text-align: center; font-size: 12px; color: #888; border-top: 1px solid #ddd; padding-top: 10px; }
+                    </style>
+                </head>
+                <body>
+                    <h2>${escapeHtml(promoNom)}</h2>
+                    <table>
+                        <thead><tr><th>#</th><th>Matricule</th><th>Nom</th></tr></thead>
+                        <tbody>
+                            ${table.querySelector('tbody').innerHTML}
+                        </tbody>
+                    </table>
+                    <div class="footer">Imprimé le ${new Date().toLocaleString('fr-FR')}</div>
+                    <script>
+                        window.onload = function() {
+                            window.print();
+                            setTimeout(function(){ window.close(); }, 1000);
+                        };
+                    <\/script>
+                </body>
+                </html>
+            `);
+            printWindow.document.close();
         });
+        
+        // ========== RAPPORT AVEC CHECKBOX POUR FICHES (SUPPRIMÉ) ==========
+        // Le panel rapport a été retiré, donc les fonctions associées sont supprimées.
         
         // ========== PAIEMENTS RÉCENTS ==========
         async function chargerPaiementsRecents(){
@@ -921,7 +752,7 @@
         });
         
         // ========== ÉCOUTEURS TEMPS RÉEL ==========
-        db.collection('transactions').onSnapshot(s=>{allTransactions=[];s.forEach(d=>allTransactions.push({id:d.id,...d.data()}));mettreAJourStatsHeader();calculerTotauxFinanciers();if(document.getElementById('panel-paiementsRecents').classList.contains('active'))chargerPaiementsRecents();if(document.getElementById('panel-rapport').classList.contains('active'))document.getElementById('afficherRapport')?.click();});
+        db.collection('transactions').onSnapshot(s=>{allTransactions=[];s.forEach(d=>allTransactions.push({id:d.id,...d.data()}));mettreAJourStatsHeader();calculerTotauxFinanciers();if(document.getElementById('panel-paiementsRecents').classList.contains('active'))chargerPaiementsRecents();});
         db.collection('depenses').onSnapshot(s=>{allDepenses=[];s.forEach(d=>allDepenses.push({id:d.id,...d.data()}));mettreAJourStatsHeader();calculerTotauxFinanciers();if(document.getElementById('panel-finance').classList.contains('active'))chargerDepenses();});
         
         // ========== INITIALISATION CHARGEMENT ==========
@@ -932,21 +763,21 @@
             allFiches=await chargerCollection('fiches');
             const users=await chargerCollection('utilisateurs');
             allUtilisateurs=users.filter(u=>u.role==='comptabilite');
-            chargerAnneesListe();chargerComptesListe();chargerPromotionsListe();chargerFichesListe();afficherBoutonsPromotions();chargerSelects();chargerJournalierAnnee();mettreAJourStatsHeader();calculerTotauxFinanciers();
+            chargerAnneesListe();chargerComptesListe();chargerPromotionsListe();chargerFichesListe();afficherBoutonsPromotions();chargerJournalierAnnee();mettreAJourStatsHeader();calculerTotauxFinanciers();
         })();
         
         // ========== REFRESH ==========
-        document.getElementById('refreshAnneesBtn')?.addEventListener('click',async()=>{allAnnees=await chargerCollection('anneesAcademiques');chargerAnneesListe();chargerSelects();chargerJournalierAnnee();showToast('Années actualisées');});
+        document.getElementById('refreshAnneesBtn')?.addEventListener('click',async()=>{allAnnees=await chargerCollection('anneesAcademiques');chargerAnneesListe();chargerJournalierAnnee();showToast('Années actualisées');});
         document.getElementById('refreshComptesBtn')?.addEventListener('click',async()=>{const users=await chargerCollection('utilisateurs');allUtilisateurs=users.filter(u=>u.role==='comptabilite');chargerComptesListe();showToast('Comptes actualisés');});
-        document.getElementById('refreshPromotionsBtn')?.addEventListener('click',async()=>{allPromotions=await chargerCollection('promotions');chargerPromotionsListe();afficherBoutonsPromotions();chargerSelects();showToast('Promotions actualisées');});
-        document.getElementById('refreshFichesBtn')?.addEventListener('click',async()=>{allFiches=await chargerCollection('fiches');chargerFichesListe();chargerSelects();showToast('Fiches actualisées');});
-        document.getElementById('refreshEtudiantsBtn')?.addEventListener('click',async()=>{allEtudiants=await chargerCollection('etudiants');afficherBoutonsPromotions();if(currentSelectedPromotion)afficherEtudiantsParPromotion(currentSelectedPromotion);showToast('Étudiants actualisés');});
+        document.getElementById('refreshPromotionsBtn')?.addEventListener('click',async()=>{allPromotions=await chargerCollection('promotions');chargerPromotionsListe();afficherBoutonsPromotions();showToast('Promotions actualisées');});
+        document.getElementById('refreshFichesBtn')?.addEventListener('click',async()=>{allFiches=await chargerCollection('fiches');chargerFichesListe();showToast('Fiches actualisées');});
+        document.getElementById('refreshEtudiantsBtn')?.addEventListener('click',async()=>{allEtudiants=await chargerCollection('etudiants');afficherBoutonsPromotions();if(currentSelectedPromotion){currentSearchTerm = document.getElementById('rechercheEtudiant')?.value || '';afficherEtudiantsParPromotion(currentSelectedPromotion, currentSearchTerm);}showToast('Étudiants actualisés');});
         document.getElementById('refreshFinanceBtn')?.addEventListener('click',()=>{chargerDepenses();calculerTotauxFinanciers();showToast('Données financières actualisées');});
         document.getElementById('refreshPaiementsBtn')?.addEventListener('click',()=>chargerPaiementsRecents());
         document.getElementById('filtrerDepensesBtn')?.addEventListener('click',()=>chargerDepenses());
         
         // ========== MENUS ==========
-        document.querySelectorAll('.menu-card').forEach(card=>{card.addEventListener('click',()=>{document.getElementById('homePage').style.display='none';document.querySelectorAll('.content-panel').forEach(p=>p.classList.remove('active'));const panel=document.getElementById(`panel-${card.dataset.menu}`);if(panel)panel.classList.add('active');if(card.dataset.menu==='paiementsRecents')chargerPaiementsRecents();if(card.dataset.menu==='finance')chargerDepenses();if(card.dataset.menu==='rapport'){chargerSelects();} });});
+        document.querySelectorAll('.menu-card').forEach(card=>{card.addEventListener('click',()=>{document.getElementById('homePage').style.display='none';document.querySelectorAll('.content-panel').forEach(p=>p.classList.remove('active'));const panel=document.getElementById(`panel-${card.dataset.menu}`);if(panel)panel.classList.add('active');if(card.dataset.menu==='paiementsRecents')chargerPaiementsRecents();if(card.dataset.menu==='finance')chargerDepenses();});});
         document.getElementById('homeBrand')?.addEventListener('click',(e)=>{e.preventDefault();goHome();});
         
         // ========== PROFIL & SESSION ==========
@@ -961,10 +792,11 @@
         document.getElementById('currencySelect').value=deviseActuelle;
         if(deviseActuelle==='USD')document.getElementById('rateBadge').textContent='1 FC = 0.00043 $';
         else if(deviseActuelle==='HYBRID')document.getElementById('rateBadge').textContent='FC + $';
-        console.log('✅ Dashboard Doyen - Correction du calcul des duplicatas dans le rapport journalier');
-        console.log('✅ Les entrées des duplicatas utilisent désormais les frais de duplicata (10 000 FC)');
-        // Petite ligne de code en plus
+        console.log('✅ Dashboard Doyen - Suppression du bouton Rapports');
+        console.log('✅ Ajout des boutons Rechercher et Imprimer dans la page Étudiants');
         console.log('✅ Toutes les fonctionnalités sont incluses.');
+        // Petite ligne de code en plus
+        console.log('✅ Version finale avec toutes les corrections.');
     </script>
 </body>
 </html>
