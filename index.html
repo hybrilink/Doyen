@@ -18,6 +18,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -217,6 +218,22 @@
         .fiches-horizontales .fiche-tag.paid .montant { color: #155724; }
         .fiches-horizontales .fiche-tag.duplicata { background: #fff3cd; border-color: #ffeaa7; color: #856404; }
         .fiches-horizontales .fiche-tag.duplicata .montant { color: #856404; }
+        
+        /* Styles pour le QR Code */
+        .qr-code-container {
+            display: inline-block;
+            margin: 0 auto;
+            padding: 3px;
+            background: white;
+            border-radius: 4px;
+        }
+        .qr-code-container img {
+            display: block;
+            width: 60px;
+            height: 60px;
+        }
+
+        /* ========== STYLES POUR L'IMPRESSION DU RAPPORT JOURNALIER ========== */
         @media print {
             .navbar-custom, .panel-header .home-btn, .panel-header .fullscreen-btn, .panel-header .btn-refresh, .rapport-filters, .home-btn, .btn-action, .btn-refresh, .fullscreen-btn, .export-btn, .refresh-btn-mystic, .btn-print-journalier, .no-print { display: none !important; }
             .content-panel { box-shadow: none !important; border: 1px solid #ddd !important; }
@@ -224,6 +241,122 @@
             .rapport-table { font-size: 11px; }
             .duplicata-table th { background: #f0f0f0 !important; color: #000 !important; }
             .etudiants-table th { background: #f0f0f0 !important; color: #000 !important; }
+            
+            /* ===== EN-TÊTE DU RAPPORT IMPRIMÉ ===== */
+            .print-header-journalier {
+                display: flex !important;
+                align-items: center;
+                justify-content: space-between;
+                margin-bottom: 10px;
+                padding-bottom: 0px;
+                width: 100%;
+            }
+            .print-header-journalier .header-left {
+                flex: 1;
+                text-align: left;
+                padding-right: 10px;
+                border-bottom: 3px solid #003366;
+                padding-bottom: 8px;
+            }
+            .print-header-journalier .header-left h1 {
+                font-size: 20px !important;
+                font-weight: bold;
+                color: #003366;
+                margin: 0;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+            }
+            .print-header-journalier .header-center {
+                flex: 0 0 auto;
+                text-align: center;
+                padding: 0 15px;
+                margin-bottom: 5px;
+            }
+            .print-header-journalier .header-center img {
+                width: 80px;
+                height: 80px;
+                object-fit: contain;
+                display: block;
+                background: white;
+            }
+            .print-header-journalier .header-right {
+                flex: 1;
+                text-align: right;
+                padding-left: 10px;
+                border-bottom: 3px solid #003366;
+                padding-bottom: 8px;
+            }
+            .print-header-journalier .header-right h2 {
+                font-size: 18px !important;
+                font-weight: bold;
+                color: #003366;
+                margin: 0;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+            }
+            
+            /* ===== DATE D'IMPRESSION ===== */
+            .print-date-journalier {
+                text-align: right;
+                font-size: 12px;
+                color: #555;
+                margin-bottom: 8px;
+                font-weight: bold;
+                text-transform: uppercase;
+                margin-top: 5px;
+            }
+            
+            /* ===== PIED DE PAGE DU RAPPORT IMPRIMÉ ===== */
+            .print-footer-journalier {
+                display: flex !important;
+                justify-content: space-between;
+                align-items: center;
+                margin-top: 25px;
+                padding-top: 12px;
+                border-top: 3px solid #003366;
+                font-size: 13px !important;
+                font-weight: bold;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
+            .print-footer-journalier .footer-left { 
+                text-align: left; 
+                flex: 1;
+            }
+            .print-footer-journalier .footer-center { 
+                text-align: center; 
+                flex: 1;
+            }
+            .print-footer-journalier .footer-right { 
+                text-align: right; 
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                align-items: flex-end;
+            }
+            .print-footer-journalier .footer-left p,
+            .print-footer-journalier .footer-center p {
+                margin: 0;
+                color: #003366;
+                font-size: 13px !important;
+            }
+            .print-footer-journalier .footer-right .qr-code-container {
+                display: inline-block;
+                margin-top: 2px;
+            }
+            .print-footer-journalier .footer-right .qr-code-container img {
+                width: 60px;
+                height: 60px;
+            }
+            .print-footer-journalier .footer-right .qr-label {
+                font-size: 8px !important;
+                color: #666;
+                margin-top: 2px;
+                text-transform: lowercase;
+            }
+            
+            /* Sauts de page */
+            .page-break { page-break-before: always; }
         }
     </style>
 </head>
@@ -267,7 +400,6 @@
                 <div class="col-md-3 col-sm-6"><div class="menu-card" data-menu="promotion"><div class="menu-icon"><i class="bi bi-trophy-fill"></i></div><div class="menu-title">Promotions</div></div></div>
                 <div class="col-md-3 col-sm-6"><div class="menu-card" data-menu="fiche"><div class="menu-icon"><i class="bi bi-file-text-fill"></i></div><div class="menu-title">Fiches</div></div></div>
                 <div class="col-md-3 col-sm-6"><div class="menu-card" data-menu="etudiant"><div class="menu-icon"><i class="bi bi-mortarboard-fill"></i></div><div class="menu-title">Étudiants</div></div></div>
-                <!-- Le bouton Rapports a été retiré -->
                 <div class="col-md-3 col-sm-6"><div class="menu-card" data-menu="paiementsRecents"><div class="menu-icon"><i class="bi bi-clock-history"></i></div><div class="menu-title">Paiements Récents</div></div></div>
                 <div class="col-md-3 col-sm-6"><div class="menu-card" data-menu="bordereau"><div class="menu-icon"><i class="bi bi-qr-code-scan"></i></div><div class="menu-title">Vérification Bordereau</div></div></div>
                 <div class="col-md-3 col-sm-6"><div class="menu-card" data-menu="rapportJournalier"><div class="menu-icon"><i class="bi bi-journal-bookmark-fill"></i></div><div class="menu-title">Rapport Journalier</div></div></div>
@@ -282,7 +414,6 @@
         <div id="panel-promotion" class="content-panel"><div class="panel-header"><h4><i class="bi bi-trophy-fill"></i> Promotions</h4><div><button class="btn-refresh" id="refreshPromotionsBtn"><i class="bi bi-arrow-repeat"></i> Actualiser</button><button class="fullscreen-btn" onclick="toggleFullscreen('panel-promotion')"><i class="bi bi-arrows-fullscreen"></i></button><button class="home-btn" onclick="goHome()"><i class="bi bi-house-door-fill"></i> Accueil</button></div></div><div id="promotionsListe"><div class="text-center"><div class="loading-spinner"></div> Chargement...</div></div></div>
         <div id="panel-fiche" class="content-panel"><div class="panel-header"><h4><i class="bi bi-file-text-fill"></i> Fiches</h4><div><button class="btn-refresh" id="refreshFichesBtn"><i class="bi bi-arrow-repeat"></i> Actualiser</button><button class="fullscreen-btn" onclick="toggleFullscreen('panel-fiche')"><i class="bi bi-arrows-fullscreen"></i></button><button class="home-btn" onclick="goHome()"><i class="bi bi-house-door-fill"></i> Accueil</button></div></div><div id="fichesListe"><div class="text-center"><div class="loading-spinner"></div> Chargement...</div></div></div>
         <div id="panel-etudiant" class="content-panel"><div class="panel-header"><h4><i class="bi bi-mortarboard-fill"></i> Étudiants</h4><div><button class="btn-refresh" id="refreshEtudiantsBtn"><i class="bi bi-arrow-repeat"></i> Actualiser</button><button class="fullscreen-btn" onclick="toggleFullscreen('panel-etudiant')"><i class="bi bi-arrows-fullscreen"></i></button><button class="home-btn" onclick="goHome()"><i class="bi bi-house-door-fill"></i> Accueil</button></div></div><div id="promotionButtons" class="promotion-buttons"></div>
-            <!-- Barre de recherche et boutons pour la liste des étudiants -->
             <div class="row g-2 mb-3 no-print">
                 <div class="col-md-6">
                     <div class="input-group">
@@ -297,9 +428,7 @@
             <div id="etudiantsListe"><div class="text-center"><div class="loading-spinner"></div> Chargement...</div></div>
         </div>
         
-        <!-- PANEL RAPPORT SUPPRIMÉ -->
-        
-        <!-- PANEL RAPPORT JOURNALIER AVEC IMPRESSION ET TABLEAU DUPLICATA -->
+        <!-- PANEL RAPPORT JOURNALIER AVEC EN-TÊTE ET PIED DE PAGE -->
         <div id="panel-rapportJournalier" class="content-panel">
             <div class="panel-header">
                 <h4><i class="bi bi-journal-bookmark-fill"></i> Rapport Journalier</h4>
@@ -550,9 +679,6 @@
             printWindow.document.close();
         });
         
-        // ========== RAPPORT AVEC CHECKBOX POUR FICHES (SUPPRIMÉ) ==========
-        // Le panel rapport a été retiré, donc les fonctions associées sont supprimées.
-        
         // ========== PAIEMENTS RÉCENTS ==========
         async function chargerPaiementsRecents(){
             const c=document.getElementById('paiementsRecentsListe');if(!c)return;
@@ -596,7 +722,7 @@
             resDiv.style.display='block';resDiv.innerHTML=`<div class="bordereau-result"><div class="authentic-true text-center"><i class="bi bi-check-circle-fill" style="font-size:48px;"></i><h3>✓ Reçu AUTHENTIQUE</h3></div><div class="row"><div class="col-md-6"><div class="receipt-info"><strong>N° Reçu:</strong> ${escapeHtml(t.numeroRecu||t.id)}</div><div class="receipt-info"><strong>Date:</strong> ${t.date?new Date(t.date.toDate()).toLocaleString('fr-FR'):'-'}</div><div class="receipt-info"><strong>Étudiant:</strong> ${escapeHtml(t.etudiantNom)}</div></div><div class="col-md-6"><div class="receipt-info"><strong>Promotion:</strong> ${escapeHtml(promo)}</div><div class="receipt-info"><strong>Année:</strong> ${escapeHtml(annee)}</div><div class="receipt-info"><strong>Montant:</strong> ${formaterMontant(t.montantTotal||0)}</div></div></div><div class="receipt-info mt-3"><strong>Comptable:</strong> ${escapeHtml(t.comptable||'-')}</div></div>`;
         });
         
-        // ========== RAPPORT JOURNALIER AVEC CORRECTION POUR LES DUPLICATAS ==========
+        // ========== RAPPORT JOURNALIER AVEC EN-TÊTE ET PIED DE PAGE ==========
         function chargerJournalierAnnee(){const s=document.getElementById('journalierAnnee');if(s){s.innerHTML='<option value="">-- Sélectionner --</option>';allAnnees.forEach(a=>s.innerHTML+=`<option value="${a.id}">${escapeHtml(a.annee||a.nom)}</option>`);}}
         
         function genererDetailsFiches(transaction) {
@@ -617,6 +743,26 @@
             return detailsHtml || '<span class="text-muted">-</span>';
         }
         
+        // Fonction pour générer le QR Code
+        function genererQRCodePourRapport() {
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('fr-FR');
+            const timeStr = now.toLocaleTimeString('fr-FR');
+            
+            const qrData = JSON.stringify({
+                document: 'Rapport Journalier - Doyen',
+                universite: 'UNIVERSITE DE LUBUMBASHI',
+                faculte: 'FACULTE DES SCIENCES AGRONOMIQUES',
+                date: dateStr,
+                heure: timeStr,
+                doyen: 'Michel Mulimbi Mpundu',
+                comptable: 'Nawej Nduwa Arsene',
+                generated_by: 'HYBRILINK-TECH'
+            });
+            
+            return qrData;
+        }
+        
         document.getElementById('afficherJournalier')?.addEventListener('click',()=>{
             const anneeId=document.getElementById('journalierAnnee').value;
             const debut=document.getElementById('journalierDateDebut').value;
@@ -630,8 +776,6 @@
             let duplicatas = transactions.filter(t => t.isDuplicata === true);
             let transactionsOriginales = transactions.filter(t => !t.isDuplicata);
             
-            // ===== CORRECTION : Calcul correct des entrées pour les duplicatas =====
-            // Pour les duplicatas, on prend les frais de duplicata (10 000 FC) et non le montant total de la transaction originale
             const totalEntrees = transactions.reduce((s, t) => {
                 if (t.isDuplicata) {
                     return s + (t.dernierFraisDuplicata || t.duplicataFrais || 0);
@@ -698,13 +842,21 @@
                 alert('Veuillez d\'abord générer un rapport journalier.');
                 return;
             }
+            
+            const maintenant = new Date();
+            const dateImpression = maintenant.toLocaleString('fr-FR', {
+                day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit'
+            });
+            
+            const qrData = genererQRCodePourRapport();
+            
             const printWindow = window.open('', '_blank', 'width=800,height=600');
             printWindow.document.write(`
                 <html>
                 <head>
                     <title>Rapport Journalier</title>
                     <style>
-                        body { font-family: 'Segoe UI', sans-serif; padding: 20px; }
+                        body { font-family: 'Segoe UI', sans-serif; padding: 20px; margin: 0; }
                         .rapport-summary { background: #e8f4fd; padding: 15px; border-radius: 10px; margin-bottom: 20px; }
                         .rapport-table { width: 100%; border-collapse: collapse; font-size: 12px; }
                         .rapport-table th { background: #f0f0f0; padding: 8px; border: 1px solid #ddd; }
@@ -720,25 +872,172 @@
                         .fs-5 { font-size: 1.25rem; }
                         .paiement-numero { background: #667eea; color: white; padding: 2px 8px; border-radius: 12px; font-size: 11px; }
                         .mt-3 { margin-top: 15px; }
-                        .mb-2 { margin-bottom: 10px; }
                         .row { display: flex; gap: 10px; flex-wrap: wrap; }
                         .col-md-3 { flex: 0 0 23%; }
                         .col-md-4 { flex: 0 0 30%; }
-                        .col-md-12 { flex: 0 0 100%; }
                         .text-center { text-align: center; }
                         .table-responsive { overflow-x: auto; }
                         .details-fiches-cell { max-width: 200px; font-size: 11px; }
                         .fiche-detail-item { background: #f0f4ff; padding: 2px 6px; border-radius: 10px; margin: 1px; display: inline-block; font-size: 10px; border: 1px solid #d0d8ff; }
                         .fiche-detail-item.paid { background: #d4edda; border-color: #c3e6cb; color: #155724; }
-                        .fiches-horizontales { display: flex; flex-wrap: wrap; gap: 4px; }
-                        .fiche-tag { background: #e8f4fd; padding: 2px 8px; border-radius: 12px; font-size: 10px; border: 1px solid #b8d4f0; }
-                        .fiche-tag .montant { font-weight: bold; }
+                        
+                        /* ===== EN-TÊTE DU RAPPORT IMPRIMÉ ===== */
+                        .print-header-journalier {
+                            display: flex !important;
+                            align-items: center;
+                            justify-content: space-between;
+                            margin-bottom: 10px;
+                            padding-bottom: 0px;
+                            width: 100%;
+                        }
+                        .print-header-journalier .header-left {
+                            flex: 1;
+                            text-align: left;
+                            padding-right: 10px;
+                            border-bottom: 3px solid #003366;
+                            padding-bottom: 8px;
+                        }
+                        .print-header-journalier .header-left h1 {
+                            font-size: 20px !important;
+                            font-weight: bold;
+                            color: #003366;
+                            margin: 0;
+                            text-transform: uppercase;
+                            letter-spacing: 1px;
+                        }
+                        .print-header-journalier .header-center {
+                            flex: 0 0 auto;
+                            text-align: center;
+                            padding: 0 15px;
+                            margin-bottom: 5px;
+                        }
+                        .print-header-journalier .header-center img {
+                            width: 80px;
+                            height: 80px;
+                            object-fit: contain;
+                            display: block;
+                            background: white;
+                        }
+                        .print-header-journalier .header-right {
+                            flex: 1;
+                            text-align: right;
+                            padding-left: 10px;
+                            border-bottom: 3px solid #003366;
+                            padding-bottom: 8px;
+                        }
+                        .print-header-journalier .header-right h2 {
+                            font-size: 18px !important;
+                            font-weight: bold;
+                            color: #003366;
+                            margin: 0;
+                            text-transform: uppercase;
+                            letter-spacing: 1px;
+                        }
+                        
+                        /* ===== DATE D'IMPRESSION ===== */
+                        .print-date-journalier {
+                            text-align: right;
+                            font-size: 12px;
+                            color: #555;
+                            margin-bottom: 8px;
+                            font-weight: bold;
+                            text-transform: uppercase;
+                            margin-top: 5px;
+                        }
+                        
+                        /* ===== PIED DE PAGE DU RAPPORT IMPRIMÉ ===== */
+                        .print-footer-journalier {
+                            display: flex !important;
+                            justify-content: space-between;
+                            align-items: center;
+                            margin-top: 25px;
+                            padding-top: 12px;
+                            border-top: 3px solid #003366;
+                            font-size: 13px !important;
+                            font-weight: bold;
+                            text-transform: uppercase;
+                            letter-spacing: 0.5px;
+                        }
+                        .print-footer-journalier .footer-left { 
+                            text-align: left; 
+                            flex: 1;
+                        }
+                        .print-footer-journalier .footer-center { 
+                            text-align: center; 
+                            flex: 1;
+                        }
+                        .print-footer-journalier .footer-right { 
+                            text-align: right; 
+                            flex: 1;
+                            display: flex;
+                            flex-direction: column;
+                            align-items: flex-end;
+                        }
+                        .print-footer-journalier .footer-left p,
+                        .print-footer-journalier .footer-center p {
+                            margin: 0;
+                            color: #003366;
+                            font-size: 13px !important;
+                        }
+                        .print-footer-journalier .footer-right .qr-code-container {
+                            display: inline-block;
+                            margin-top: 2px;
+                        }
+                        .print-footer-journalier .footer-right .qr-code-container img {
+                            width: 60px;
+                            height: 60px;
+                        }
+                        .print-footer-journalier .footer-right .qr-label {
+                            font-size: 8px !important;
+                            color: #666;
+                            margin-top: 2px;
+                            text-transform: lowercase;
+                        }
+                        
+                        /* Sauts de page */
+                        .page-break { page-break-before: always; }
                         @media print { .no-print { display: none; } }
                     </style>
                 </head>
                 <body>
-                    <h2 style="color:#003366;">📋 Rapport Journalier</h2>
+                    <!-- ===== EN-TÊTE ===== -->
+                    <div class="print-header-journalier">
+                        <div class="header-left">
+                            <h1>UNIVERSITE DE LUBUMBASHI</h1>
+                        </div>
+                        <div class="header-center">
+                            <img src="icon-192x192.png" alt="Logo" onerror="this.src='https://via.placeholder.com/80x80?text=UNILU'">
+                        </div>
+                        <div class="header-right">
+                            <h2>FACULTE DES SCIENCES AGRONOMIQUES</h2>
+                        </div>
+                    </div>
+                    
+                    <!-- ===== DATE D'IMPRESSION ===== -->
+                    <div class="print-date-journalier">
+                        Imprimé le : ${dateImpression}
+                    </div>
+                    
+                    <!-- ===== CONTENU DU RAPPORT ===== -->
                     <div id="printContent">${dernierRapportJournalierHTML}</div>
+                    
+                    <!-- ===== PIED DE PAGE ===== -->
+                    <div class="print-footer-journalier">
+                        <div class="footer-left">
+                            <p>SECRÉTAIRE ACADÉMIQUE</p>
+                        </div>
+                        <div class="footer-center">
+                            <p>COMPTABLE : NAWEJ NDUWA ARSENE</p>
+                        </div>
+                        <div class="footer-right">
+                            <p>DOYEN : MICHEL MULIMBI MPUNDU</p>
+                            <div class="qr-code-container">
+                                <img src="https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(qrData)}&size=60x60&color=003366&bgcolor=ffffff" alt="QR Code">
+                            </div>
+                            <span class="qr-label">Document certifié</span>
+                        </div>
+                    </div>
+                    
                     <script>
                         window.onload = function() {
                             window.print();
@@ -792,11 +1091,15 @@
         document.getElementById('currencySelect').value=deviseActuelle;
         if(deviseActuelle==='USD')document.getElementById('rateBadge').textContent='1 FC = 0.00043 $';
         else if(deviseActuelle==='HYBRID')document.getElementById('rateBadge').textContent='FC + $';
-        console.log('✅ Dashboard Doyen - Suppression du bouton Rapports');
-        console.log('✅ Ajout des boutons Rechercher et Imprimer dans la page Étudiants');
+        
+        console.log('✅ Dashboard Doyen - Version finale avec en-tête et pied de page pour le rapport journalier');
+        console.log('✅ En-tête: UNIVERSITE DE LUBUMBASHI | Logo | FACULTE DES SCIENCES AGRONOMIQUES');
+        console.log('✅ Chaque partie a sa ligne bleue en dessous');
+        console.log('✅ Pied: SECRETAIRE ACADEMIQUE | COMPTABLE : NAWEJ NDUWA ARSENE | DOYEN : MICHEL MULIMBI MPUNDU + QR Code');
+        console.log('✅ QR Code intégré dans le pied de page');
         console.log('✅ Toutes les fonctionnalités sont incluses.');
         // Petite ligne de code en plus
-        console.log('✅ Version finale avec toutes les corrections.');
+        console.log('✅ Version stable prête pour la production.');
     </script>
 </body>
 </html>
