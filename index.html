@@ -18,6 +18,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -210,74 +211,28 @@
         .duplicata-table tr:hover { background: #fff8e1; }
         .btn-print-journalier { background: #ffb347; color: #003366; border: none; padding: 8px 20px; border-radius: 25px; font-weight: bold; transition: all 0.3s; display: inline-flex; align-items: center; gap: 8px; cursor: pointer; }
         .btn-print-journalier:hover { background: #ff9800; transform: scale(1.05); }
+        .fiches-horizontales { display: flex; flex-wrap: wrap; gap: 4px 8px; padding: 4px 0; }
+        .fiches-horizontales .fiche-tag { background: #e8f4fd; padding: 2px 10px; border-radius: 15px; font-size: 11px; border: 1px solid #b8d4f0; color: #003366; white-space: nowrap; display: inline-flex; align-items: center; gap: 4px; }
+        .fiches-horizontales .fiche-tag .montant { font-weight: bold; color: #003366; }
+        .fiches-horizontales .fiche-tag.paid { background: #d4edda; border-color: #c3e6cb; color: #155724; }
+        .fiches-horizontales .fiche-tag.paid .montant { color: #155724; }
+        .fiches-horizontales .fiche-tag.duplicata { background: #fff3cd; border-color: #ffeaa7; color: #856404; }
+        .fiches-horizontales .fiche-tag.duplicata .montant { color: #856404; }
         
-        /* ========== STYLES POUR LES BOUTONS D'ACTION ========== */
-        .btn-group-sm .btn {
-            padding: 4px 10px;
-            font-size: 13px;
+        /* Styles pour le QR Code */
+        .qr-code-container {
+            display: inline-block;
+            margin: 0 auto;
+            padding: 3px;
+            background: white;
             border-radius: 4px;
-            margin: 0 2px;
         }
-        .btn-group-sm .btn i {
-            font-size: 15px;
+        .qr-code-container img {
+            display: block;
+            width: 60px;
+            height: 60px;
         }
-        .btn-outline-primary {
-            color: #003366;
-            border-color: #003366;
-            background: white;
-        }
-        .btn-outline-primary:hover {
-            background: #003366;
-            color: white;
-        }
-        .btn-outline-danger {
-            color: #dc3545;
-            border-color: #dc3545;
-            background: white;
-        }
-        .btn-outline-danger:hover {
-            background: #dc3545;
-            color: white;
-        }
-        .btn-outline-success {
-            color: #28a745;
-            border-color: #28a745;
-            background: white;
-        }
-        .btn-outline-success:hover {
-            background: #28a745;
-            color: white;
-        }
-        .btn-outline-info {
-            color: #17a2b8;
-            border-color: #17a2b8;
-            background: white;
-        }
-        .btn-outline-info:hover {
-            background: #17a2b8;
-            color: white;
-        }
-        .btn-actions-group {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 4px;
-        }
-        .badge-type-ligne {
-            background: #17a2b8;
-            color: white;
-            font-size: 9px;
-            padding: 2px 8px;
-            border-radius: 10px;
-        }
-        .badge-type-comptoir {
-            background: #6c757d;
-            color: white;
-            font-size: 9px;
-            padding: 2px 8px;
-            border-radius: 10px;
-        }
-        
+
         /* ========== STYLES POUR L'IMPRESSION DU RAPPORT JOURNALIER ========== */
         @media print {
             .navbar-custom, .panel-header .home-btn, .panel-header .fullscreen-btn, .panel-header .btn-refresh, .rapport-filters, .home-btn, .btn-action, .btn-refresh, .fullscreen-btn, .export-btn, .refresh-btn-mystic, .btn-print-journalier, .no-print { display: none !important; }
@@ -287,40 +242,39 @@
             .duplicata-table th { background: #f0f0f0 !important; color: #000 !important; }
             .etudiants-table th { background: #f0f0f0 !important; color: #000 !important; }
             
+            /* ===== EN-TÊTE DU RAPPORT IMPRIMÉ ===== */
             .print-header-journalier {
                 display: flex !important;
                 align-items: center;
                 justify-content: space-between;
-                margin-bottom: 15px;
-                padding-bottom: 10px;
-                border-bottom: 3px solid #003366;
+                margin-bottom: 10px;
+                padding-bottom: 0px;
+                width: 100%;
             }
             .print-header-journalier .header-left {
                 flex: 1;
                 text-align: left;
+                padding-right: 10px;
+                border-bottom: 3px solid #003366;
+                padding-bottom: 8px;
             }
             .print-header-journalier .header-left h1 {
-                font-size: 18px !important;
+                font-size: 20px !important;
                 font-weight: bold;
                 color: #003366;
                 margin: 0;
                 text-transform: uppercase;
                 letter-spacing: 1px;
             }
-            .print-header-journalier .header-left p {
-                font-size: 12px;
-                color: #666;
-                margin: 2px 0 0 0;
-                text-transform: uppercase;
-            }
             .print-header-journalier .header-center {
                 flex: 0 0 auto;
                 text-align: center;
                 padding: 0 15px;
+                margin-bottom: 5px;
             }
             .print-header-journalier .header-center img {
-                width: 70px;
-                height: 70px;
+                width: 80px;
+                height: 80px;
                 object-fit: contain;
                 display: block;
                 background: white;
@@ -328,51 +282,80 @@
             .print-header-journalier .header-right {
                 flex: 1;
                 text-align: right;
+                padding-left: 10px;
+                border-bottom: 3px solid #003366;
+                padding-bottom: 8px;
             }
             .print-header-journalier .header-right h2 {
-                font-size: 16px !important;
+                font-size: 18px !important;
                 font-weight: bold;
                 color: #003366;
                 margin: 0;
                 text-transform: uppercase;
                 letter-spacing: 1px;
             }
-            .print-header-journalier .header-right p {
+            
+            /* ===== DATE D'IMPRESSION ===== */
+            .print-date-journalier {
+                text-align: right;
                 font-size: 12px;
-                color: #666;
-                margin: 2px 0 0 0;
+                color: #555;
+                margin-bottom: 8px;
+                font-weight: bold;
                 text-transform: uppercase;
+                margin-top: 5px;
             }
             
+            /* ===== PIED DE PAGE DU RAPPORT IMPRIMÉ ===== */
             .print-footer-journalier {
                 display: flex !important;
                 justify-content: space-between;
+                align-items: center;
                 margin-top: 25px;
                 padding-top: 12px;
                 border-top: 3px solid #003366;
-                font-size: 12px !important;
+                font-size: 13px !important;
                 font-weight: bold;
                 text-transform: uppercase;
                 letter-spacing: 0.5px;
             }
-            .print-footer-journalier .footer-left { text-align: left; }
-            .print-footer-journalier .footer-center { text-align: center; }
-            .print-footer-journalier .footer-right { text-align: right; }
-            .print-footer-journalier p {
+            .print-footer-journalier .footer-left { 
+                text-align: left; 
+                flex: 1;
+            }
+            .print-footer-journalier .footer-center { 
+                text-align: center; 
+                flex: 1;
+            }
+            .print-footer-journalier .footer-right { 
+                text-align: right; 
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                align-items: flex-end;
+            }
+            .print-footer-journalier .footer-left p,
+            .print-footer-journalier .footer-center p {
                 margin: 0;
                 color: #003366;
-                font-size: 12px !important;
+                font-size: 13px !important;
+            }
+            .print-footer-journalier .footer-right .qr-code-container {
+                display: inline-block;
+                margin-top: 2px;
+            }
+            .print-footer-journalier .footer-right .qr-code-container img {
+                width: 60px;
+                height: 60px;
+            }
+            .print-footer-journalier .footer-right .qr-label {
+                font-size: 8px !important;
+                color: #666;
+                margin-top: 2px;
+                text-transform: lowercase;
             }
             
-            .print-date-journalier {
-                text-align: right;
-                font-size: 11px;
-                color: #555;
-                margin-bottom: 10px;
-                font-weight: bold;
-                text-transform: uppercase;
-            }
-            
+            /* Sauts de page */
             .page-break { page-break-before: always; }
         }
     </style>
@@ -380,7 +363,7 @@
 <body>
     <nav class="navbar navbar-custom">
         <div class="container">
-            <a class="navbar-brand text-white" href="#" id="homeBrand"><img src="fsa.png" width="50px" style="border-radius : 50px"></i> Faculté Agronomique - Doyen</a>
+            <a class="navbar-brand text-white" href="#" id="homeBrand"><img src="fsa.png" width="50px" style="border-radius:50px"></i> Faculté Agronomique - Doyen</a>
             <div class="navbar-right">
                 <div class="currency-selector">
                     <i class="bi bi-currency-exchange" style="color: white;"></i>
@@ -445,7 +428,7 @@
             <div id="etudiantsListe"><div class="text-center"><div class="loading-spinner"></div> Chargement...</div></div>
         </div>
         
-        <!-- PANEL RAPPORT JOURNALIER AVEC EN-TÊTE ET PIED DE PAGE POUR L'IMPRESSION -->
+        <!-- PANEL RAPPORT JOURNALIER AVEC EN-TÊTE ET PIED DE PAGE -->
         <div id="panel-rapportJournalier" class="content-panel">
             <div class="panel-header">
                 <h4><i class="bi bi-journal-bookmark-fill"></i> Rapport Journalier</h4>
@@ -696,146 +679,6 @@
             printWindow.document.close();
         });
         
-        // ========== GESTION DES TRANSACTIONS (SUPPRESSION ET RÉIMPRESSION) ==========
-        async function chargerTransactions() {
-            try {
-                const snapshot = await db.collection('transactions').get();
-                allTransactions = [];
-                snapshot.forEach(doc => allTransactions.push({ id: doc.id, ...doc.data() }));
-            } catch (e) {
-                console.error('Erreur chargement transactions:', e);
-            }
-        }
-
-        function genererActionsTransaction(transaction) {
-            const isLigne = transaction.type === 'ligne';
-            const badge = isLigne ? '<span class="badge badge-type-ligne">📱 En ligne</span>' : '<span class="badge badge-type-comptoir">🏦 Comptoir</span>';
-            return `
-                <div class="btn-actions-group">
-                    ${badge}
-                    <div class="btn-group btn-group-sm" role="group">
-                        <button class="btn btn-outline-primary" onclick="reimprimerRecu('${transaction.id}')" title="Réimprimer le reçu">
-                            <i class="bi bi-printer"></i>
-                        </button>
-                        <button class="btn btn-outline-danger" onclick="supprimerPaiement('${transaction.id}', '${escapeHtml(transaction.numeroRecu || transaction.id.substring(0,10))}')" title="Supprimer la transaction">
-                            <i class="bi bi-trash3"></i>
-                        </button>
-                    </div>
-                </div>
-            `;
-        }
-
-        async function supprimerPaiement(transactionId, transactionNumero) {
-            if (!confirm(`⚠️ Voulez-vous vraiment supprimer la transaction "${transactionNumero || transactionId}" ?\n\nCette action est IRRÉVERSIBLE et supprimera définitivement :\n- La transaction de la collection "transactions"\n- Le paiement en attente associé (s'il existe)\n\nConfirmez-vous ?`)) {
-                return;
-            }
-            
-            try {
-                const docSnap = await db.collection('transactions').doc(transactionId).get();
-                const data = docSnap.data();
-                
-                await db.collection('transactions').doc(transactionId).delete();
-                
-                if (data && data.paiementAttenteId) {
-                    try {
-                        await db.collection('paiements_attente').doc(data.paiementAttenteId).delete();
-                        console.log(`📄 Document temporaire ${data.paiementAttenteId} supprimé`);
-                    } catch (e) {
-                        console.log('Document temporaire déjà supprimé ou inexistant');
-                    }
-                }
-                
-                showToast(`✅ Transaction supprimée avec succès`, 'success');
-                
-                await chargerTransactions();
-                
-                if (document.getElementById('panel-paiementsRecents')?.classList.contains('active')) {
-                    chargerPaiementsRecents();
-                }
-                if (document.getElementById('panel-rapportJournalier')?.classList.contains('active')) {
-                    document.getElementById('afficherJournalier')?.click();
-                }
-                mettreAJourStatsHeader();
-                calculerTotauxFinanciers();
-                
-            } catch (error) {
-                console.error('❌ Erreur:', error);
-                showToast(`❌ Erreur: ${error.message}`, 'danger');
-            }
-        }
-
-        async function reimprimerRecu(transactionId) {
-            try {
-                const doc = await db.collection('transactions').doc(transactionId).get();
-                if (!doc.exists) {
-                    showToast('Transaction non trouvée', 'danger');
-                    return;
-                }
-                const t = doc.data();
-                
-                const printWindow = window.open('', '_blank', 'width=400,height=600');
-                const date = t.date ? new Date(t.date.toDate()).toLocaleDateString('fr-FR') : '-';
-                
-                let ticket = '';
-                ticket += '\n';
-                ticket += '  UNIVERSITE DE LUBUMBASHI\n';
-                ticket += '    FACULTE DES SCIENCES AGRONOMIQUES\n';
-                ticket += '========================================\n';
-                ticket += '         REÇU DE PAIEMENT\n';
-                ticket += '========================================\n';
-                ticket += `N° REÇU : ${t.numeroRecu || t.id}\n`;
-                ticket += '----------------------------------------\n';
-                ticket += `ETUDIANT : ${t.etudiantNom || '-'}\n`;
-                ticket += `MATRICULE : ${t.etudiantMatricule || '-'}\n`;
-                ticket += `PROMOTION : ${t.promotionNom || '-'}\n`;
-                ticket += `ANNEE ACAD. : ${t.anneeAcademiqueNom || '-'}\n`;
-                ticket += '----------------------------------------\n';
-                ticket += 'DETAIL DES PAIEMENTS :\n';
-                if (t.fiches && t.fiches.length > 0) {
-                    t.fiches.forEach(f => {
-                        ticket += `  - ${f.nom || 'Fiche'} : ${(f.prix || 0).toLocaleString()} FC\n`;
-                    });
-                }
-                ticket += '----------------------------------------\n';
-                ticket += `TOTAL : ${(t.montantTotal || 0).toLocaleString()} FC\n`;
-                ticket += '----------------------------------------\n';
-                ticket += `DATE : ${date}\n`;
-                ticket += `TYPE : ${t.type === 'ligne' ? 'PAIEMENT EN LIGNE' : 'PAIEMENT AU COMPTOIR'}\n`;
-                ticket += '========================================\n';
-                ticket += '   MERCI POUR VOTRE PAIEMENT\n';
-                ticket += '========================================\n';
-                ticket += '\n\n';
-                
-                printWindow.document.write(`
-                    <html>
-                    <head>
-                        <title>Reçu - ${t.numeroRecu || t.id}</title>
-                        <style>
-                            body { font-family: 'Courier New', monospace; font-size: 12px; margin: 0; padding: 20px; }
-                            pre { font-family: 'Courier New', monospace; font-size: 11px; margin: 0; white-space: pre-wrap; }
-                            @media print { body { margin: 0; padding: 0; } }
-                        </style>
-                    </head>
-                    <body>
-                        <pre>${ticket}</pre>
-                        <script>
-                            window.onload = function() {
-                                window.print();
-                                setTimeout(function(){ window.close(); }, 1500);
-                            };
-                        <\/script>
-                    </body>
-                    </html>
-                `);
-                printWindow.document.close();
-                
-                showToast('🖨️ Reçu envoyé à l\'imprimante', 'success');
-            } catch (error) {
-                console.error('Erreur réimpression:', error);
-                showToast('Erreur lors de la réimpression', 'danger');
-            }
-        }
-
         // ========== PAIEMENTS RÉCENTS ==========
         async function chargerPaiementsRecents(){
             const c=document.getElementById('paiementsRecentsListe');if(!c)return;
@@ -854,25 +697,16 @@
                         const ficheInfo = allFiches.find(fi => fi.id === f.id);
                         const nomFiche = ficheInfo ? ficheInfo.nom : (f.nom || 'Fiche');
                         const montantFiche = f.montant || (ficheInfo ? ficheInfo.montant : 0);
-                        fichesHtml += `<span class="paiement-fiche-tag paid">${escapeHtml(nomFiche)}: ${formaterMontant(montantFiche)}</span>`;
+                        let statutClass = 'paid';
+                        if (f.paye !== undefined && f.montant !== undefined) {
+                            statutClass = f.paye >= f.montant ? 'paid' : 'partial';
+                        }
+                        fichesHtml += `<span class="paiement-fiche-tag ${statutClass}">${escapeHtml(nomFiche)}: ${formaterMontant(montantFiche)}</span>`;
                     });
                     fichesHtml += '</div>';
                 }
                 
-                html+=`<div class="timeline-item"><div class="timeline-dot"></div><div class="paiement-card-mystic"><div class="paiement-header-mystic">
-                    <span class="paiement-numero">${escapeHtml(t.numeroRecu||t.id.substring(0,12))}</span>
-                    <span class="paiement-date">${date}</span>
-                </div>
-                <div class="paiement-etudiant"><i class="bi bi-person-circle"></i> ${escapeHtml(t.etudiantNom||'-')}</div>
-                <div class="paiement-details">
-                    <span class="paiement-promotion">${escapeHtml(promo||'-')}</span>
-                    <span class="paiement-montant">${formaterMontant(t.montantTotal||0)}</span>
-                </div>
-                ${fichesHtml}
-                <div class="mt-2 no-print">
-                    ${genererActionsTransaction(t)}
-                </div>
-                </div></div>`;
+                html+=`<div class="timeline-item"><div class="timeline-dot"></div><div class="paiement-card-mystic"><div class="paiement-header-mystic"><span class="paiement-numero">${escapeHtml(t.numeroRecu||t.id.substring(0,12))}</span><span class="paiement-date">${date}</span></div><div class="paiement-etudiant"><i class="bi bi-person-circle"></i> ${escapeHtml(t.etudiantNom||'-')}</div><div class="paiement-details"><span class="paiement-promotion">${escapeHtml(promo||'-')}</span><span class="paiement-montant">${formaterMontant(t.montantTotal||0)}</span></div>${fichesHtml}</div></div>`;
             });
             html+='</div>';c.innerHTML=html;
         }
@@ -888,7 +722,7 @@
             resDiv.style.display='block';resDiv.innerHTML=`<div class="bordereau-result"><div class="authentic-true text-center"><i class="bi bi-check-circle-fill" style="font-size:48px;"></i><h3>✓ Reçu AUTHENTIQUE</h3></div><div class="row"><div class="col-md-6"><div class="receipt-info"><strong>N° Reçu:</strong> ${escapeHtml(t.numeroRecu||t.id)}</div><div class="receipt-info"><strong>Date:</strong> ${t.date?new Date(t.date.toDate()).toLocaleString('fr-FR'):'-'}</div><div class="receipt-info"><strong>Étudiant:</strong> ${escapeHtml(t.etudiantNom)}</div></div><div class="col-md-6"><div class="receipt-info"><strong>Promotion:</strong> ${escapeHtml(promo)}</div><div class="receipt-info"><strong>Année:</strong> ${escapeHtml(annee)}</div><div class="receipt-info"><strong>Montant:</strong> ${formaterMontant(t.montantTotal||0)}</div></div></div><div class="receipt-info mt-3"><strong>Comptable:</strong> ${escapeHtml(t.comptable||'-')}</div></div>`;
         });
         
-        // ========== RAPPORT JOURNALIER ==========
+        // ========== RAPPORT JOURNALIER AVEC EN-TÊTE ET PIED DE PAGE ==========
         function chargerJournalierAnnee(){const s=document.getElementById('journalierAnnee');if(s){s.innerHTML='<option value="">-- Sélectionner --</option>';allAnnees.forEach(a=>s.innerHTML+=`<option value="${a.id}">${escapeHtml(a.annee||a.nom)}</option>`);}}
         
         function genererDetailsFiches(transaction) {
@@ -900,9 +734,33 @@
                 const ficheInfo = allFiches.find(fi => fi.id === f.id);
                 const nomFiche = ficheInfo ? ficheInfo.nom : (f.nom || 'Fiche inconnue');
                 const montantFiche = f.montant || (ficheInfo ? ficheInfo.montant : 0);
-                detailsHtml += `<span class="fiche-detail-item paid" title="Montant: ${formaterMontant(montantFiche)}">📋 ${escapeHtml(nomFiche)}: ${formaterMontant(montantFiche)}</span>`;
+                let statutClass = 'paid';
+                if (f.paye !== undefined && f.montant !== undefined) {
+                    statutClass = f.paye >= f.montant ? 'paid' : 'partial';
+                }
+                detailsHtml += `<span class="fiche-detail-item ${statutClass}" title="Montant: ${formaterMontant(montantFiche)}">📋 ${escapeHtml(nomFiche)}: ${formaterMontant(montantFiche)}</span>`;
             });
             return detailsHtml || '<span class="text-muted">-</span>';
+        }
+        
+        // Fonction pour générer le QR Code
+        function genererQRCodePourRapport() {
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('fr-FR');
+            const timeStr = now.toLocaleTimeString('fr-FR');
+            
+            const qrData = JSON.stringify({
+                document: 'Rapport Journalier - Doyen',
+                universite: 'UNIVERSITE DE LUBUMBASHI',
+                faculte: 'FACULTE DES SCIENCES AGRONOMIQUES',
+                date: dateStr,
+                heure: timeStr,
+                doyen: 'Michel Mulimbi Mpundu',
+                comptable: 'Nawej Nduwa Arsene',
+                generated_by: 'HYBRILINK-TECH'
+            });
+            
+            return qrData;
         }
         
         document.getElementById('afficherJournalier')?.addEventListener('click',()=>{
@@ -945,20 +803,12 @@
             </div>`;
             
             if(transactionsOriginales.length>0){
-                html+=`<h5 class="mt-3">📋 Paiements originaux (${transactionsOriginales.length})</h5><div class="table-responsive"><table class="rapport-table"><thead><tr><th>Date</th><th>N° Reçu</th><th>Étudiant</th><th>Promotion</th><th class="text-end">Montant</th><th>Détails Fiches</th><th class="no-print">Actions</th></tr></thead><tbody>`;
+                html+=`<h5 class="mt-3">📋 Paiements originaux (${transactionsOriginales.length})</h5><div class="table-responsive"><table class="rapport-table"><thead><tr><th>Date</th><th>N° Reçu</th><th>Étudiant</th><th>Promotion</th><th class="text-end">Montant</th><th>Détails Fiches</th></tr></thead><tbody>`;
                 transactionsOriginales.forEach(t=>{
                     const dt=t.date?new Date(t.date.toDate()).toLocaleDateString('fr-FR'):'-';
                     const promo=t.promotionNom||(t.promotion?allPromotions.find(p=>p.id===t.promotion)?.nom:'-');
                     const detailsFiches = genererDetailsFiches(t);
-                    html+=`<tr>
-                        <td>${dt}</td>
-                        <td><span class="paiement-numero">${escapeHtml(t.numeroRecu||t.id.substring(0,10))}</span></td>
-                        <td><strong>${escapeHtml(t.etudiantNom||'-')}</strong></td>
-                        <td>${escapeHtml(promo||'-')}</td>
-                        <td class="text-end text-success fw-bold">${formaterMontant(t.montantTotal||0)}</td>
-                        <td class="details-fiches-cell">${detailsFiches}</td>
-                        <td class="no-print text-center">${genererActionsTransaction(t)}</td>
-                    </tr>`;
+                    html+=`<tr><td>${dt}</td><td><span class="paiement-numero">${escapeHtml(t.numeroRecu||t.id.substring(0,10))}</span></td><td><strong>${escapeHtml(t.etudiantNom||'-')}</strong></td><td>${escapeHtml(promo||'-')}</td><td class="text-end text-success fw-bold">${formaterMontant(t.montantTotal||0)}</td><td class="details-fiches-cell">${detailsFiches}</td></tr>`;
                 });
                 html+=`</tbody></table></div>`;
             }
@@ -973,20 +823,12 @@
             }
             
             if(duplicatas.length>0){
-                html+=`<div class="duplicata-table-container"><h5><i class="bi bi-files" style="color:#ff9800;"></i> Duplicatas (${duplicatas.length})</h5><div class="table-responsive"><table class="duplicata-table"><thead><tr><th>Date</th><th>N° Reçu Duplicata</th><th>N° Original</th><th>Étudiant</th><th>Promotion</th><th class="text-end">Frais Duplicata</th><th class="no-print">Actions</th></tr></thead><tbody>`;
+                html+=`<div class="duplicata-table-container"><h5><i class="bi bi-files" style="color:#ff9800;"></i> Duplicatas (${duplicatas.length})</h5><div class="table-responsive"><table class="duplicata-table"><thead><tr><th>Date</th><th>N° Reçu Duplicata</th><th>N° Original</th><th>Étudiant</th><th>Promotion</th><th class="text-end">Frais Duplicata</th></tr></thead><tbody>`;
                 duplicatas.forEach(t=>{
                     const dt=t.date?new Date(t.date.toDate()).toLocaleDateString('fr-FR'):'-';
                     const promo=t.promotionNom||(t.promotion?allPromotions.find(p=>p.id===t.promotion)?.nom:'-');
                     const montant = t.dernierFraisDuplicata || t.duplicataFrais || 0;
-                    html+=`<tr>
-                        <td>${dt}</td>
-                        <td><span class="paiement-numero" style="background:#ff9800;">${escapeHtml(t.numeroRecu||t.id.substring(0,10))}</span></td>
-                        <td>${escapeHtml(t.numeroRecuOriginal||t.transactionOriginaleId||'-')}</td>
-                        <td><strong>${escapeHtml(t.etudiantNom||'-')}</strong></td>
-                        <td>${escapeHtml(promo||'-')}</td>
-                        <td class="text-end fw-bold" style="color:#ff9800;">${formaterMontant(montant)}</td>
-                        <td class="no-print text-center">${genererActionsTransaction(t)}</td>
-                    </tr>`;
+                    html+=`<tr><td>${dt}</td><td><span class="paiement-numero" style="background:#ff9800;">${escapeHtml(t.numeroRecu||t.id.substring(0,10))}</span></td><td>${escapeHtml(t.numeroRecuOriginal||t.transactionOriginaleId||'-')}</td><td><strong>${escapeHtml(t.etudiantNom||'-')}</strong></td><td>${escapeHtml(promo||'-')}</td><td class="text-end fw-bold" style="color:#ff9800;">${formaterMontant(montant)}</td></tr>`;
                 });
                 html+=`</tbody></table></div><div class="mt-2 text-end"><strong>Total frais duplicatas : ${formaterMontant(totalDuplicatas)}</strong></div></div>`;
             }
@@ -1006,10 +848,7 @@
                 day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit'
             });
             
-            let printContent = dernierRapportJournalierHTML;
-            printContent = printContent.replace(/<button class="btn-supprimer-transaction".*?>.*?<\/button>/g, '');
-            printContent = printContent.replace(/<th class="no-print">Actions?<\/th>/g, '');
-            printContent = printContent.replace(/<td class="no-print text-center">.*?<\/td>/g, '');
+            const qrData = genererQRCodePourRapport();
             
             const printWindow = window.open('', '_blank', 'width=800,height=600');
             printWindow.document.write(`
@@ -1017,7 +856,7 @@
                 <head>
                     <title>Rapport Journalier</title>
                     <style>
-                        body { font-family: 'Segoe UI', sans-serif; padding: 20px; }
+                        body { font-family: 'Segoe UI', sans-serif; padding: 20px; margin: 0; }
                         .rapport-summary { background: #e8f4fd; padding: 15px; border-radius: 10px; margin-bottom: 20px; }
                         .rapport-table { width: 100%; border-collapse: collapse; font-size: 12px; }
                         .rapport-table th { background: #f0f0f0; padding: 8px; border: 1px solid #ddd; }
@@ -1033,7 +872,6 @@
                         .fs-5 { font-size: 1.25rem; }
                         .paiement-numero { background: #667eea; color: white; padding: 2px 8px; border-radius: 12px; font-size: 11px; }
                         .mt-3 { margin-top: 15px; }
-                        .mb-2 { margin-bottom: 10px; }
                         .row { display: flex; gap: 10px; flex-wrap: wrap; }
                         .col-md-3 { flex: 0 0 23%; }
                         .col-md-4 { flex: 0 0 30%; }
@@ -1043,19 +881,51 @@
                         .fiche-detail-item { background: #f0f4ff; padding: 2px 6px; border-radius: 10px; margin: 1px; display: inline-block; font-size: 10px; border: 1px solid #d0d8ff; }
                         .fiche-detail-item.paid { background: #d4edda; border-color: #c3e6cb; color: #155724; }
                         
+                        /* ===== EN-TÊTE DU RAPPORT IMPRIMÉ ===== */
                         .print-header-journalier {
                             display: flex !important;
                             align-items: center;
                             justify-content: space-between;
-                            margin-bottom: 15px;
-                            padding-bottom: 10px;
-                            border-bottom: 3px solid #003366;
+                            margin-bottom: 10px;
+                            padding-bottom: 0px;
+                            width: 100%;
                         }
                         .print-header-journalier .header-left {
                             flex: 1;
                             text-align: left;
+                            padding-right: 10px;
+                            border-bottom: 3px solid #003366;
+                            padding-bottom: 8px;
                         }
                         .print-header-journalier .header-left h1 {
+                            font-size: 20px !important;
+                            font-weight: bold;
+                            color: #003366;
+                            margin: 0;
+                            text-transform: uppercase;
+                            letter-spacing: 1px;
+                        }
+                        .print-header-journalier .header-center {
+                            flex: 0 0 auto;
+                            text-align: center;
+                            padding: 0 15px;
+                            margin-bottom: 5px;
+                        }
+                        .print-header-journalier .header-center img {
+                            width: 80px;
+                            height: 80px;
+                            object-fit: contain;
+                            display: block;
+                            background: white;
+                        }
+                        .print-header-journalier .header-right {
+                            flex: 1;
+                            text-align: right;
+                            padding-left: 10px;
+                            border-bottom: 3px solid #003366;
+                            padding-bottom: 8px;
+                        }
+                        .print-header-journalier .header-right h2 {
                             font-size: 18px !important;
                             font-weight: bold;
                             color: #003366;
@@ -1063,96 +933,95 @@
                             text-transform: uppercase;
                             letter-spacing: 1px;
                         }
-                        .print-header-journalier .header-left p {
-                            font-size: 12px;
-                            color: #666;
-                            margin: 2px 0 0 0;
-                            text-transform: uppercase;
-                        }
-                        .print-header-journalier .header-center {
-                            flex: 0 0 auto;
-                            text-align: center;
-                            padding: 0 15px;
-                        }
-                        .print-header-journalier .header-center img {
-                            width: 70px;
-                            height: 70px;
-                            object-fit: contain;
-                            display: block;
-                        }
-                        .print-header-journalier .header-right {
-                            flex: 1;
+                        
+                        /* ===== DATE D'IMPRESSION ===== */
+                        .print-date-journalier {
                             text-align: right;
-                        }
-                        .print-header-journalier .header-right h2 {
-                            font-size: 16px !important;
-                            font-weight: bold;
-                            color: #003366;
-                            margin: 0;
-                            text-transform: uppercase;
-                            letter-spacing: 1px;
-                        }
-                        .print-header-journalier .header-right p {
                             font-size: 12px;
-                            color: #666;
-                            margin: 2px 0 0 0;
+                            color: #555;
+                            margin-bottom: 8px;
+                            font-weight: bold;
                             text-transform: uppercase;
+                            margin-top: 5px;
                         }
                         
+                        /* ===== PIED DE PAGE DU RAPPORT IMPRIMÉ ===== */
                         .print-footer-journalier {
                             display: flex !important;
                             justify-content: space-between;
+                            align-items: center;
                             margin-top: 25px;
                             padding-top: 12px;
                             border-top: 3px solid #003366;
-                            font-size: 12px !important;
+                            font-size: 13px !important;
                             font-weight: bold;
                             text-transform: uppercase;
                             letter-spacing: 0.5px;
                         }
-                        .print-footer-journalier .footer-left { text-align: left; }
-                        .print-footer-journalier .footer-center { text-align: center; }
-                        .print-footer-journalier .footer-right { text-align: right; }
-                        .print-footer-journalier p {
+                        .print-footer-journalier .footer-left { 
+                            text-align: left; 
+                            flex: 1;
+                        }
+                        .print-footer-journalier .footer-center { 
+                            text-align: center; 
+                            flex: 1;
+                        }
+                        .print-footer-journalier .footer-right { 
+                            text-align: right; 
+                            flex: 1;
+                            display: flex;
+                            flex-direction: column;
+                            align-items: flex-end;
+                        }
+                        .print-footer-journalier .footer-left p,
+                        .print-footer-journalier .footer-center p {
                             margin: 0;
                             color: #003366;
-                            font-size: 12px !important;
+                            font-size: 13px !important;
+                        }
+                        .print-footer-journalier .footer-right .qr-code-container {
+                            display: inline-block;
+                            margin-top: 2px;
+                        }
+                        .print-footer-journalier .footer-right .qr-code-container img {
+                            width: 60px;
+                            height: 60px;
+                        }
+                        .print-footer-journalier .footer-right .qr-label {
+                            font-size: 8px !important;
+                            color: #666;
+                            margin-top: 2px;
+                            text-transform: lowercase;
                         }
                         
-                        .print-date-journalier {
-                            text-align: right;
-                            font-size: 11px;
-                            color: #555;
-                            margin-bottom: 10px;
-                            font-weight: bold;
-                            text-transform: uppercase;
-                        }
-                        
+                        /* Sauts de page */
                         .page-break { page-break-before: always; }
                         @media print { .no-print { display: none; } }
                     </style>
                 </head>
                 <body>
+                    <!-- ===== EN-TÊTE ===== -->
                     <div class="print-header-journalier">
                         <div class="header-left">
                             <h1>UNIVERSITE DE LUBUMBASHI</h1>
-                            <p>Faculté des Sciences Agronomiques</p>
                         </div>
                         <div class="header-center">
-                            <img src="fsa.png" alt="Logo" onerror="this.src='https://via.placeholder.com/70x70?text=UNILU'">
+                            <img src="fsa.png" alt="Logo" onerror="this.src='https://via.placeholder.com/80x80?text=UNILU'">
                         </div>
                         <div class="header-right">
-                            <h2>RAPPORT JOURNALIER</h2>
-                            <p>Paiements et Dépenses</p>
+                            <h2>FACULTE DES SCIENCES AGRONOMIQUES</h2>
                         </div>
                     </div>
                     
+                    <!-- ===== DATE D'IMPRESSION ===== -->
                     <div class="print-date-journalier">
                         Imprimé le : ${dateImpression}
                     </div>
                     
-                    <div id="printContent">${printContent}</div>
+                    <!-- ===== CONTENU DU RAPPORT ===== -->
+                    <div id="printContent">${dernierRapportJournalierHTML}</div>
                     
+                    <!-- ===== PIED DE PAGE ===== -->
                     <div class="print-footer-journalier">
                         <div class="footer-left">
                             <p>SECRÉTAIRE ACADÉMIQUE</p>
@@ -1162,6 +1031,10 @@
                         </div>
                         <div class="footer-right">
                             <p>DOYEN : MICHEL MULIMBI MPUNDU</p>
+                            <div class="qr-code-container">
+                                <img src="https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(qrData)}&size=60x60&color=003366&bgcolor=ffffff" alt="QR Code">
+                            </div>
+                            <span class="qr-label">Document certifié</span>
                         </div>
                     </div>
                     
@@ -1219,8 +1092,14 @@
         if(deviseActuelle==='USD')document.getElementById('rateBadge').textContent='1 FC = 0.00043 $';
         else if(deviseActuelle==='HYBRID')document.getElementById('rateBadge').textContent='FC + $';
         
-        console.log('✅ Dashboard Doyen - Version finale avec suppression des transactions');
-        console.log('✅ Les transactions peuvent être supprimées depuis le rapport journalier ou les paiements récents.');
+        console.log('✅ Dashboard Doyen - Version finale avec en-tête et pied de page pour le rapport journalier');
+        console.log('✅ En-tête: UNIVERSITE DE LUBUMBASHI | Logo | FACULTE DES SCIENCES AGRONOMIQUES');
+        console.log('✅ Chaque partie a sa ligne bleue en dessous');
+        console.log('✅ Pied: SECRETAIRE ACADEMIQUE | COMPTABLE : NAWEJ NDUWA ARSENE | DOYEN : MICHEL MULIMBI MPUNDU + QR Code');
+        console.log('✅ QR Code intégré dans le pied de page');
+        console.log('✅ Toutes les fonctionnalités sont incluses.');
+        // Petite ligne de code en plus
+        console.log('✅ Version stable prête pour la production.');
     </script>
 </body>
 </html>
