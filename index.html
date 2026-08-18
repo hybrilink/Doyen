@@ -233,6 +233,128 @@
             height: 60px;
         }
 
+        /* Bouton Voir Plus */
+        .btn-voir-plus {
+            background: var(--accent-yellow);
+            color: var(--primary-blue);
+            border: none;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn-voir-plus:hover {
+            background: #ff9800;
+            transform: scale(1.05);
+        }
+
+        /* Modal Historique des paiements */
+        .historique-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 3000;
+            animation: fadeIn 0.3s ease;
+        }
+        .historique-modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 800px;
+            width: 95%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+        .historique-modal-content h4 {
+            color: var(--primary-blue);
+            border-bottom: 2px solid var(--accent-yellow);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .historique-modal-content .close-modal {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            float: right;
+        }
+        .historique-modal-content .close-modal:hover {
+            background: #a71d2a;
+            transform: scale(1.05);
+        }
+        .historique-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            margin-top: 15px;
+        }
+        .historique-table th {
+            background: var(--primary-blue);
+            color: white;
+            padding: 10px;
+            text-align: left;
+        }
+        .historique-table td {
+            padding: 10px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .historique-table tr:hover {
+            background: #f8f9fa;
+        }
+        .historique-total {
+            margin-top: 15px;
+            padding: 10px;
+            background: #e8f4fd;
+            border-radius: 10px;
+            text-align: right;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        .historique-empty {
+            text-align: center;
+            padding: 40px;
+            color: #888;
+        }
+        .historique-empty i {
+            font-size: 48px;
+            color: #ccc;
+            margin-bottom: 15px;
+        }
+        .btn-print-historique {
+            background: #17a2b8;
+            color: white;
+            border: none;
+            padding: 5px 15px;
+            border-radius: 10px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-left: 10px;
+        }
+        .btn-print-historique:hover {
+            background: #0f6b7a;
+            transform: scale(1.05);
+        }
+
+        /* Masquer la colonne Action lors de l'impression */
+        @media print {
+            .col-action, .col-action th, .col-action td {
+                display: none !important;
+            }
+        }
+
         /* ========== STYLES POUR L'IMPRESSION DU RAPPORT JOURNALIER ========== */
         @media print {
             .navbar-custom, .panel-header .home-btn, .panel-header .fullscreen-btn, .panel-header .btn-refresh, .rapport-filters, .home-btn, .btn-action, .btn-refresh, .fullscreen-btn, .export-btn, .refresh-btn-mystic, .btn-print-journalier, .no-print { display: none !important; }
@@ -470,6 +592,15 @@
         <div id="panel-about" class="content-panel"><div class="panel-header"><h4><i class="bi bi-info-circle-fill"></i> À propos</h4><div><button class="fullscreen-btn" onclick="toggleFullscreen('panel-about')"><i class="bi bi-arrows-fullscreen"></i></button><button class="home-btn" onclick="goHome()"><i class="bi bi-house-door-fill"></i> Accueil</button></div></div><div class="about-container"><div class="about-logo"><img src="t.png" alt="HYBRILINK-TECH" onerror="this.src='https://via.placeholder.com/120x120?text=HT'"><h2>HYBRILINK - TECH</h2></div><div class="text-center mb-4"><h3 style="color:var(--primary-blue);">Votre Partenaire Digital Complet</h3></div><div class="services-grid"><div class="service-card"><i class="bi bi-laptop"></i><h5>Support Bureautique</h5><p>Installation, formation & dépannage</p></div><div class="service-card"><i class="bi bi-diagram-3"></i><h5>Administration Réseau</h5><p>Réseau & Systèmes</p></div><div class="service-card"><i class="bi bi-tools"></i><h5>Maintenance</h5><p>Maintenance Informatique</p></div><div class="service-card"><i class="bi bi-code-square"></i><h5>Développement Web</h5><p>Applications Web sur mesure</p></div></div><div class="promise-box"><i class="bi bi-star-fill"></i><h4>🎯 NOTRE PROMESSE</h4><p>« De votre ordinateur à votre application web, nous gérons tout votre écosystème digital ! »</p></div><div class="contact-info"><h5 class="text-center" style="color:var(--primary-blue);">Nos Contacts</h5><div class="contact-item"><i class="bi bi-whatsapp"></i><span><strong>Tél:</strong> <a href="tel:+243895051472">+243 895 051 472</a> / <a href="tel:+243971877758">+243 971 877 758</a></span></div><div class="contact-item"><i class="bi bi-envelope-fill"></i><span><strong>Email:</strong> <a href="mailto:hybrilink@gmail.com">hybrilink@gmail.com</a></span></div><div class="contact-item"><i class="bi bi-globe"></i><span><strong>Site:</strong> <a href="https://hybrilinktech-tech.github.io/ht/" target="_blank">hybrilinktech-tech.github.io/ht/</a></span></div><div class="text-center mt-4"><a href="https://hybrilinktech-tech.github.io/ht/" target="_blank" class="website-btn"><i class="bi bi-box-arrow-up-right"></i> Visiter notre site</a></div></div></div></div>
     </div>
     
+    <!-- Modal Historique des paiements -->
+    <div id="historiqueModal" class="historique-modal" style="display:none;">
+        <div class="historique-modal-content">
+            <button class="close-modal" onclick="fermerHistorique()"><i class="bi bi-x-circle"></i> Fermer</button>
+            <h4 id="historiqueTitre"><i class="bi bi-clock-history"></i> Historique des paiements</h4>
+            <div id="historiqueContenu"></div>
+        </div>
+    </div>
+    
     <div id="profileModal" style="display:none;"><div class="profile-modal" style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:2000;"><div class="profile-modal-content" style="background:white;border-radius:20px;padding:30px;max-width:400px;width:90%;"><div class="text-center"><i class="bi bi-person-circle" style="font-size:80px;"></i><h4 id="profilNom"></h4><p id="profilMatricule"></p><p id="profilEmail"></p><hr><h5>Changer mot de passe</h5><input type="password" class="form-control mb-2" id="newPassword" placeholder="Nouveau"><input type="password" class="form-control mb-2" id="confirmNewPassword" placeholder="Confirmer"><button class="btn-action" id="changePasswordBtn">Modifier</button><button class="btn btn-secondary mt-2 w-100" onclick="closeProfileModal()">Fermer</button></div></div></div></div>
     
     <div class="info-text">
@@ -521,6 +652,10 @@
             if (document.getElementById('panel-paiementsRecents').classList.contains('active')) chargerPaiementsRecents();
             if (document.getElementById('panel-finance').classList.contains('active')) chargerDepenses();
             if (document.getElementById('panel-rapportJournalier').classList.contains('active')) document.getElementById('afficherJournalier')?.click();
+            // Rafraîchir la liste des étudiants si elle est active
+            if (document.getElementById('panel-etudiant').classList.contains('active')) {
+                afficherEtudiantsParPromotion(currentSelectedPromotion, currentSearchTerm);
+            }
         }
         window.changerDevise = changerDevise;
         
@@ -528,6 +663,7 @@
         let allAnnees = [], allPromotions = [], allEtudiants = [], allFiches = [], allUtilisateurs = [], allTransactions = [], allDepenses = [];
         let currentSelectedPromotion = null, currentSearchTerm = '';
         let dernierRapportJournalierHTML = '';
+        let etudiantHistoriqueEnCours = null;
         
         // ========== FONCTIONS UTILITAIRES ==========
         function showToast(msg, type='success') {
@@ -607,16 +743,216 @@
         
         function afficherBoutonsPromotions(){const c=document.getElementById('promotionButtons');if(!c)return;let html='';allPromotions.forEach(p=>{const nb=allEtudiants.filter(e=>e.promotion===p.id).length;html+=`<button class="promotion-btn" data-promo="${p.id}">📚 ${escapeHtml(p.nom)} <span class="badge bg-secondary">${nb}</span></button>`;});c.innerHTML=html;document.querySelectorAll('.promotion-btn').forEach(btn=>{btn.addEventListener('click',()=>{document.querySelectorAll('.promotion-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');currentSelectedPromotion=btn.dataset.promo;currentSearchTerm = document.getElementById('rechercheEtudiant')?.value || '';afficherEtudiantsParPromotion(currentSelectedPromotion, currentSearchTerm);});});}
         
+        // ========== AFFICHER LES ÉTUDIANTS AVEC COLONNE ACTION ==========
         function afficherEtudiantsParPromotion(promoId, searchTerm = '') {
             if(!promoId){document.getElementById('etudiantsListe').innerHTML='<div class="text-center"><h5>Sélectionnez une promotion</h5></div>';return;}
             let filtres=allEtudiants.filter(e=>e.promotion===promoId);
             if(searchTerm) filtres=filtres.filter(e=>e.nom?.toLowerCase().includes(searchTerm.toLowerCase()) || e.matricule?.toLowerCase().includes(searchTerm.toLowerCase()));
             const promoMap={};allPromotions.forEach(p=>promoMap[p.id]=p.nom);
             if(filtres.length===0){document.getElementById('etudiantsListe').innerHTML=`<div class="alert alert-info">Aucun étudiant trouvé en ${escapeHtml(promoMap[promoId])}</div>`;return;}
-            let html=`<h5>Promotion: ${escapeHtml(promoMap[promoId])} (${filtres.length} étudiants)</h5><div class="table-responsive"><table class="etudiants-table" id="etudiantsTable"><thead><tr><th>#</th><th>Matricule</th><th>Nom</th></tr></thead><tbody>`;
-            filtres.forEach((e,idx)=>{html+=`<tr><td>${idx+1}</td><td>${escapeHtml(e.matricule||e.id.substring(0,8))}</td><td><strong>${escapeHtml(e.nom)}</strong></td></tr>`;});
+            
+            // Construire le tableau avec la colonne Action
+            let html=`<h5>Promotion: ${escapeHtml(promoMap[promoId])} (${filtres.length} étudiants)</h5><div class="table-responsive"><table class="etudiants-table" id="etudiantsTable"><thead><tr><th>#</th><th>Matricule</th><th>Nom</th><th class="col-action">Action</th></tr></thead><tbody>`;
+            filtres.forEach((e,idx)=>{
+                html+=`<tr>
+                    <td>${idx+1}</td>
+                    <td>${escapeHtml(e.matricule||e.id.substring(0,8))}</td>
+                    <td><strong>${escapeHtml(e.nom)}</strong></td>
+                    <td class="col-action">
+                        <button class="btn-voir-plus" onclick="voirHistoriquePaiements('${e.id}', '${escapeHtml(e.nom)}')">
+                            <i class="bi bi-eye"></i> Voir plus
+                        </button>
+                    </td>
+                </tr>`;
+            });
             html+='</tbody></table></div>';
             document.getElementById('etudiantsListe').innerHTML=html;
+        }
+        
+        // ========== HISTORIQUE DES PAIEMENTS D'UN ÉTUDIANT ==========
+        function voirHistoriquePaiements(etudiantId, etudiantNom) {
+            // Récupérer toutes les transactions de l'étudiant
+            const transactions = allTransactions.filter(t => t.etudiantId === etudiantId);
+            transactions.sort((a,b) => (b.date?.toDate()||0) - (a.date?.toDate()||0));
+            
+            const modal = document.getElementById('historiqueModal');
+            const contenu = document.getElementById('historiqueContenu');
+            const titre = document.getElementById('historiqueTitre');
+            
+            titre.innerHTML = `<i class="bi bi-clock-history"></i> Historique des paiements - ${escapeHtml(etudiantNom)} <button class="btn-print-historique" onclick="imprimerHistorique('${etudiantId}', '${escapeHtml(etudiantNom)}')"><i class="bi bi-printer-fill"></i> Imprimer</button>`;
+            
+            if (transactions.length === 0) {
+                contenu.innerHTML = `
+                    <div class="historique-empty">
+                        <i class="bi bi-inbox"></i>
+                        <h5>Aucun paiement enregistré pour cet étudiant</h5>
+                        <p class="text-muted">Aucune transaction trouvée dans la comptabilité.</p>
+                    </div>
+                `;
+            } else {
+                let total = 0;
+                let html = `
+                    <table class="historique-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>N° Reçu</th>
+                                <th>Type</th>
+                                <th>Fiches</th>
+                                <th class="text-end">Montant</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+                
+                transactions.forEach(t => {
+                    const date = t.date ? new Date(t.date.toDate()).toLocaleString('fr-FR') : '-';
+                    const type = t.isDuplicata ? 'Duplicata' : 'Original';
+                    const montant = t.isDuplicata ? (t.dernierFraisDuplicata || t.duplicataFrais || 0) : (t.montantTotal || 0);
+                    total += montant;
+                    
+                    let fichesNoms = '';
+                    if (t.fiches && t.fiches.length > 0) {
+                        fichesNoms = t.fiches.map(f => {
+                            const ficheInfo = allFiches.find(fi => fi.id === f.id);
+                            const nom = ficheInfo ? ficheInfo.nom : (f.nom || 'Fiche');
+                            const prix = f.montant || (ficheInfo ? ficheInfo.montant : 0);
+                            return `<span class="paiement-fiche-tag">${escapeHtml(nom)}: ${formaterMontant(prix)}</span>`;
+                        }).join(' ');
+                    } else {
+                        fichesNoms = '<span class="text-muted">-</span>';
+                    }
+                    
+                    const typeBadge = t.isDuplicata ? '<span class="duplicata-badge">DUPLICATA</span>' : '';
+                    
+                    html += `
+                        <tr>
+                            <td>${date}</td>
+                            <td><span class="paiement-numero">${escapeHtml(t.numeroRecu || t.id.substring(0,10))}</span> ${typeBadge}</td>
+                            <td>${type}</td>
+                            <td style="max-width:200px;">${fichesNoms}</td>
+                            <td class="text-end" style="font-weight:bold;color:${t.isDuplicata ? '#ff9800' : '#28a745'};">${formaterMontant(montant)}</td>
+                        </tr>
+                    `;
+                });
+                
+                html += `
+                        </tbody>
+                    </table>
+                    <div class="historique-total">
+                        Total des paiements : ${formaterMontant(total)}
+                    </div>
+                `;
+                
+                contenu.innerHTML = html;
+            }
+            
+            modal.style.display = 'flex';
+            etudiantHistoriqueEnCours = { id: etudiantId, nom: etudiantNom };
+        }
+        
+        function fermerHistorique() {
+            document.getElementById('historiqueModal').style.display = 'none';
+            etudiantHistoriqueEnCours = null;
+        }
+        
+        // Fermer le modal en cliquant à l'extérieur
+        document.getElementById('historiqueModal')?.addEventListener('click', function(e) {
+            if (e.target === this) {
+                fermerHistorique();
+            }
+        });
+        
+        // ========== IMPRIMER L'HISTORIQUE D'UN ÉTUDIANT ==========
+        function imprimerHistorique(etudiantId, etudiantNom) {
+            const transactions = allTransactions.filter(t => t.etudiantId === etudiantId);
+            transactions.sort((a,b) => (b.date?.toDate()||0) - (a.date?.toDate()||0));
+            
+            if (transactions.length === 0) {
+                alert('Aucun paiement à imprimer pour cet étudiant.');
+                return;
+            }
+            
+            let total = 0;
+            let tableRows = '';
+            transactions.forEach(t => {
+                const date = t.date ? new Date(t.date.toDate()).toLocaleString('fr-FR') : '-';
+                const type = t.isDuplicata ? 'Duplicata' : 'Original';
+                const montant = t.isDuplicata ? (t.dernierFraisDuplicata || t.duplicataFrais || 0) : (t.montantTotal || 0);
+                total += montant;
+                
+                let fichesNoms = '';
+                if (t.fiches && t.fiches.length > 0) {
+                    fichesNoms = t.fiches.map(f => {
+                        const ficheInfo = allFiches.find(fi => fi.id === f.id);
+                        const nom = ficheInfo ? ficheInfo.nom : (f.nom || 'Fiche');
+                        const prix = f.montant || (ficheInfo ? ficheInfo.montant : 0);
+                        return `${nom}: ${prix.toLocaleString()} FC`;
+                    }).join('; ');
+                } else {
+                    fichesNoms = '-';
+                }
+                
+                tableRows += `
+                    <tr>
+                        <td>${date}</td>
+                        <td>${t.numeroRecu || t.id.substring(0,10)}</td>
+                        <td>${type}</td>
+                        <td>${fichesNoms}</td>
+                        <td style="text-align:right;font-weight:bold;">${montant.toLocaleString()} FC</td>
+                    </tr>
+                `;
+            });
+            
+            const now = new Date().toLocaleString('fr-FR');
+            const printWindow = window.open('', '_blank', 'width=800,height=600');
+            printWindow.document.write(`
+                <html>
+                <head>
+                    <title>Historique des paiements - ${etudiantNom}</title>
+                    <style>
+                        body { font-family: 'Segoe UI', sans-serif; padding: 20px; }
+                        h2 { color: #003366; text-align: center; margin-bottom: 20px; }
+                        .subtitle { text-align: center; color: #666; margin-bottom: 20px; }
+                        table { width: 100%; border-collapse: collapse; font-size: 13px; }
+                        th { background: #003366; color: white; padding: 10px; text-align: left; }
+                        td { padding: 8px 10px; border-bottom: 1px solid #ddd; }
+                        tr:hover { background: #f5f5f5; }
+                        .text-end { text-align: right; }
+                        .total { margin-top: 15px; padding: 10px; background: #e8f4fd; border-radius: 8px; text-align: right; font-weight: bold; font-size: 16px; }
+                        .footer { margin-top: 30px; text-align: center; font-size: 12px; color: #888; border-top: 1px solid #ddd; padding-top: 10px; }
+                    </style>
+                </head>
+                <body>
+                    <h2>UNIVERSITE DE LUBUMBASHI</h2>
+                    <h3 style="text-align:center;color:#003366;">FACULTE DES SCIENCES AGRONOMIQUES</h3>
+                    <div class="subtitle">Historique des paiements - <strong>${escapeHtml(etudiantNom)}</strong></div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>N° Reçu</th>
+                                <th>Type</th>
+                                <th>Fiches</th>
+                                <th class="text-end">Montant</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${tableRows}
+                        </tbody>
+                    </table>
+                    <div class="total">Total des paiements : ${total.toLocaleString()} FC</div>
+                    <div class="footer">Imprimé le ${now} | Document certifié par le Doyen</div>
+                    <script>
+                        window.onload = function() {
+                            window.print();
+                            setTimeout(function(){ window.close(); }, 1000);
+                        };
+                    <\/script>
+                </body>
+                </html>
+            `);
+            printWindow.document.close();
         }
         
         // ========== GESTION DE LA RECHERCHE ET IMPRESSION POUR ÉTUDIANTS ==========
@@ -656,6 +992,8 @@
                         tr:hover { background: #f5f5f5; }
                         .text-center { text-align: center; }
                         .footer { margin-top: 30px; text-align: center; font-size: 12px; color: #888; border-top: 1px solid #ddd; padding-top: 10px; }
+                        /* Masquer la colonne Action lors de l'impression */
+                        .col-action { display: none !important; }
                     </style>
                 </head>
                 <body>
@@ -663,7 +1001,7 @@
                     <table>
                         <thead><tr><th>#</th><th>Matricule</th><th>Nom</th></tr></thead>
                         <tbody>
-                            ${table.querySelector('tbody').innerHTML}
+                            ${table.querySelector('tbody').innerHTML.replace(/<td class="col-action">.*?<\/td>/g, '')}
                         </tbody>
                     </table>
                     <div class="footer">Imprimé le ${new Date().toLocaleString('fr-FR')}</div>
@@ -743,7 +1081,6 @@
             return detailsHtml || '<span class="text-muted">-</span>';
         }
         
-        // Fonction pour générer le QR Code
         function genererQRCodePourRapport() {
             const now = new Date();
             const dateStr = now.toLocaleDateString('fr-FR');
@@ -881,7 +1218,6 @@
                         .fiche-detail-item { background: #f0f4ff; padding: 2px 6px; border-radius: 10px; margin: 1px; display: inline-block; font-size: 10px; border: 1px solid #d0d8ff; }
                         .fiche-detail-item.paid { background: #d4edda; border-color: #c3e6cb; color: #155724; }
                         
-                        /* ===== EN-TÊTE DU RAPPORT IMPRIMÉ ===== */
                         .print-header-journalier {
                             display: flex !important;
                             align-items: center;
@@ -934,7 +1270,6 @@
                             letter-spacing: 1px;
                         }
                         
-                        /* ===== DATE D'IMPRESSION ===== */
                         .print-date-journalier {
                             text-align: right;
                             font-size: 12px;
@@ -945,7 +1280,6 @@
                             margin-top: 5px;
                         }
                         
-                        /* ===== PIED DE PAGE DU RAPPORT IMPRIMÉ ===== */
                         .print-footer-journalier {
                             display: flex !important;
                             justify-content: space-between;
@@ -994,13 +1328,11 @@
                             text-transform: lowercase;
                         }
                         
-                        /* Sauts de page */
                         .page-break { page-break-before: always; }
                         @media print { .no-print { display: none; } }
                     </style>
                 </head>
                 <body>
-                    <!-- ===== EN-TÊTE ===== -->
                     <div class="print-header-journalier">
                         <div class="header-left">
                             <h1>UNIVERSITE DE LUBUMBASHI</h1>
@@ -1013,15 +1345,12 @@
                         </div>
                     </div>
                     
-                    <!-- ===== DATE D'IMPRESSION ===== -->
                     <div class="print-date-journalier">
                         Imprimé le : ${dateImpression}
                     </div>
                     
-                    <!-- ===== CONTENU DU RAPPORT ===== -->
                     <div id="printContent">${dernierRapportJournalierHTML}</div>
                     
-                    <!-- ===== PIED DE PAGE ===== -->
                     <div class="print-footer-journalier">
                         <div class="footer-left">
                             <p>SECRÉTAIRE ACADÉMIQUE</p>
@@ -1092,11 +1421,11 @@
         if(deviseActuelle==='USD')document.getElementById('rateBadge').textContent='1 FC = 0.00043 $';
         else if(deviseActuelle==='HYBRID')document.getElementById('rateBadge').textContent='FC + $';
         
-        console.log('✅ Dashboard Doyen - Version finale avec en-tête et pied de page pour le rapport journalier');
-        console.log('✅ En-tête: UNIVERSITE DE LUBUMBASHI | Logo | FACULTE DES SCIENCES AGRONOMIQUES');
-        console.log('✅ Chaque partie a sa ligne bleue en dessous');
-        console.log('✅ Pied: SECRETAIRE ACADEMIQUE | COMPTABLE : NAWEJ NDUWA ARSENE | DOYEN : MICHEL MULIMBI MPUNDU + QR Code');
-        console.log('✅ QR Code intégré dans le pied de page');
+        console.log('✅ Dashboard Doyen - Version avec colonne Action et historique des paiements');
+        console.log('✅ Nouvelle colonne "Action" avec bouton "Voir plus" pour chaque étudiant');
+        console.log('✅ Affichage de l\'historique complet des paiements de l\'étudiant');
+        console.log('✅ Impression de l\'historique avec tous les détails');
+        console.log('✅ Colonne Action masquée lors de l\'impression de la liste des étudiants');
         console.log('✅ Toutes les fonctionnalités sont incluses.');
         // Petite ligne de code en plus
         console.log('✅ Version stable prête pour la production.');
