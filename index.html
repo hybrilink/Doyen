@@ -18,7 +18,6 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -219,7 +218,6 @@
         .fiches-horizontales .fiche-tag.duplicata { background: #fff3cd; border-color: #ffeaa7; color: #856404; }
         .fiches-horizontales .fiche-tag.duplicata .montant { color: #856404; }
         
-        /* Styles pour le QR Code */
         .qr-code-container {
             display: inline-block;
             margin: 0 auto;
@@ -233,7 +231,39 @@
             height: 60px;
         }
 
-        /* ========== STYLES POUR L'IMPRESSION DU RAPPORT JOURNALIER ========== */
+        /* ===== NOUVELLE CARTE RAPPORT & HISTORIQUE ===== */
+        .menu-card.rapport-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        .menu-card.rapport-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%);
+            animation: pulse 3s infinite;
+        }
+        .menu-card.rapport-card .menu-icon { color: #ffb347; position: relative; z-index: 1; }
+        .menu-card.rapport-card .menu-title { color: white; position: relative; z-index: 1; }
+        .menu-card.rapport-card .menu-subtitle { color: rgba(255,255,255,0.85); font-size: 12px; margin-top: 5px; position: relative; z-index: 1; }
+        .menu-card.rapport-card:hover { transform: translateY(-10px) scale(1.02); box-shadow: 0 25px 40px rgba(102,126,234,0.4); }
+        .menu-card.rapport-card .menu-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #ffb347;
+            color: #003366;
+            font-size: 10px;
+            font-weight: bold;
+            padding: 3px 10px;
+            border-radius: 20px;
+            z-index: 2;
+        }
+
         @media print {
             .navbar-custom, .panel-header .home-btn, .panel-header .fullscreen-btn, .panel-header .btn-refresh, .rapport-filters, .home-btn, .btn-action, .btn-refresh, .fullscreen-btn, .export-btn, .refresh-btn-mystic, .btn-print-journalier, .no-print { display: none !important; }
             .content-panel { box-shadow: none !important; border: 1px solid #ddd !important; }
@@ -242,7 +272,6 @@
             .duplicata-table th { background: #f0f0f0 !important; color: #000 !important; }
             .etudiants-table th { background: #f0f0f0 !important; color: #000 !important; }
             
-            /* ===== EN-TÊTE DU RAPPORT IMPRIMÉ ===== */
             .print-header-journalier {
                 display: flex !important;
                 align-items: center;
@@ -295,7 +324,6 @@
                 letter-spacing: 1px;
             }
             
-            /* ===== DATE D'IMPRESSION ===== */
             .print-date-journalier {
                 text-align: right;
                 font-size: 12px;
@@ -306,7 +334,6 @@
                 margin-top: 5px;
             }
             
-            /* ===== PIED DE PAGE DU RAPPORT IMPRIMÉ ===== */
             .print-footer-journalier {
                 display: flex !important;
                 justify-content: space-between;
@@ -354,8 +381,6 @@
                 margin-top: 2px;
                 text-transform: lowercase;
             }
-            
-            /* Sauts de page */
             .page-break { page-break-before: always; }
         }
     </style>
@@ -363,7 +388,7 @@
 <body>
     <nav class="navbar navbar-custom">
         <div class="container">
-            <a class="navbar-brand text-white" href="#" id="homeBrand"><img src="fsa.png" width="50px" style="border-radius:50px"></i> Faculté Agronomique - Doyen</a>
+            <a class="navbar-brand text-white" href="#" id="homeBrand"><img src="fsa.png" width="50px" style="border-radius:50px"> Faculté Agronomique - Doyen</a>
             <div class="navbar-right">
                 <div class="currency-selector">
                     <i class="bi bi-currency-exchange" style="color: white;"></i>
@@ -405,6 +430,16 @@
                 <div class="col-md-3 col-sm-6"><div class="menu-card" data-menu="rapportJournalier"><div class="menu-icon"><i class="bi bi-journal-bookmark-fill"></i></div><div class="menu-title">Rapport Journalier</div></div></div>
                 <div class="col-md-3 col-sm-6"><div class="menu-card" data-menu="finance"><div class="menu-icon"><i class="bi bi-piggy-bank-fill"></i></div><div class="menu-title">Gestion Financière</div></div></div>
                 <div class="col-md-3 col-sm-6"><div class="menu-card" data-menu="about"><div class="menu-icon"><i class="bi bi-info-circle-fill"></i></div><div class="menu-title">À propos</div></div></div>
+                
+                <!-- ===== NOUVELLE CARTE RAPPORT & HISTORIQUE ===== -->
+                <div class="col-md-3 col-sm-6">
+                    <div class="menu-card rapport-card" onclick="window.location.href='rapport.html'">
+                        <div class="menu-badge">NOUVEAU</div>
+                        <div class="menu-icon"><i class="bi bi-file-earmark-bar-graph-fill"></i></div>
+                        <div class="menu-title">Rapport & Historique</div>
+                        <div class="menu-subtitle">Analyses, exports et relevés</div>
+                    </div>
+                </div>
             </div>
         </div>
         
@@ -428,7 +463,6 @@
             <div id="etudiantsListe"><div class="text-center"><div class="loading-spinner"></div> Chargement...</div></div>
         </div>
         
-        <!-- PANEL RAPPORT JOURNALIER AVEC EN-TÊTE ET PIED DE PAGE -->
         <div id="panel-rapportJournalier" class="content-panel">
             <div class="panel-header">
                 <h4><i class="bi bi-journal-bookmark-fill"></i> Rapport Journalier</h4>
@@ -452,7 +486,6 @@
             </div>
         </div>
         
-        <!-- PANEL PAIEMENTS RECENTS -->
         <div id="panel-paiementsRecents" class="content-panel">
             <div class="panel-header">
                 <h4><i class="bi bi-clock-history"></i> Paiements Récents</h4>
@@ -480,8 +513,9 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <script>
-        // Configuration Firebase
+        // ========== CONFIGURATION FIREBASE ==========
         const firebaseConfig = {
             apiKey: "AIzaSyBb82N2-5ns7qKjQBAj5UvDW87s2PZ27F0",
             authDomain: "fsa-unilu.firebaseapp.com",
@@ -490,15 +524,48 @@
             messagingSenderId: "36551990738",
             appId: "1:36551990738:web:e91fdcb53f8aab5d1b7c0b"
         };
+        
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
-        db.enablePersistence({ synchronizeTabs: true }).catch(err => console.warn(err));
+        const auth = firebase.auth();
+        
+        // Activer la persistance
+        db.enablePersistence({ synchronizeTabs: true }).catch(err => {
+            console.warn('Persistance non activée:', err);
+        });
+        
+        // ========== VÉRIFICATION DE LA SESSION ==========
+        function verifierSession() {
+            const session = localStorage.getItem('session_doyen');
+            if (!session) {
+                window.location.href = 'login-doyen.html';
+                return false;
+            }
+            try {
+                const sessionData = JSON.parse(session);
+                if (Date.now() > sessionData.expires) {
+                    localStorage.removeItem('session_doyen');
+                    window.location.href = 'login-doyen.html';
+                    return false;
+                }
+                return sessionData;
+            } catch (e) {
+                window.location.href = 'login-doyen.html';
+                return false;
+            }
+        }
+        
+        const sessionData = verifierSession();
+        if (!sessionData) {
+            // Redirection déjà effectuée
+        }
         
         // ========== CONVERSION DE DEVISE ==========
         const TAUX_CONVERSION = 2300;
         let deviseActuelle = localStorage.getItem('deviseDoyen') || 'FC';
         
         function formaterMontant(montantFC) {
+            if (montantFC === undefined || montantFC === null) return '0 FC';
             if (deviseActuelle === 'USD') return `$ ${(montantFC / TAUX_CONVERSION).toFixed(2)}`;
             if (deviseActuelle === 'HYBRID') return `${montantFC.toLocaleString()} FC ($ ${(montantFC / TAUX_CONVERSION).toFixed(2)})`;
             return `${montantFC.toLocaleString()} FC`;
@@ -514,36 +581,191 @@
             rafraichirTousLesAffichages();
             showToast(`Devise changée : ${deviseActuelle}`, 'success');
         }
+        window.changerDevise = changerDevise;
         
         function rafraichirTousLesAffichages() {
             mettreAJourStatsHeader();
             calculerTotauxFinanciers();
             if (document.getElementById('panel-paiementsRecents').classList.contains('active')) chargerPaiementsRecents();
             if (document.getElementById('panel-finance').classList.contains('active')) chargerDepenses();
-            if (document.getElementById('panel-rapportJournalier').classList.contains('active')) document.getElementById('afficherJournalier')?.click();
+            if (document.getElementById('panel-rapportJournalier').classList.contains('active')) {
+                const btn = document.getElementById('afficherJournalier');
+                if (btn) btn.click();
+            }
         }
-        window.changerDevise = changerDevise;
+        
+        // ========== FONCTIONS UTILITAIRES ==========
+        function showToast(msg, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const bg = type === 'success' ? '#28a745' : (type === 'warning' ? '#ffc107' : '#dc3545');
+            const icon = type === 'success' ? 'check-circle-fill' : 'exclamation-triangle-fill';
+            container.insertAdjacentHTML('afterbegin', `
+                <div class="toast notification-toast" style="background:${bg};color:${type === 'warning' ? '#333' : 'white'};border-radius:10px;margin-bottom:10px;">
+                    <div class="toast-body"><i class="bi bi-${icon} me-2"></i>${msg}</div>
+                </div>
+            `);
+            setTimeout(() => container.firstElementChild?.remove(), 4000);
+        }
+        
+        function escapeHtml(t) {
+            if (!t) return '';
+            const d = document.createElement('div');
+            d.textContent = t;
+            return d.innerHTML;
+        }
+        
+        function toggleFullscreen(pid) {
+            const p = document.getElementById(pid);
+            if (!p) return;
+            if (document.fullscreenElement) {
+                document.exitFullscreen();
+                p.classList.remove('fullscreen');
+            } else {
+                p.classList.add('fullscreen');
+                p.requestFullscreen();
+            }
+        }
+        
+        function goHome() {
+            document.querySelectorAll('.content-panel').forEach(p => p.classList.remove('active', 'fullscreen'));
+            if (document.fullscreenElement) document.exitFullscreen();
+            document.getElementById('homePage').style.display = 'block';
+        }
+        
+        // ========== CHARGEMENT DES DONNÉES ==========
+        async function chargerCollection(name) {
+            try {
+                const s = await db.collection(name).get();
+                return s.docs.map(d => ({ id: d.id, ...d.data() }));
+            } catch (e) {
+                return [];
+            }
+        }
         
         // ========== VARIABLES ==========
         let allAnnees = [], allPromotions = [], allEtudiants = [], allFiches = [], allUtilisateurs = [], allTransactions = [], allDepenses = [];
         let currentSelectedPromotion = null, currentSearchTerm = '';
         let dernierRapportJournalierHTML = '';
         
-        // ========== FONCTIONS UTILITAIRES ==========
-        function showToast(msg, type='success') {
-            const container = document.getElementById('toastContainer');
-            const bg = type==='success'?'#28a745':type==='warning'?'#ffc107':'#dc3545';
-            const icon = type==='success'?'check-circle-fill':'exclamation-triangle-fill';
-            container.insertAdjacentHTML('afterbegin', `<div class="toast notification-toast" style="background:${bg};color:${type==='warning'?'#333':'white'};border-radius:10px;margin-bottom:10px;"><div class="toast-body"><i class="bi bi-${icon} me-2"></i>${msg}</div></div>`);
-            setTimeout(()=>container.firstElementChild?.remove(),4000);
+        // ========== FONCTIONS MÉTIER ==========
+        function chargerAnneesListe() {
+            const c = document.getElementById('anneesListe');
+            if (!c) return;
+            if (allAnnees.length === 0) {
+                c.innerHTML = '<div class="alert alert-info">Aucune année académique</div>';
+                return;
+            }
+            let html = '<div class="table-responsive"><table class="table table-bordered"><thead><tr><th>Année</th><th>Statut</th></tr></thead><tbody>';
+            allAnnees.forEach(a => {
+                html += `<tr><td><strong>${escapeHtml(a.annee || a.nom)}</strong></td><td>${a.statut === 'active' ? '<span class="text-success">Active</span>' : '<span class="text-muted">Inactive</span>'}</td></tr>`;
+            });
+            html += '</tbody></table></div>';
+            c.innerHTML = html;
         }
-        function escapeHtml(t){if(!t)return '';const d=document.createElement('div');d.textContent=t;return d.innerHTML;}
-        function toggleFullscreen(pid){const p=document.getElementById(pid);if(!p)return;if(document.fullscreenElement){document.exitFullscreen();p.classList.remove('fullscreen');}else{p.classList.add('fullscreen');p.requestFullscreen();}}
-        function goHome(){document.querySelectorAll('.content-panel').forEach(p=>p.classList.remove('active','fullscreen'));if(document.fullscreenElement)document.exitFullscreen();document.getElementById('homePage').style.display='block';}
         
-        // ========== CHARGEMENT DES DONNÉES ==========
-        async function chargerCollection(name){try{const s=await db.collection(name).get();return s.docs.map(d=>({id:d.id,...d.data()}));}catch(e){return[];}}
+        function chargerComptesListe() {
+            const c = document.getElementById('comptesListe');
+            if (!c) return;
+            const filtres = allUtilisateurs.filter(u => u.role === 'comptabilite');
+            if (filtres.length === 0) {
+                c.innerHTML = '<div class="alert alert-info">Aucun compte comptabilité</div>';
+                return;
+            }
+            let html = '<div class="table-responsive"><table class="table table-bordered"><thead><tr><th>Nom</th><th>Email</th></tr></thead><tbody>';
+            filtres.forEach(u => {
+                html += `<tr><td><strong>${escapeHtml(u.nomComplet)}</strong></td><td>${escapeHtml(u.email || '-')}</td></tr>`;
+            });
+            html += '</tbody></table></div>';
+            c.innerHTML = html;
+        }
         
+        function chargerPromotionsListe() {
+            const c = document.getElementById('promotionsListe');
+            if (!c) return;
+            if (allPromotions.length === 0) {
+                c.innerHTML = '<div class="alert alert-info">Aucune promotion</div>';
+                return;
+            }
+            let html = '<div class="table-responsive"><table class="table table-bordered"><thead><tr><th>Promotion</th><th>Capacité</th><th>Étudiants</th></tr></thead><tbody>';
+            allPromotions.forEach(p => {
+                const nb = allEtudiants.filter(e => e.promotion === p.id).length;
+                html += `<tr><td><strong>${escapeHtml(p.nom)}</strong></td><td>${p.capacite || '-'}</td><td><span class="badge bg-primary">${nb}</span></td></tr>`;
+            });
+            html += '</tbody></table></div>';
+            c.innerHTML = html;
+        }
+        
+        function chargerFichesListe() {
+            const c = document.getElementById('fichesListe');
+            if (!c) return;
+            if (allFiches.length === 0) {
+                c.innerHTML = '<div class="alert alert-info">Aucune fiche</div>';
+                return;
+            }
+            const promoMap = {};
+            allPromotions.forEach(p => promoMap[p.id] = p.nom);
+            let html = '<div class="table-responsive"><table class="table table-bordered"><thead><tr><th>Fiche</th><th>Montant</th><th>Promotions</th></tr></thead><tbody>';
+            allFiches.forEach(f => {
+                let promos = '';
+                if (f.promotions) promos = f.promotions.map(pid => promoMap[pid]).filter(p => p).join(', ');
+                else if (f.promotion) promos = promoMap[f.promotion] || '';
+                html += `<tr><td><strong>${escapeHtml(f.nom)}</strong></td><td>${formaterMontant(f.montant || 0)}</td><td>${escapeHtml(promos || '-')}</td></tr>`;
+            });
+            html += '</tbody></table></div>';
+            c.innerHTML = html;
+        }
+        
+        function afficherBoutonsPromotions() {
+            const c = document.getElementById('promotionButtons');
+            if (!c) return;
+            if (allPromotions.length === 0) {
+                c.innerHTML = '<div class="alert alert-info">Aucune promotion disponible</div>';
+                return;
+            }
+            let html = '';
+            allPromotions.forEach(p => {
+                const nb = allEtudiants.filter(e => e.promotion === p.id).length;
+                html += `<button class="promotion-btn" data-promo="${p.id}">📚 ${escapeHtml(p.nom)} <span class="badge bg-secondary">${nb}</span></button>`;
+            });
+            c.innerHTML = html;
+            
+            document.querySelectorAll('.promotion-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.promotion-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    currentSelectedPromotion = this.dataset.promo;
+                    currentSearchTerm = document.getElementById('rechercheEtudiant')?.value || '';
+                    afficherEtudiantsParPromotion(currentSelectedPromotion, currentSearchTerm);
+                });
+            });
+        }
+        
+        function afficherEtudiantsParPromotion(promoId, searchTerm = '') {
+            if (!promoId) {
+                document.getElementById('etudiantsListe').innerHTML = '<div class="text-center"><h5>Sélectionnez une promotion</h5></div>';
+                return;
+            }
+            let filtres = allEtudiants.filter(e => e.promotion === promoId);
+            if (searchTerm) filtres = filtres.filter(e => e.nom?.toLowerCase().includes(searchTerm.toLowerCase()) || e.matricule?.toLowerCase().includes(searchTerm.toLowerCase()));
+            const promoMap = {};
+            allPromotions.forEach(p => promoMap[p.id] = p.nom);
+            
+            if (filtres.length === 0) {
+                document.getElementById('etudiantsListe').innerHTML = `<div class="alert alert-info">Aucun étudiant trouvé en ${escapeHtml(promoMap[promoId] || promoId)}</div>`;
+                return;
+            }
+            
+            let html = `<h5>Promotion: ${escapeHtml(promoMap[promoId])} (${filtres.length} étudiants)</h5>
+                        <div class="table-responsive"><table class="etudiants-table" id="etudiantsTable">
+                        <thead><tr><th>#</th><th>Matricule</th><th>Nom</th></tr></thead><tbody>`;
+            filtres.forEach((e, idx) => {
+                html += `<tr><td>${idx + 1}</td><td><code>${escapeHtml(e.matricule || e.id.substring(0,8))}</code></td><td><strong>${escapeHtml(e.nom)}</strong></td></tr>`;
+            });
+            html += '</tbody></table></div>';
+            document.getElementById('etudiantsListe').innerHTML = html;
+        }
+        
+        // ========== STATS FINANCIÈRES ==========
         async function mettreAJourStatsHeader() {
             const aujourdhui = new Date();
             aujourdhui.setHours(0, 0, 0, 0);
@@ -568,7 +790,7 @@
             document.getElementById('todaySortiesHeader').innerHTML = formaterMontant(sorties);
             document.getElementById('todaySoldeHeader').innerHTML = formaterMontant(entrees - sorties);
         }
-
+        
         async function calculerTotauxFinanciers() {
             let totalE = 0, totalS = 0;
             allTransactions.forEach(t => {
@@ -583,43 +805,323 @@
             document.getElementById('totalSorties').innerHTML = formaterMontant(totalS);
             document.getElementById('soldeActuel').innerHTML = formaterMontant(totalE - totalS);
         }
+        
         async function chargerDepenses() {
-            const debut=document.getElementById('financeDateDebut')?.value;
-            const fin=document.getElementById('financeDateFin')?.value;
-            let depenses=[...allDepenses];
-            if(debut){const d=new Date(debut);d.setHours(0,0,0,0);depenses=depenses.filter(dep=>dep.date&&dep.date.toDate()>=d);}
-            if(fin){const f=new Date(fin);f.setHours(23,59,59,999);depenses=depenses.filter(dep=>dep.date&&dep.date.toDate()<=f);}
-            depenses.sort((a,b)=>(b.date?.toDate()||0)-(a.date?.toDate()||0));
-            const container=document.getElementById('depensesListe');
-            if(depenses.length===0){container.innerHTML='<div class="empty-state-mystic"><i class="bi bi-inbox"></i><h5>Aucune dépense</h5></div>';return;}
-            let html='';
-            depenses.slice(0,10).forEach(d=>{
-                const date=d.date?new Date(d.date.toDate()).toLocaleString('fr-FR'):'-';
-                html+=`<div class="depense-item"><div class="depense-header"><span class="depense-montant">${formaterMontant(d.montant||0)}</span><span class="depense-date">${date}</span></div><div class="depense-motif">${escapeHtml(d.motif||'-')}</div><div class="depense-comptable">${escapeHtml(d.comptable||'-')}</div></div>`;
+            const debut = document.getElementById('financeDateDebut')?.value;
+            const fin = document.getElementById('financeDateFin')?.value;
+            let depenses = [...allDepenses];
+            if (debut) {
+                const d = new Date(debut);
+                d.setHours(0, 0, 0, 0);
+                depenses = depenses.filter(dep => dep.date && dep.date.toDate() >= d);
+            }
+            if (fin) {
+                const f = new Date(fin);
+                f.setHours(23, 59, 59, 999);
+                depenses = depenses.filter(dep => dep.date && dep.date.toDate() <= f);
+            }
+            depenses.sort((a, b) => (b.date?.toDate() || 0) - (a.date?.toDate() || 0));
+            const container = document.getElementById('depensesListe');
+            if (depenses.length === 0) {
+                container.innerHTML = '<div class="empty-state-mystic"><i class="bi bi-inbox"></i><h5>Aucune dépense</h5></div>';
+                return;
+            }
+            let html = '';
+            depenses.slice(0, 10).forEach(d => {
+                const date = d.date ? new Date(d.date.toDate()).toLocaleString('fr-FR') : '-';
+                html += `<div class="depense-item"><div class="depense-header"><span class="depense-montant">${formaterMontant(d.montant || 0)}</span><span class="depense-date">${date}</span></div><div class="depense-motif">${escapeHtml(d.motif || '-')}</div><div class="depense-comptable">${escapeHtml(d.comptable || '-')}</div></div>`;
             });
-            container.innerHTML=html;
+            container.innerHTML = html;
         }
         
-        function chargerAnneesListe(){const c=document.getElementById('anneesListe');if(!c)return;if(allAnnees.length===0){c.innerHTML='<div class="alert alert-info">Aucune année</div>';return;}let html='<table class="table table-bordered"><thead><tr><th>Année</th><th>Statut</th></tr></thead><tbody>';allAnnees.forEach(a=>{html+=`<tr><td><strong>${escapeHtml(a.annee||a.nom)}</strong></td><td>${a.statut==='active'?'<span class="text-success">Active</span>':'<span class="text-muted">Inactive</span>'}</td></tr>`;});html+='</tbody></table>';c.innerHTML=html;}
-        function chargerComptesListe(){const c=document.getElementById('comptesListe');if(!c)return;const filtres=allUtilisateurs.filter(u=>u.role==='comptabilite');if(filtres.length===0){c.innerHTML='<div class="alert alert-info">Aucun compte</div>';return;}let html='<table class="table table-bordered"><thead><tr><th>Nom</th><th>Email</th></tr></thead><tbody>';filtres.forEach(u=>{html+=`<tr><td><strong>${escapeHtml(u.nomComplet)}</strong></td><td>${escapeHtml(u.email||'-')}</td></tr>`;});html+='</tbody></table>';c.innerHTML=html;}
-        function chargerPromotionsListe(){const c=document.getElementById('promotionsListe');if(!c)return;if(allPromotions.length===0){c.innerHTML='<div class="alert alert-info">Aucune promotion</div>';return;}let html='<table class="table table-bordered"><thead><tr><th>Promotion</th><th>Capacité</th><th>Étudiants</th></tr></thead><tbody>';allPromotions.forEach(p=>{const nb=allEtudiants.filter(e=>e.promotion===p.id).length;html+=`<tr><td><strong>${escapeHtml(p.nom)}</strong></td><td>${p.capacite||'-'}</td><td><span class="badge bg-primary">${nb}</span></td></tr>`;});html+='</tbody></table>';c.innerHTML=html;}
-        function chargerFichesListe(){const c=document.getElementById('fichesListe');if(!c)return;if(allFiches.length===0){c.innerHTML='<div class="alert alert-info">Aucune fiche</div>';return;}const promoMap={};allPromotions.forEach(p=>promoMap[p.id]=p.nom);let html='<table class="table table-bordered"><thead><tr><th>Fiche</th><th>Montant</th><th>Promotions</th></tr></thead><tbody>';allFiches.forEach(f=>{let promos='';if(f.promotions)promos=f.promotions.map(pid=>promoMap[pid]).filter(p=>p).join(', ');else if(f.promotion)promos=promoMap[f.promotion]||'';html+=`<tr><td><strong>${escapeHtml(f.nom)}</strong></td><td>${formaterMontant(f.montant||0)}</td><td>${escapeHtml(promos||'-')}</td></tr>`;});html+='</tbody></table>';c.innerHTML=html;}
-        
-        function afficherBoutonsPromotions(){const c=document.getElementById('promotionButtons');if(!c)return;let html='';allPromotions.forEach(p=>{const nb=allEtudiants.filter(e=>e.promotion===p.id).length;html+=`<button class="promotion-btn" data-promo="${p.id}">📚 ${escapeHtml(p.nom)} <span class="badge bg-secondary">${nb}</span></button>`;});c.innerHTML=html;document.querySelectorAll('.promotion-btn').forEach(btn=>{btn.addEventListener('click',()=>{document.querySelectorAll('.promotion-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');currentSelectedPromotion=btn.dataset.promo;currentSearchTerm = document.getElementById('rechercheEtudiant')?.value || '';afficherEtudiantsParPromotion(currentSelectedPromotion, currentSearchTerm);});});}
-        
-        function afficherEtudiantsParPromotion(promoId, searchTerm = '') {
-            if(!promoId){document.getElementById('etudiantsListe').innerHTML='<div class="text-center"><h5>Sélectionnez une promotion</h5></div>';return;}
-            let filtres=allEtudiants.filter(e=>e.promotion===promoId);
-            if(searchTerm) filtres=filtres.filter(e=>e.nom?.toLowerCase().includes(searchTerm.toLowerCase()) || e.matricule?.toLowerCase().includes(searchTerm.toLowerCase()));
-            const promoMap={};allPromotions.forEach(p=>promoMap[p.id]=p.nom);
-            if(filtres.length===0){document.getElementById('etudiantsListe').innerHTML=`<div class="alert alert-info">Aucun étudiant trouvé en ${escapeHtml(promoMap[promoId])}</div>`;return;}
-            let html=`<h5>Promotion: ${escapeHtml(promoMap[promoId])} (${filtres.length} étudiants)</h5><div class="table-responsive"><table class="etudiants-table" id="etudiantsTable"><thead><tr><th>#</th><th>Matricule</th><th>Nom</th></tr></thead><tbody>`;
-            filtres.forEach((e,idx)=>{html+=`<tr><td>${idx+1}</td><td>${escapeHtml(e.matricule||e.id.substring(0,8))}</td><td><strong>${escapeHtml(e.nom)}</strong></td></tr>`;});
-            html+='</tbody></table></div>';
-            document.getElementById('etudiantsListe').innerHTML=html;
+        // ========== PAIEMENTS RÉCENTS ==========
+        async function chargerPaiementsRecents() {
+            const c = document.getElementById('paiementsRecentsListe');
+            if (!c) return;
+            const transactions = [...allTransactions].sort((a, b) => (b.date?.toDate() || 0) - (a.date?.toDate() || 0)).slice(0, 15);
+            if (transactions.length === 0) {
+                c.innerHTML = '<div class="empty-state-mystic"><i class="bi bi-inbox"></i><h5>Aucun paiement</h5></div>';
+                return;
+            }
+            const total = transactions.reduce((s, t) => s + (t.montantTotal || 0), 0);
+            let html = `<div class="paiements-stats-grid">
+                <div class="mystic-stat-card"><div class="mystic-stat-number">${formaterMontant(total)}</div><div class="mystic-stat-label">Total collecté</div></div>
+                <div class="mystic-stat-card"><div class="mystic-stat-number">${transactions.length}</div><div class="mystic-stat-label">Paiements</div></div>
+            </div><div class="paiements-timeline">`;
+            
+            transactions.forEach(t => {
+                const date = t.date ? new Date(t.date.toDate()).toLocaleString('fr-FR') : '-';
+                const promo = t.promotionNom || (t.promotion ? allPromotions.find(p => p.id === t.promotion)?.nom : '-');
+                
+                let fichesHtml = '';
+                if (t.fiches && t.fiches.length > 0) {
+                    fichesHtml = '<div class="paiement-fiches-detail">';
+                    t.fiches.forEach(f => {
+                        const ficheInfo = allFiches.find(fi => fi.id === f.id);
+                        const nomFiche = ficheInfo ? ficheInfo.nom : (f.nom || 'Fiche');
+                        const montantFiche = f.montant || (ficheInfo ? ficheInfo.montant : 0);
+                        let statutClass = 'paid';
+                        if (f.paye !== undefined && f.montant !== undefined) {
+                            statutClass = f.paye >= f.montant ? 'paid' : 'partial';
+                        }
+                        fichesHtml += `<span class="paiement-fiche-tag ${statutClass}">${escapeHtml(nomFiche)}: ${formaterMontant(montantFiche)}</span>`;
+                    });
+                    fichesHtml += '</div>';
+                }
+                
+                html += `<div class="timeline-item"><div class="timeline-dot"></div>
+                    <div class="paiement-card-mystic">
+                        <div class="paiement-header-mystic">
+                            <span class="paiement-numero">${escapeHtml(t.numeroRecu || t.id.substring(0,12))}</span>
+                            <span class="paiement-date">${date}</span>
+                        </div>
+                        <div class="paiement-etudiant"><i class="bi bi-person-circle"></i> ${escapeHtml(t.etudiantNom || '-')}</div>
+                        <div class="paiement-details">
+                            <span class="paiement-promotion">${escapeHtml(promo || '-')}</span>
+                            <span class="paiement-montant">${formaterMontant(t.montantTotal || 0)}</span>
+                        </div>
+                        ${fichesHtml}
+                    </div>
+                </div>`;
+            });
+            html += '</div>';
+            c.innerHTML = html;
         }
         
-        // ========== GESTION DE LA RECHERCHE ET IMPRESSION POUR ÉTUDIANTS ==========
+        // ========== BORDEREAU ==========
+        document.getElementById('verifierBordereauBtn')?.addEventListener('click', function() {
+            const num = document.getElementById('bordereauNumero').value.trim();
+            const t = allTransactions.find(tx => tx.numeroRecu === num || tx.id === num);
+            const resDiv = document.getElementById('bordereauResultat');
+            if (!t) {
+                resDiv.style.display = 'block';
+                resDiv.innerHTML = `<div class="bordereau-result text-center"><div class="authentic-false"><i class="bi bi-x-octagon-fill" style="font-size:48px;"></i><h3>Reçu NON authentique</h3><p>Numéro: ${escapeHtml(num)}</p></div></div>`;
+                return;
+            }
+            const annee = allAnnees.find(a => a.id === t.anneeAcademiqueId)?.annee || '-';
+            const promo = t.promotionNom || (t.promotion ? allPromotions.find(p => p.id === t.promotion)?.nom : '-');
+            resDiv.style.display = 'block';
+            resDiv.innerHTML = `<div class="bordereau-result">
+                <div class="authentic-true text-center"><i class="bi bi-check-circle-fill" style="font-size:48px;"></i><h3>✓ Reçu AUTHENTIQUE</h3></div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="receipt-info"><strong>N° Reçu:</strong> ${escapeHtml(t.numeroRecu || t.id)}</div>
+                        <div class="receipt-info"><strong>Date:</strong> ${t.date ? new Date(t.date.toDate()).toLocaleString('fr-FR') : '-'}</div>
+                        <div class="receipt-info"><strong>Étudiant:</strong> ${escapeHtml(t.etudiantNom)}</div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="receipt-info"><strong>Promotion:</strong> ${escapeHtml(promo)}</div>
+                        <div class="receipt-info"><strong>Année:</strong> ${escapeHtml(annee)}</div>
+                        <div class="receipt-info"><strong>Montant:</strong> ${formaterMontant(t.montantTotal || 0)}</div>
+                    </div>
+                </div>
+                <div class="receipt-info mt-3"><strong>Comptable:</strong> ${escapeHtml(t.comptable || '-')}</div>
+            </div>`;
+        });
+        
+        // ========== RAPPORT JOURNALIER ==========
+        function chargerJournalierAnnee() {
+            const s = document.getElementById('journalierAnnee');
+            if (s) {
+                s.innerHTML = '<option value="">-- Sélectionner --</option>';
+                allAnnees.forEach(a => {
+                    s.innerHTML += `<option value="${a.id}">${escapeHtml(a.annee || a.nom)}</option>`;
+                });
+            }
+        }
+        
+        function genererDetailsFiches(transaction) {
+            if (!transaction.fiches || transaction.fiches.length === 0) {
+                return '<span class="text-muted">-</span>';
+            }
+            let detailsHtml = '';
+            transaction.fiches.forEach(f => {
+                const ficheInfo = allFiches.find(fi => fi.id === f.id);
+                const nomFiche = ficheInfo ? ficheInfo.nom : (f.nom || 'Fiche inconnue');
+                const montantFiche = f.montant || (ficheInfo ? ficheInfo.montant : 0);
+                let statutClass = 'paid';
+                if (f.paye !== undefined && f.montant !== undefined) {
+                    statutClass = f.paye >= f.montant ? 'paid' : 'partial';
+                }
+                detailsHtml += `<span class="fiche-detail-item ${statutClass}">📋 ${escapeHtml(nomFiche)}: ${formaterMontant(montantFiche)}</span>`;
+            });
+            return detailsHtml || '<span class="text-muted">-</span>';
+        }
+        
+        function genererQRCodePourRapport() {
+            const now = new Date();
+            return JSON.stringify({
+                document: 'Rapport Journalier - Doyen',
+                universite: 'UNIVERSITE DE LUBUMBASHI',
+                faculte: 'FACULTE DES SCIENCES AGRONOMIQUES',
+                date: now.toLocaleDateString('fr-FR'),
+                heure: now.toLocaleTimeString('fr-FR')
+            });
+        }
+        
+        document.getElementById('afficherJournalier')?.addEventListener('click', function() {
+            const anneeId = document.getElementById('journalierAnnee').value;
+            const debut = document.getElementById('journalierDateDebut').value;
+            const fin = document.getElementById('journalierDateFin').value;
+            if (!anneeId || !debut || !fin) {
+                alert('Veuillez remplir tous les champs');
+                return;
+            }
+            const d = new Date(debut);
+            d.setHours(0, 0, 0, 0);
+            const f = new Date(fin);
+            f.setHours(23, 59, 59, 999);
+            let transactions = allTransactions.filter(t => t.anneeAcademiqueId === anneeId && t.date && t.date.toDate() >= d && t.date.toDate() <= f);
+            let depenses = allDepenses.filter(dep => dep.date && dep.date.toDate() >= d && dep.date.toDate() <= f);
+            
+            let duplicatas = transactions.filter(t => t.isDuplicata === true);
+            let transactionsOriginales = transactions.filter(t => !t.isDuplicata);
+            
+            const totalEntrees = transactions.reduce((s, t) => {
+                if (t.isDuplicata) return s + (t.dernierFraisDuplicata || t.duplicataFrais || 0);
+                return s + (t.montantTotal || 0);
+            }, 0);
+            
+            const totalSorties = depenses.reduce((s, d) => s + (d.montant || 0), 0);
+            const totalDuplicatas = duplicatas.reduce((s, t) => s + (t.dernierFraisDuplicata || t.duplicataFrais || 0), 0);
+            
+            const anneeNom = allAnnees.find(a => a.id === anneeId)?.annee || '';
+            let html = `<div class="rapport-summary">
+                <div class="row text-center">
+                    <div class="col-md-3"><strong>Période:</strong><br>${debut.split('-').reverse().join('/')} au ${fin.split('-').reverse().join('/')}</div>
+                    <div class="col-md-3"><strong>Année:</strong><br>${escapeHtml(anneeNom)}</div>
+                    <div class="col-md-3"><strong>Entrées:</strong><br><span class="text-success fs-5">${formaterMontant(totalEntrees)}</span></div>
+                    <div class="col-md-3"><strong>Sorties:</strong><br><span class="text-danger fs-5">${formaterMontant(totalSorties)}</span></div>
+                </div>
+                <hr>
+                <div class="row text-center">
+                    <div class="col-md-4"><strong>Dont duplicatas:</strong><br><span style="color:#ff9800;font-weight:bold;">${formaterMontant(totalDuplicatas)}</span></div>
+                    <div class="col-md-4"><strong>Dont paiements originaux:</strong><br><span class="text-success">${formaterMontant(totalEntrees - totalDuplicatas)}</span></div>
+                    <div class="col-md-4"><strong>Solde période:</strong><br><span class="${totalEntrees - totalSorties >= 0 ? 'text-success' : 'text-danger'} fw-bold fs-5">${formaterMontant(totalEntrees - totalSorties)}</span></div>
+                </div>
+            </div>`;
+            
+            if (transactionsOriginales.length > 0) {
+                html += `<h5 class="mt-3">📋 Paiements originaux (${transactionsOriginales.length})</h5>
+                    <div class="table-responsive"><table class="rapport-table"><thead><tr><th>Date</th><th>N° Reçu</th><th>Étudiant</th><th>Promotion</th><th class="text-end">Montant</th><th>Détails Fiches</th></tr></thead><tbody>`;
+                transactionsOriginales.forEach(t => {
+                    const dt = t.date ? new Date(t.date.toDate()).toLocaleDateString('fr-FR') : '-';
+                    const promo = t.promotionNom || (t.promotion ? allPromotions.find(p => p.id === t.promotion)?.nom : '-');
+                    const detailsFiches = genererDetailsFiches(t);
+                    html += `<tr><td>${dt}</td><td><span class="paiement-numero">${escapeHtml(t.numeroRecu || t.id.substring(0,10))}</span></td><td><strong>${escapeHtml(t.etudiantNom || '-')}</strong></td><td>${escapeHtml(promo || '-')}</td><td class="text-end text-success fw-bold">${formaterMontant(t.montantTotal || 0)}</td><td class="details-fiches-cell">${detailsFiches}</td></tr>`;
+                });
+                html += `</tbody></table></div>`;
+            }
+            
+            if (depenses.length > 0) {
+                html += `<h5 class="mt-3">📤 Dépenses (${depenses.length})</h5>
+                    <div class="table-responsive"><table class="rapport-table"><thead><tr><th>Date</th><th>Motif</th><th>Comptable</th><th class="text-end">Montant</th></tr></thead><tbody>`;
+                depenses.forEach(d => {
+                    const dt = d.date ? new Date(d.date.toDate()).toLocaleDateString('fr-FR') : '-';
+                    html += `<tr><td>${dt}</td><td>${escapeHtml(d.motif || '-')}</td><td>${escapeHtml(d.comptable || '-')}</td><td class="text-end text-danger fw-bold">${formaterMontant(d.montant || 0)}</td></tr>`;
+                });
+                html += `</tbody></table></div>`;
+            }
+            
+            if (duplicatas.length > 0) {
+                html += `<div class="duplicata-table-container">
+                    <h5><i class="bi bi-files" style="color:#ff9800;"></i> Duplicatas (${duplicatas.length})</h5>
+                    <div class="table-responsive"><table class="duplicata-table"><thead><tr><th>Date</th><th>N° Reçu Duplicata</th><th>N° Original</th><th>Étudiant</th><th>Promotion</th><th class="text-end">Frais Duplicata</th></tr></thead><tbody>`;
+                duplicatas.forEach(t => {
+                    const dt = t.date ? new Date(t.date.toDate()).toLocaleDateString('fr-FR') : '-';
+                    const promo = t.promotionNom || (t.promotion ? allPromotions.find(p => p.id === t.promotion)?.nom : '-');
+                    const montant = t.dernierFraisDuplicata || t.duplicataFrais || 0;
+                    html += `<tr><td>${dt}</td><td><span class="paiement-numero" style="background:#ff9800;">${escapeHtml(t.numeroRecu || t.id.substring(0,10))}</span></td><td>${escapeHtml(t.numeroRecuOriginal || t.transactionOriginaleId || '-')}</td><td><strong>${escapeHtml(t.etudiantNom || '-')}</strong></td><td>${escapeHtml(promo || '-')}</td><td class="text-end fw-bold" style="color:#ff9800;">${formaterMontant(montant)}</td></tr>`;
+                });
+                html += `</tbody></table></div>
+                    <div class="mt-2 text-end"><strong>Total frais duplicatas : ${formaterMontant(totalDuplicatas)}</strong></div>
+                </div>`;
+            }
+            
+            document.getElementById('journalierResultat').innerHTML = html;
+            dernierRapportJournalierHTML = html;
+        });
+        
+        document.getElementById('imprimerJournalierBtn')?.addEventListener('click', function() {
+            if (!dernierRapportJournalierHTML) {
+                alert('Veuillez d\'abord générer un rapport journalier.');
+                return;
+            }
+            const maintenant = new Date();
+            const dateImpression = maintenant.toLocaleString('fr-FR', {
+                day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit'
+            });
+            const qrData = genererQRCodePourRapport();
+            
+            const printWindow = window.open('', '_blank', 'width=800,height=600');
+            printWindow.document.write(`
+                <html><head><title>Rapport Journalier</title>
+                <style>
+                    body { font-family: 'Segoe UI', sans-serif; padding: 20px; margin: 0; }
+                    .rapport-summary { background: #e8f4fd; padding: 15px; border-radius: 10px; margin-bottom: 20px; }
+                    .rapport-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+                    .rapport-table th { background: #f0f0f0; padding: 8px; border: 1px solid #ddd; }
+                    .rapport-table td { padding: 6px 8px; border: 1px solid #ddd; }
+                    .duplicata-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 10px; }
+                    .duplicata-table th { background: #ffc107; padding: 8px; border: 1px solid #ddd; }
+                    .duplicata-table td { padding: 6px 8px; border: 1px solid #ddd; }
+                    .duplicata-table-container { margin-top: 20px; border-top: 2px solid #ffc107; padding-top: 15px; }
+                    .text-end { text-align: right; }
+                    .text-success { color: #28a745; }
+                    .text-danger { color: #dc3545; }
+                    .fw-bold { font-weight: bold; }
+                    .fs-5 { font-size: 1.25rem; }
+                    .paiement-numero { background: #667eea; color: white; padding: 2px 8px; border-radius: 12px; font-size: 11px; }
+                    .mt-3 { margin-top: 15px; }
+                    .row { display: flex; gap: 10px; flex-wrap: wrap; }
+                    .col-md-3 { flex: 0 0 23%; }
+                    .col-md-4 { flex: 0 0 30%; }
+                    .text-center { text-align: center; }
+                    .table-responsive { overflow-x: auto; }
+                    .details-fiches-cell { max-width: 200px; font-size: 11px; }
+                    .fiche-detail-item { background: #f0f4ff; padding: 2px 6px; border-radius: 10px; margin: 1px; display: inline-block; font-size: 10px; border: 1px solid #d0d8ff; }
+                    .fiche-detail-item.paid { background: #d4edda; border-color: #c3e6cb; color: #155724; }
+                    .print-header-journalier { display: flex !important; align-items: center; justify-content: space-between; margin-bottom: 10px; padding-bottom: 0px; width: 100%; }
+                    .print-header-journalier .header-left { flex: 1; text-align: left; padding-right: 10px; border-bottom: 3px solid #003366; padding-bottom: 8px; }
+                    .print-header-journalier .header-left h1 { font-size: 20px !important; font-weight: bold; color: #003366; margin: 0; text-transform: uppercase; letter-spacing: 1px; }
+                    .print-header-journalier .header-center { flex: 0 0 auto; text-align: center; padding: 0 15px; margin-bottom: 5px; }
+                    .print-header-journalier .header-center img { width: 80px; height: 80px; object-fit: contain; display: block; background: white; }
+                    .print-header-journalier .header-right { flex: 1; text-align: right; padding-left: 10px; border-bottom: 3px solid #003366; padding-bottom: 8px; }
+                    .print-header-journalier .header-right h2 { font-size: 18px !important; font-weight: bold; color: #003366; margin: 0; text-transform: uppercase; letter-spacing: 1px; }
+                    .print-date-journalier { text-align: right; font-size: 12px; color: #555; margin-bottom: 8px; font-weight: bold; text-transform: uppercase; margin-top: 5px; }
+                    .print-footer-journalier { display: flex !important; justify-content: space-between; align-items: center; margin-top: 25px; padding-top: 12px; border-top: 3px solid #003366; font-size: 13px !important; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; }
+                    .print-footer-journalier .footer-left { text-align: left; flex: 1; }
+                    .print-footer-journalier .footer-center { text-align: center; flex: 1; }
+                    .print-footer-journalier .footer-right { text-align: right; flex: 1; display: flex; flex-direction: column; align-items: flex-end; }
+                    .print-footer-journalier .footer-left p, .print-footer-journalier .footer-center p { margin: 0; color: #003366; font-size: 13px !important; }
+                    .print-footer-journalier .footer-right .qr-code-container { display: inline-block; margin-top: 2px; }
+                    .print-footer-journalier .footer-right .qr-code-container img { width: 60px; height: 60px; }
+                    .print-footer-journalier .footer-right .qr-label { font-size: 8px !important; color: #666; margin-top: 2px; text-transform: lowercase; }
+                </style>
+                </head><body>
+                <div class="print-header-journalier">
+                    <div class="header-left"><h1>UNIVERSITE DE LUBUMBASHI</h1></div>
+                    <div class="header-center"><img src="fsa.png" alt="Logo" onerror="this.src='https://via.placeholder.com/80x80?text=UNILU'"></div>
+                    <div class="header-right"><h2>FACULTE DES SCIENCES AGRONOMIQUES</h2></div>
+                </div>
+                <div class="print-date-journalier">Imprimé le : ${dateImpression}</div>
+                <div id="printContent">${dernierRapportJournalierHTML}</div>
+                <div class="print-footer-journalier">
+                    <div class="footer-left"><p>SECRÉTAIRE ACADÉMIQUE</p></div>
+                    <div class="footer-center"><p>COMPTABLE : NAWEJ NDUWA ARSENE</p></div>
+                    <div class="footer-right">
+                        <p>DOYEN : MICHEL MULIMBI MPUNDU</p>
+                        <div class="qr-code-container"><img src="https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(qrData)}&size=60x60&color=003366&bgcolor=ffffff" alt="QR Code"></div>
+                        <span class="qr-label">Document certifié</span>
+                    </div>
+                </div>
+                <script>window.onload=function(){window.print();setTimeout(function(){window.close();},1000);};<\/script>
+                </body></html>
+            `);
+            printWindow.document.close();
+        });
+        
+        // ========== RECHERCHE ET IMPRESSION ÉTUDIANTS ==========
         document.getElementById('btnRechercherEtudiant')?.addEventListener('click', function() {
             if (currentSelectedPromotion) {
                 currentSearchTerm = document.getElementById('rechercheEtudiant').value;
@@ -644,462 +1146,245 @@
             const promoNom = document.querySelector('#etudiantsListe h5')?.textContent || 'Liste des étudiants';
             const printWindow = window.open('', '_blank', 'width=800,height=600');
             printWindow.document.write(`
-                <html>
-                <head>
-                    <title>Liste des étudiants</title>
-                    <style>
-                        body { font-family: 'Segoe UI', sans-serif; padding: 20px; }
-                        h2 { color: #003366; text-align: center; margin-bottom: 20px; }
-                        table { width: 100%; border-collapse: collapse; font-size: 14px; }
-                        th { background: #003366; color: white; padding: 10px; text-align: left; }
-                        td { padding: 8px 10px; border-bottom: 1px solid #ddd; }
-                        tr:hover { background: #f5f5f5; }
-                        .text-center { text-align: center; }
-                        .footer { margin-top: 30px; text-align: center; font-size: 12px; color: #888; border-top: 1px solid #ddd; padding-top: 10px; }
-                    </style>
-                </head>
-                <body>
-                    <h2>${escapeHtml(promoNom)}</h2>
-                    <table>
-                        <thead><tr><th>#</th><th>Matricule</th><th>Nom</th></tr></thead>
-                        <tbody>
-                            ${table.querySelector('tbody').innerHTML}
-                        </tbody>
-                    </table>
-                    <div class="footer">Imprimé le ${new Date().toLocaleString('fr-FR')}</div>
-                    <script>
-                        window.onload = function() {
-                            window.print();
-                            setTimeout(function(){ window.close(); }, 1000);
-                        };
-                    <\/script>
-                </body>
-                </html>
-            `);
-            printWindow.document.close();
-        });
-        
-        // ========== PAIEMENTS RÉCENTS ==========
-        async function chargerPaiementsRecents(){
-            const c=document.getElementById('paiementsRecentsListe');if(!c)return;
-            const transactions=[...allTransactions].sort((a,b)=>(b.date?.toDate()||0)-(a.date?.toDate()||0)).slice(0,15);
-            if(transactions.length===0){c.innerHTML='<div class="empty-state-mystic"><i class="bi bi-inbox"></i><h5>Aucun paiement</h5></div>';return;}
-            const total=transactions.reduce((s,t)=>s+(t.montantTotal||0),0);
-            let html=`<div class="paiements-stats-grid"><div class="mystic-stat-card"><div class="mystic-stat-number">${formaterMontant(total)}</div><div class="mystic-stat-label">Total collecté</div></div><div class="mystic-stat-card"><div class="mystic-stat-number">${transactions.length}</div><div class="mystic-stat-label">Paiements</div></div></div><div class="paiements-timeline">`;
-            transactions.forEach(t=>{
-                const date=t.date?new Date(t.date.toDate()).toLocaleString('fr-FR'):'-';
-                const promo=t.promotionNom||(t.promotion?allPromotions.find(p=>p.id===t.promotion)?.nom:'-');
-                
-                let fichesHtml = '';
-                if (t.fiches && t.fiches.length > 0) {
-                    fichesHtml = '<div class="paiement-fiches-detail">';
-                    t.fiches.forEach(f => {
-                        const ficheInfo = allFiches.find(fi => fi.id === f.id);
-                        const nomFiche = ficheInfo ? ficheInfo.nom : (f.nom || 'Fiche');
-                        const montantFiche = f.montant || (ficheInfo ? ficheInfo.montant : 0);
-                        let statutClass = 'paid';
-                        if (f.paye !== undefined && f.montant !== undefined) {
-                            statutClass = f.paye >= f.montant ? 'paid' : 'partial';
-                        }
-                        fichesHtml += `<span class="paiement-fiche-tag ${statutClass}">${escapeHtml(nomFiche)}: ${formaterMontant(montantFiche)}</span>`;
-                    });
-                    fichesHtml += '</div>';
-                }
-                
-                html+=`<div class="timeline-item"><div class="timeline-dot"></div><div class="paiement-card-mystic"><div class="paiement-header-mystic"><span class="paiement-numero">${escapeHtml(t.numeroRecu||t.id.substring(0,12))}</span><span class="paiement-date">${date}</span></div><div class="paiement-etudiant"><i class="bi bi-person-circle"></i> ${escapeHtml(t.etudiantNom||'-')}</div><div class="paiement-details"><span class="paiement-promotion">${escapeHtml(promo||'-')}</span><span class="paiement-montant">${formaterMontant(t.montantTotal||0)}</span></div>${fichesHtml}</div></div>`;
-            });
-            html+='</div>';c.innerHTML=html;
-        }
-        
-        // ========== BORDEREAU ==========
-        document.getElementById('verifierBordereauBtn')?.addEventListener('click',()=>{
-            const num=document.getElementById('bordereauNumero').value.trim();
-            const t=allTransactions.find(tx=>tx.numeroRecu===num||tx.id===num);
-            const resDiv=document.getElementById('bordereauResultat');
-            if(!t){resDiv.style.display='block';resDiv.innerHTML=`<div class="bordereau-result text-center"><div class="authentic-false"><i class="bi bi-x-octagon-fill" style="font-size:48px;"></i><h3>Reçu NON authentique</h3><p>Numéro: ${escapeHtml(num)}</p></div></div>`;return;}
-            const annee=allAnnees.find(a=>a.id===t.anneeAcademiqueId)?.annee||'-';
-            const promo=t.promotionNom||(t.promotion?allPromotions.find(p=>p.id===t.promotion)?.nom:'-');
-            resDiv.style.display='block';resDiv.innerHTML=`<div class="bordereau-result"><div class="authentic-true text-center"><i class="bi bi-check-circle-fill" style="font-size:48px;"></i><h3>✓ Reçu AUTHENTIQUE</h3></div><div class="row"><div class="col-md-6"><div class="receipt-info"><strong>N° Reçu:</strong> ${escapeHtml(t.numeroRecu||t.id)}</div><div class="receipt-info"><strong>Date:</strong> ${t.date?new Date(t.date.toDate()).toLocaleString('fr-FR'):'-'}</div><div class="receipt-info"><strong>Étudiant:</strong> ${escapeHtml(t.etudiantNom)}</div></div><div class="col-md-6"><div class="receipt-info"><strong>Promotion:</strong> ${escapeHtml(promo)}</div><div class="receipt-info"><strong>Année:</strong> ${escapeHtml(annee)}</div><div class="receipt-info"><strong>Montant:</strong> ${formaterMontant(t.montantTotal||0)}</div></div></div><div class="receipt-info mt-3"><strong>Comptable:</strong> ${escapeHtml(t.comptable||'-')}</div></div>`;
-        });
-        
-        // ========== RAPPORT JOURNALIER AVEC EN-TÊTE ET PIED DE PAGE ==========
-        function chargerJournalierAnnee(){const s=document.getElementById('journalierAnnee');if(s){s.innerHTML='<option value="">-- Sélectionner --</option>';allAnnees.forEach(a=>s.innerHTML+=`<option value="${a.id}">${escapeHtml(a.annee||a.nom)}</option>`);}}
-        
-        function genererDetailsFiches(transaction) {
-            if (!transaction.fiches || transaction.fiches.length === 0) {
-                return '<span class="text-muted">-</span>';
-            }
-            let detailsHtml = '';
-            transaction.fiches.forEach(f => {
-                const ficheInfo = allFiches.find(fi => fi.id === f.id);
-                const nomFiche = ficheInfo ? ficheInfo.nom : (f.nom || 'Fiche inconnue');
-                const montantFiche = f.montant || (ficheInfo ? ficheInfo.montant : 0);
-                let statutClass = 'paid';
-                if (f.paye !== undefined && f.montant !== undefined) {
-                    statutClass = f.paye >= f.montant ? 'paid' : 'partial';
-                }
-                detailsHtml += `<span class="fiche-detail-item ${statutClass}" title="Montant: ${formaterMontant(montantFiche)}">📋 ${escapeHtml(nomFiche)}: ${formaterMontant(montantFiche)}</span>`;
-            });
-            return detailsHtml || '<span class="text-muted">-</span>';
-        }
-        
-        // Fonction pour générer le QR Code
-        function genererQRCodePourRapport() {
-            const now = new Date();
-            const dateStr = now.toLocaleDateString('fr-FR');
-            const timeStr = now.toLocaleTimeString('fr-FR');
-            
-            const qrData = JSON.stringify({
-                document: 'Rapport Journalier - Doyen',
-                universite: 'UNIVERSITE DE LUBUMBASHI',
-                faculte: 'FACULTE DES SCIENCES AGRONOMIQUES',
-                date: dateStr,
-                heure: timeStr,
-                doyen: 'Michel Mulimbi Mpundu',
-                comptable: 'Nawej Nduwa Arsene',
-                generated_by: 'HYBRILINK-TECH'
-            });
-            
-            return qrData;
-        }
-        
-        document.getElementById('afficherJournalier')?.addEventListener('click',()=>{
-            const anneeId=document.getElementById('journalierAnnee').value;
-            const debut=document.getElementById('journalierDateDebut').value;
-            const fin=document.getElementById('journalierDateFin').value;
-            if(!anneeId||!debut||!fin){alert('Veuillez remplir tous les champs');return;}
-            const d=new Date(debut);d.setHours(0,0,0,0);
-            const f=new Date(fin);f.setHours(23,59,59,999);
-            let transactions=allTransactions.filter(t=>t.anneeAcademiqueId===anneeId&&t.date&&t.date.toDate()>=d&&t.date.toDate()<=f);
-            let depenses=allDepenses.filter(dep=>dep.date&&dep.date.toDate()>=d&&dep.date.toDate()<=f);
-            
-            let duplicatas = transactions.filter(t => t.isDuplicata === true);
-            let transactionsOriginales = transactions.filter(t => !t.isDuplicata);
-            
-            const totalEntrees = transactions.reduce((s, t) => {
-                if (t.isDuplicata) {
-                    return s + (t.dernierFraisDuplicata || t.duplicataFrais || 0);
-                }
-                return s + (t.montantTotal || 0);
-            }, 0);
-            
-            const totalSorties = depenses.reduce((s, d) => s + (d.montant || 0), 0);
-            const totalDuplicatas = duplicatas.reduce((s, t) => s + (t.dernierFraisDuplicata || t.duplicataFrais || 0), 0);
-            
-            const anneeNom=allAnnees.find(a=>a.id===anneeId)?.annee||'';
-            let html=`<div class="rapport-summary">
-                <div class="row text-center">
-                    <div class="col-md-3"><strong>Période:</strong><br>${debut.split('-').reverse().join('/')} au ${fin.split('-').reverse().join('/')}</div>
-                    <div class="col-md-3"><strong>Année:</strong><br>${escapeHtml(anneeNom)}</div>
-                    <div class="col-md-3"><strong>Entrées:</strong><br><span class="text-success fs-5">${formaterMontant(totalEntrees)}</span></div>
-                    <div class="col-md-3"><strong>Sorties:</strong><br><span class="text-danger fs-5">${formaterMontant(totalSorties)}</span></div>
-                </div>
-                <hr>
-                <div class="row text-center">
-                    <div class="col-md-4"><strong>Dont duplicatas:</strong><br><span style="color:#ff9800;font-weight:bold;">${formaterMontant(totalDuplicatas)}</span></div>
-                    <div class="col-md-4"><strong>Dont paiements originaux:</strong><br><span class="text-success">${formaterMontant(totalEntrees - totalDuplicatas)}</span></div>
-                    <div class="col-md-4"><strong>Solde période:</strong><br><span class="${totalEntrees-totalSorties>=0?'text-success':'text-danger'} fw-bold fs-5">${formaterMontant(totalEntrees-totalSorties)}</span></div>
-                </div>
-            </div>`;
-            
-            if(transactionsOriginales.length>0){
-                html+=`<h5 class="mt-3">📋 Paiements originaux (${transactionsOriginales.length})</h5><div class="table-responsive"><table class="rapport-table"><thead><tr><th>Date</th><th>N° Reçu</th><th>Étudiant</th><th>Promotion</th><th class="text-end">Montant</th><th>Détails Fiches</th></tr></thead><tbody>`;
-                transactionsOriginales.forEach(t=>{
-                    const dt=t.date?new Date(t.date.toDate()).toLocaleDateString('fr-FR'):'-';
-                    const promo=t.promotionNom||(t.promotion?allPromotions.find(p=>p.id===t.promotion)?.nom:'-');
-                    const detailsFiches = genererDetailsFiches(t);
-                    html+=`<tr><td>${dt}</td><td><span class="paiement-numero">${escapeHtml(t.numeroRecu||t.id.substring(0,10))}</span></td><td><strong>${escapeHtml(t.etudiantNom||'-')}</strong></td><td>${escapeHtml(promo||'-')}</td><td class="text-end text-success fw-bold">${formaterMontant(t.montantTotal||0)}</td><td class="details-fiches-cell">${detailsFiches}</td></tr>`;
-                });
-                html+=`</tbody></table></div>`;
-            }
-            
-            if(depenses.length>0){
-                html+=`<h5 class="mt-3">📤 Dépenses (${depenses.length})</h5><div class="table-responsive"><table class="rapport-table"><thead><tr><th>Date</th><th>Motif</th><th>Comptable</th><th class="text-end">Montant</th></tr></thead><tbody>`;
-                depenses.forEach(d=>{
-                    const dt=d.date?new Date(d.date.toDate()).toLocaleDateString('fr-FR'):'-';
-                    html+=`<tr><td>${dt}</td><td>${escapeHtml(d.motif||'-')}</td><td>${escapeHtml(d.comptable||'-')}</td><td class="text-end text-danger fw-bold">${formaterMontant(d.montant||0)}</td></tr>`;
-                });
-                html+=`</tbody></table></div>`;
-            }
-            
-            if(duplicatas.length>0){
-                html+=`<div class="duplicata-table-container"><h5><i class="bi bi-files" style="color:#ff9800;"></i> Duplicatas (${duplicatas.length})</h5><div class="table-responsive"><table class="duplicata-table"><thead><tr><th>Date</th><th>N° Reçu Duplicata</th><th>N° Original</th><th>Étudiant</th><th>Promotion</th><th class="text-end">Frais Duplicata</th></tr></thead><tbody>`;
-                duplicatas.forEach(t=>{
-                    const dt=t.date?new Date(t.date.toDate()).toLocaleDateString('fr-FR'):'-';
-                    const promo=t.promotionNom||(t.promotion?allPromotions.find(p=>p.id===t.promotion)?.nom:'-');
-                    const montant = t.dernierFraisDuplicata || t.duplicataFrais || 0;
-                    html+=`<tr><td>${dt}</td><td><span class="paiement-numero" style="background:#ff9800;">${escapeHtml(t.numeroRecu||t.id.substring(0,10))}</span></td><td>${escapeHtml(t.numeroRecuOriginal||t.transactionOriginaleId||'-')}</td><td><strong>${escapeHtml(t.etudiantNom||'-')}</strong></td><td>${escapeHtml(promo||'-')}</td><td class="text-end fw-bold" style="color:#ff9800;">${formaterMontant(montant)}</td></tr>`;
-                });
-                html+=`</tbody></table></div><div class="mt-2 text-end"><strong>Total frais duplicatas : ${formaterMontant(totalDuplicatas)}</strong></div></div>`;
-            }
-            
-            document.getElementById('journalierResultat').innerHTML=html;
-            dernierRapportJournalierHTML = html;
-        });
-        
-        document.getElementById('imprimerJournalierBtn')?.addEventListener('click', function() {
-            if (!dernierRapportJournalierHTML) {
-                alert('Veuillez d\'abord générer un rapport journalier.');
-                return;
-            }
-            
-            const maintenant = new Date();
-            const dateImpression = maintenant.toLocaleString('fr-FR', {
-                day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit'
-            });
-            
-            const qrData = genererQRCodePourRapport();
-            
-            const printWindow = window.open('', '_blank', 'width=800,height=600');
-            printWindow.document.write(`
-                <html>
-                <head>
-                    <title>Rapport Journalier</title>
-                    <style>
-                        body { font-family: 'Segoe UI', sans-serif; padding: 20px; margin: 0; }
-                        .rapport-summary { background: #e8f4fd; padding: 15px; border-radius: 10px; margin-bottom: 20px; }
-                        .rapport-table { width: 100%; border-collapse: collapse; font-size: 12px; }
-                        .rapport-table th { background: #f0f0f0; padding: 8px; border: 1px solid #ddd; }
-                        .rapport-table td { padding: 6px 8px; border: 1px solid #ddd; }
-                        .duplicata-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 10px; }
-                        .duplicata-table th { background: #ffc107; padding: 8px; border: 1px solid #ddd; }
-                        .duplicata-table td { padding: 6px 8px; border: 1px solid #ddd; }
-                        .duplicata-table-container { margin-top: 20px; border-top: 2px solid #ffc107; padding-top: 15px; }
-                        .text-end { text-align: right; }
-                        .text-success { color: #28a745; }
-                        .text-danger { color: #dc3545; }
-                        .fw-bold { font-weight: bold; }
-                        .fs-5 { font-size: 1.25rem; }
-                        .paiement-numero { background: #667eea; color: white; padding: 2px 8px; border-radius: 12px; font-size: 11px; }
-                        .mt-3 { margin-top: 15px; }
-                        .row { display: flex; gap: 10px; flex-wrap: wrap; }
-                        .col-md-3 { flex: 0 0 23%; }
-                        .col-md-4 { flex: 0 0 30%; }
-                        .text-center { text-align: center; }
-                        .table-responsive { overflow-x: auto; }
-                        .details-fiches-cell { max-width: 200px; font-size: 11px; }
-                        .fiche-detail-item { background: #f0f4ff; padding: 2px 6px; border-radius: 10px; margin: 1px; display: inline-block; font-size: 10px; border: 1px solid #d0d8ff; }
-                        .fiche-detail-item.paid { background: #d4edda; border-color: #c3e6cb; color: #155724; }
-                        
-                        /* ===== EN-TÊTE DU RAPPORT IMPRIMÉ ===== */
-                        .print-header-journalier {
-                            display: flex !important;
-                            align-items: center;
-                            justify-content: space-between;
-                            margin-bottom: 10px;
-                            padding-bottom: 0px;
-                            width: 100%;
-                        }
-                        .print-header-journalier .header-left {
-                            flex: 1;
-                            text-align: left;
-                            padding-right: 10px;
-                            border-bottom: 3px solid #003366;
-                            padding-bottom: 8px;
-                        }
-                        .print-header-journalier .header-left h1 {
-                            font-size: 20px !important;
-                            font-weight: bold;
-                            color: #003366;
-                            margin: 0;
-                            text-transform: uppercase;
-                            letter-spacing: 1px;
-                        }
-                        .print-header-journalier .header-center {
-                            flex: 0 0 auto;
-                            text-align: center;
-                            padding: 0 15px;
-                            margin-bottom: 5px;
-                        }
-                        .print-header-journalier .header-center img {
-                            width: 80px;
-                            height: 80px;
-                            object-fit: contain;
-                            display: block;
-                            background: white;
-                        }
-                        .print-header-journalier .header-right {
-                            flex: 1;
-                            text-align: right;
-                            padding-left: 10px;
-                            border-bottom: 3px solid #003366;
-                            padding-bottom: 8px;
-                        }
-                        .print-header-journalier .header-right h2 {
-                            font-size: 18px !important;
-                            font-weight: bold;
-                            color: #003366;
-                            margin: 0;
-                            text-transform: uppercase;
-                            letter-spacing: 1px;
-                        }
-                        
-                        /* ===== DATE D'IMPRESSION ===== */
-                        .print-date-journalier {
-                            text-align: right;
-                            font-size: 12px;
-                            color: #555;
-                            margin-bottom: 8px;
-                            font-weight: bold;
-                            text-transform: uppercase;
-                            margin-top: 5px;
-                        }
-                        
-                        /* ===== PIED DE PAGE DU RAPPORT IMPRIMÉ ===== */
-                        .print-footer-journalier {
-                            display: flex !important;
-                            justify-content: space-between;
-                            align-items: center;
-                            margin-top: 25px;
-                            padding-top: 12px;
-                            border-top: 3px solid #003366;
-                            font-size: 13px !important;
-                            font-weight: bold;
-                            text-transform: uppercase;
-                            letter-spacing: 0.5px;
-                        }
-                        .print-footer-journalier .footer-left { 
-                            text-align: left; 
-                            flex: 1;
-                        }
-                        .print-footer-journalier .footer-center { 
-                            text-align: center; 
-                            flex: 1;
-                        }
-                        .print-footer-journalier .footer-right { 
-                            text-align: right; 
-                            flex: 1;
-                            display: flex;
-                            flex-direction: column;
-                            align-items: flex-end;
-                        }
-                        .print-footer-journalier .footer-left p,
-                        .print-footer-journalier .footer-center p {
-                            margin: 0;
-                            color: #003366;
-                            font-size: 13px !important;
-                        }
-                        .print-footer-journalier .footer-right .qr-code-container {
-                            display: inline-block;
-                            margin-top: 2px;
-                        }
-                        .print-footer-journalier .footer-right .qr-code-container img {
-                            width: 60px;
-                            height: 60px;
-                        }
-                        .print-footer-journalier .footer-right .qr-label {
-                            font-size: 8px !important;
-                            color: #666;
-                            margin-top: 2px;
-                            text-transform: lowercase;
-                        }
-                        
-                        /* Sauts de page */
-                        .page-break { page-break-before: always; }
-                        @media print { .no-print { display: none; } }
-                    </style>
-                </head>
-                <body>
-                    <!-- ===== EN-TÊTE ===== -->
-                    <div class="print-header-journalier">
-                        <div class="header-left">
-                            <h1>UNIVERSITE DE LUBUMBASHI</h1>
-                        </div>
-                        <div class="header-center">
-                            <img src="fsa.png" alt="Logo" onerror="this.src='https://via.placeholder.com/80x80?text=UNILU'">
-                        </div>
-                        <div class="header-right">
-                            <h2>FACULTE DES SCIENCES AGRONOMIQUES</h2>
-                        </div>
-                    </div>
-                    
-                    <!-- ===== DATE D'IMPRESSION ===== -->
-                    <div class="print-date-journalier">
-                        Imprimé le : ${dateImpression}
-                    </div>
-                    
-                    <!-- ===== CONTENU DU RAPPORT ===== -->
-                    <div id="printContent">${dernierRapportJournalierHTML}</div>
-                    
-                    <!-- ===== PIED DE PAGE ===== -->
-                    <div class="print-footer-journalier">
-                        <div class="footer-left">
-                            <p>SECRÉTAIRE ACADÉMIQUE</p>
-                        </div>
-                        <div class="footer-center">
-                            <p>COMPTABLE : NAWEJ NDUWA ARSENE</p>
-                        </div>
-                        <div class="footer-right">
-                            <p>DOYEN : MICHEL MULIMBI MPUNDU</p>
-                            <div class="qr-code-container">
-                                <img src="https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(qrData)}&size=60x60&color=003366&bgcolor=ffffff" alt="QR Code">
-                            </div>
-                            <span class="qr-label">Document certifié</span>
-                        </div>
-                    </div>
-                    
-                    <script>
-                        window.onload = function() {
-                            window.print();
-                            setTimeout(function(){ window.close(); }, 1000);
-                        };
-                    <\/script>
-                </body>
-                </html>
+                <html><head><title>Liste des étudiants</title>
+                <style>body{font-family:'Segoe UI',sans-serif;padding:20px;}h2{color:#003366;text-align:center;margin-bottom:20px;}table{width:100%;border-collapse:collapse;font-size:14px;}th{background:#003366;color:white;padding:10px;text-align:left;}td{padding:8px 10px;border-bottom:1px solid #ddd;}tr:hover{background:#f5f5f5;}.footer{margin-top:30px;text-align:center;font-size:12px;color:#888;border-top:1px solid #ddd;padding-top:10px;}</style>
+                </head><body>
+                <h2>${escapeHtml(promoNom)}</h2>
+                <table><thead><tr><th>#</th><th>Matricule</th><th>Nom</th></tr></thead><tbody>${table.querySelector('tbody').innerHTML}</tbody></table>
+                <div class="footer">Imprimé le ${new Date().toLocaleString('fr-FR')}</div>
+                <script>window.onload=function(){window.print();setTimeout(function(){window.close();},1000);};<\/script>
+                </body></html>
             `);
             printWindow.document.close();
         });
         
         // ========== ÉCOUTEURS TEMPS RÉEL ==========
-        db.collection('transactions').onSnapshot(s=>{allTransactions=[];s.forEach(d=>allTransactions.push({id:d.id,...d.data()}));mettreAJourStatsHeader();calculerTotauxFinanciers();if(document.getElementById('panel-paiementsRecents').classList.contains('active'))chargerPaiementsRecents();});
-        db.collection('depenses').onSnapshot(s=>{allDepenses=[];s.forEach(d=>allDepenses.push({id:d.id,...d.data()}));mettreAJourStatsHeader();calculerTotauxFinanciers();if(document.getElementById('panel-finance').classList.contains('active'))chargerDepenses();});
+        db.collection('transactions').onSnapshot(s => {
+            allTransactions = [];
+            s.forEach(d => allTransactions.push({ id: d.id, ...d.data() }));
+            mettreAJourStatsHeader();
+            calculerTotauxFinanciers();
+            if (document.getElementById('panel-paiementsRecents').classList.contains('active')) chargerPaiementsRecents();
+        });
         
-        // ========== INITIALISATION CHARGEMENT ==========
-        (async()=>{
-            allAnnees=await chargerCollection('anneesAcademiques');
-            allPromotions=await chargerCollection('promotions');
-            allEtudiants=await chargerCollection('etudiants');
-            allFiches=await chargerCollection('fiches');
-            const users=await chargerCollection('utilisateurs');
-            allUtilisateurs=users.filter(u=>u.role==='comptabilite');
-            chargerAnneesListe();chargerComptesListe();chargerPromotionsListe();chargerFichesListe();afficherBoutonsPromotions();chargerJournalierAnnee();mettreAJourStatsHeader();calculerTotauxFinanciers();
-        })();
+        db.collection('depenses').onSnapshot(s => {
+            allDepenses = [];
+            s.forEach(d => allDepenses.push({ id: d.id, ...d.data() }));
+            mettreAJourStatsHeader();
+            calculerTotauxFinanciers();
+            if (document.getElementById('panel-finance').classList.contains('active')) chargerDepenses();
+        });
+        
+        db.collection('anneesAcademiques').onSnapshot(s => {
+            allAnnees = [];
+            s.forEach(d => allAnnees.push({ id: d.id, ...d.data() }));
+            chargerAnneesListe();
+            chargerJournalierAnnee();
+        });
+        
+        db.collection('promotions').onSnapshot(s => {
+            allPromotions = [];
+            s.forEach(d => allPromotions.push({ id: d.id, ...d.data() }));
+            chargerPromotionsListe();
+            afficherBoutonsPromotions();
+        });
+        
+        db.collection('etudiants').onSnapshot(s => {
+            allEtudiants = [];
+            s.forEach(d => allEtudiants.push({ id: d.id, ...d.data() }));
+            afficherBoutonsPromotions();
+            if (currentSelectedPromotion) {
+                currentSearchTerm = document.getElementById('rechercheEtudiant')?.value || '';
+                afficherEtudiantsParPromotion(currentSelectedPromotion, currentSearchTerm);
+            }
+        });
+        
+        db.collection('fiches').onSnapshot(s => {
+            allFiches = [];
+            s.forEach(d => allFiches.push({ id: d.id, ...d.data() }));
+            chargerFichesListe();
+        });
+        
+        db.collection('utilisateurs').onSnapshot(s => {
+            allUtilisateurs = [];
+            s.forEach(d => {
+                const data = d.data();
+                if (data.role === 'comptabilite') {
+                    allUtilisateurs.push({ id: d.id, ...data });
+                }
+            });
+            chargerComptesListe();
+        });
         
         // ========== REFRESH ==========
-        document.getElementById('refreshAnneesBtn')?.addEventListener('click',async()=>{allAnnees=await chargerCollection('anneesAcademiques');chargerAnneesListe();chargerJournalierAnnee();showToast('Années actualisées');});
-        document.getElementById('refreshComptesBtn')?.addEventListener('click',async()=>{const users=await chargerCollection('utilisateurs');allUtilisateurs=users.filter(u=>u.role==='comptabilite');chargerComptesListe();showToast('Comptes actualisés');});
-        document.getElementById('refreshPromotionsBtn')?.addEventListener('click',async()=>{allPromotions=await chargerCollection('promotions');chargerPromotionsListe();afficherBoutonsPromotions();showToast('Promotions actualisées');});
-        document.getElementById('refreshFichesBtn')?.addEventListener('click',async()=>{allFiches=await chargerCollection('fiches');chargerFichesListe();showToast('Fiches actualisées');});
-        document.getElementById('refreshEtudiantsBtn')?.addEventListener('click',async()=>{allEtudiants=await chargerCollection('etudiants');afficherBoutonsPromotions();if(currentSelectedPromotion){currentSearchTerm = document.getElementById('rechercheEtudiant')?.value || '';afficherEtudiantsParPromotion(currentSelectedPromotion, currentSearchTerm);}showToast('Étudiants actualisés');});
-        document.getElementById('refreshFinanceBtn')?.addEventListener('click',()=>{chargerDepenses();calculerTotauxFinanciers();showToast('Données financières actualisées');});
-        document.getElementById('refreshPaiementsBtn')?.addEventListener('click',()=>chargerPaiementsRecents());
-        document.getElementById('filtrerDepensesBtn')?.addEventListener('click',()=>chargerDepenses());
+        document.getElementById('refreshAnneesBtn')?.addEventListener('click', () => {
+            chargerAnneesListe();
+            chargerJournalierAnnee();
+            showToast('Années actualisées');
+        });
+        
+        document.getElementById('refreshComptesBtn')?.addEventListener('click', () => {
+            chargerComptesListe();
+            showToast('Comptes actualisés');
+        });
+        
+        document.getElementById('refreshPromotionsBtn')?.addEventListener('click', () => {
+            chargerPromotionsListe();
+            afficherBoutonsPromotions();
+            showToast('Promotions actualisées');
+        });
+        
+        document.getElementById('refreshFichesBtn')?.addEventListener('click', () => {
+            chargerFichesListe();
+            showToast('Fiches actualisées');
+        });
+        
+        document.getElementById('refreshEtudiantsBtn')?.addEventListener('click', () => {
+            afficherBoutonsPromotions();
+            if (currentSelectedPromotion) {
+                currentSearchTerm = document.getElementById('rechercheEtudiant')?.value || '';
+                afficherEtudiantsParPromotion(currentSelectedPromotion, currentSearchTerm);
+            }
+            showToast('Étudiants actualisés');
+        });
+        
+        document.getElementById('refreshFinanceBtn')?.addEventListener('click', () => {
+            chargerDepenses();
+            calculerTotauxFinanciers();
+            showToast('Données financières actualisées');
+        });
+        
+        document.getElementById('refreshPaiementsBtn')?.addEventListener('click', () => {
+            chargerPaiementsRecents();
+            showToast('Paiements actualisés');
+        });
+        
+        document.getElementById('filtrerDepensesBtn')?.addEventListener('click', () => {
+            chargerDepenses();
+        });
         
         // ========== MENUS ==========
-        document.querySelectorAll('.menu-card').forEach(card=>{card.addEventListener('click',()=>{document.getElementById('homePage').style.display='none';document.querySelectorAll('.content-panel').forEach(p=>p.classList.remove('active'));const panel=document.getElementById(`panel-${card.dataset.menu}`);if(panel)panel.classList.add('active');if(card.dataset.menu==='paiementsRecents')chargerPaiementsRecents();if(card.dataset.menu==='finance')chargerDepenses();});});
-        document.getElementById('homeBrand')?.addEventListener('click',(e)=>{e.preventDefault();goHome();});
+        document.querySelectorAll('.menu-card').forEach(card => {
+            card.addEventListener('click', function() {
+                if (this.classList.contains('rapport-card')) return; // géré par onclick
+                document.getElementById('homePage').style.display = 'none';
+                document.querySelectorAll('.content-panel').forEach(p => p.classList.remove('active'));
+                const panel = document.getElementById(`panel-${this.dataset.menu}`);
+                if (panel) panel.classList.add('active');
+                if (this.dataset.menu === 'paiementsRecents') chargerPaiementsRecents();
+                if (this.dataset.menu === 'finance') chargerDepenses();
+            });
+        });
         
-        // ========== PROFIL & SESSION ==========
-        const session=localStorage.getItem('session_doyen');if(!session)window.location.href='login-doyen.html';
-        const sessionData=JSON.parse(session);if(Date.now()>sessionData.expires){localStorage.removeItem('session_doyen');window.location.href='login-doyen.html';}
-        let currentMatricule=sessionData.matricule;
-        document.getElementById('profileBtn')?.addEventListener('click',async()=>{const doc=await db.collection('utilisateurs').doc(currentMatricule).get();const data=doc.data();if(data){document.getElementById('profilNom').textContent=data.nomComplet;document.getElementById('profilMatricule').textContent=`Matricule: ${currentMatricule}`;document.getElementById('profilEmail').textContent=`Email: ${data.email||'-'}`;}document.getElementById('profileModal').style.display='flex';});
-        window.closeProfileModal=()=>document.getElementById('profileModal').style.display='none';
-        document.getElementById('changePasswordBtn')?.addEventListener('click',async()=>{const np=document.getElementById('newPassword').value;const cp=document.getElementById('confirmNewPassword').value;if(np!==cp){alert('Mots de passe différents');return;}if(np.length<4){alert('Minimum 4 caractères');return;}await db.collection('utilisateurs').doc(currentMatricule).update({motDePasse:np});alert('Mot de passe modifié');closeProfileModal();});
-        document.getElementById('logoutBtn')?.addEventListener('click',()=>{localStorage.removeItem('session_doyen');window.location.href='login-doyen.html';});
+        document.getElementById('homeBrand')?.addEventListener('click', function(e) {
+            e.preventDefault();
+            goHome();
+        });
         
-        document.getElementById('currencySelect').value=deviseActuelle;
-        if(deviseActuelle==='USD')document.getElementById('rateBadge').textContent='1 FC = 0.00043 $';
-        else if(deviseActuelle==='HYBRID')document.getElementById('rateBadge').textContent='FC + $';
+        // ========== PROFIL ==========
+        document.getElementById('profileBtn')?.addEventListener('click', function() {
+            const session = JSON.parse(localStorage.getItem('session_doyen') || '{}');
+            document.getElementById('profilNom').textContent = session.nomComplet || 'Utilisateur';
+            document.getElementById('profilMatricule').textContent = `Matricule: ${session.matricule || '-'}`;
+            document.getElementById('profilEmail').textContent = `Email: ${session.email || '-'}`;
+            document.getElementById('profileModal').style.display = 'flex';
+        });
         
-        console.log('✅ Dashboard Doyen - Version finale avec en-tête et pied de page pour le rapport journalier');
+        window.closeProfileModal = function() {
+            document.getElementById('profileModal').style.display = 'none';
+        };
+        
+        // Changement de mot de passe via Auth
+        document.getElementById('changePasswordBtn')?.addEventListener('click', async function() {
+            const np = document.getElementById('newPassword').value;
+            const cp = document.getElementById('confirmNewPassword').value;
+            if (np !== cp) {
+                showToast('Les mots de passe ne correspondent pas', 'danger');
+                return;
+            }
+            if (np.length < 6) {
+                showToast('Minimum 6 caractères', 'danger');
+                return;
+            }
+            try {
+                const user = auth.currentUser;
+                if (user) {
+                    await user.updatePassword(np);
+                    showToast('Mot de passe modifié avec succès !', 'success');
+                    document.getElementById('newPassword').value = '';
+                    document.getElementById('confirmNewPassword').value = '';
+                    closeProfileModal();
+                } else {
+                    showToast('Vous devez être connecté', 'danger');
+                }
+            } catch (err) {
+                showToast('Erreur: ' + err.message, 'danger');
+            }
+        });
+        
+        // ========== DÉCONNEXION ==========
+        document.getElementById('logoutBtn')?.addEventListener('click', async function() {
+            try {
+                await auth.signOut();
+            } catch (e) {}
+            localStorage.removeItem('session_doyen');
+            window.location.href = 'login-doyen.html';
+        });
+        
+        // ========== SYNC STATUS ==========
+        let isOnline = navigator.onLine;
+        window.addEventListener('online', function() {
+            isOnline = true;
+            document.getElementById('offlineIndicator').style.display = 'none';
+            document.getElementById('syncStatus').className = 'sync-status';
+            document.getElementById('syncStatus').innerHTML = '<i class="bi bi-cloud-check"></i> Synchro';
+        });
+        
+        window.addEventListener('offline', function() {
+            isOnline = false;
+            document.getElementById('offlineIndicator').style.display = 'block';
+            document.getElementById('syncStatus').className = 'sync-status offline';
+            document.getElementById('syncStatus').innerHTML = '<i class="bi bi-cloud-off"></i> Hors-ligne';
+        });
+        
+        // ========== INITIALISATION ==========
+        document.getElementById('currencySelect').value = deviseActuelle;
+        if (deviseActuelle === 'USD') document.getElementById('rateBadge').textContent = '1 FC = 0.00043 $';
+        else if (deviseActuelle === 'HYBRID') document.getElementById('rateBadge').textContent = 'FC + $';
+        
+        console.log('✅ Dashboard Doyen - Sécurisé avec Firebase Auth');
+        console.log('✅ Nouvelle carte Rapport & Historique ajoutée');
         console.log('✅ En-tête: UNIVERSITE DE LUBUMBASHI | Logo | FACULTE DES SCIENCES AGRONOMIQUES');
-        console.log('✅ Chaque partie a sa ligne bleue en dessous');
         console.log('✅ Pied: SECRETAIRE ACADEMIQUE | COMPTABLE : NAWEJ NDUWA ARSENE | DOYEN : MICHEL MULIMBI MPUNDU + QR Code');
-        console.log('✅ QR Code intégré dans le pied de page');
-        console.log('✅ Toutes les fonctionnalités sont incluses.');
-        // Petite ligne de code en plus
-        console.log('✅ Version stable prête pour la production.');
+// ⭐ SESSION GLISSANTE : prolonge automatiquement la session
+function prolongerSession() {
+    const session = localStorage.getItem('session_doyen');
+    if (session) {
+        try {
+            const data = JSON.parse(session);
+            if (Date.now() < data.expires) {
+                // Prolonger de 24h à partir de maintenant
+                data.expires = Date.now() + (24 * 60 * 60 * 1000);
+                localStorage.setItem('session_doyen', JSON.stringify(data));
+            }
+        } catch (e) {}
+    }
+}
+
+// Prolonger à chaque interaction utilisateur (max 1 fois/minute pour éviter la surcharge)
+let lastProlongation = 0;
+function handleActivity() {
+    const now = Date.now();
+    if (now - lastProlongation > 60000) {  // 1 minute minimum entre 2 prolongations
+        lastProlongation = now;
+        prolongerSession();
+    }
+}
+
+document.addEventListener('click', handleActivity);
+document.addEventListener('keypress', handleActivity);
+document.addEventListener('touchstart', handleActivity);
+
     </script>
 </body>
 </html>
