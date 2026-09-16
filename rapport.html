@@ -1,0 +1,2518 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Rapport de Paiement - Faculté Agronomique</title>
+    <meta name="theme-color" content="#003366">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon-192x192.png">
+    <link rel="icon" type="image/png" href="icon-96x96.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="FAC Agro">
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root { --primary-blue: #003366; --dark-blue: #002244; --accent-yellow: #ffb347; }
+        
+        body {
+            background: linear-gradient(135deg, #003366 0%, #001a33 100%);
+            font-family: 'Segoe UI', sans-serif;
+            min-height: 100vh;
+        }
+        
+        .main-container {
+            min-height: calc(100vh - 70px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .rapport-page {
+            display: none;
+        }
+        
+        .rapport-page.active {
+            display: block;
+        }
+        
+        .navbar-custom {
+            background: var(--primary-blue);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            padding: 10px 0;
+        }
+        
+        .profile-photo {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--accent-yellow);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .profile-photo i {
+            font-size: 30px;
+            color: var(--primary-blue);
+        }
+        
+        .profile-photo:hover {
+            transform: scale(1.05);
+        }
+        
+        .navbar-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .content-card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            margin-top: 20px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        
+        .nav-tabs-custom {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+        
+        .nav-tabs-custom .tab-btn {
+            padding: 12px 30px;
+            border: 2px solid var(--primary-blue);
+            border-radius: 15px;
+            background: transparent;
+            color: var(--primary-blue);
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .nav-tabs-custom .tab-btn:hover {
+            background: var(--primary-blue);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,51,102,0.3);
+        }
+        
+        .nav-tabs-custom .tab-btn.active {
+            background: var(--primary-blue);
+            color: white;
+            box-shadow: 0 5px 15px rgba(0,51,102,0.3);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .filter-section {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .parallel-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        .parallel-container .col-half {
+            flex: 1;
+            min-width: 280px;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 10px 0;
+            max-height: 250px;
+            overflow-y: auto;
+            padding: 5px;
+        }
+        
+        .checkbox-group .form-check {
+            background: white;
+            padding: 8px 15px;
+            border-radius: 10px;
+            border: 1px solid #dee2e6;
+            transition: all 0.2s;
+            margin: 0;
+            flex: 0 1 auto;
+        }
+        
+        .checkbox-group .form-check:hover {
+            border-color: var(--primary-blue);
+            background: #f0f7ff;
+        }
+        
+        .checkbox-group .form-check input:checked + label {
+            color: var(--primary-blue);
+            font-weight: bold;
+        }
+        
+        .checkbox-group .form-check label {
+            cursor: pointer;
+            margin-left: 5px;
+        }
+        
+        .btn-action {
+            padding: 10px 25px;
+            border-radius: 10px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary-custom {
+            background: linear-gradient(135deg, #003366, #002244);
+            color: white;
+        }
+        
+        .btn-primary-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(0, 51, 102, 0.5);
+        }
+        
+        .btn-success-custom {
+            background: #28a745;
+            color: white;
+        }
+        
+        .btn-success-custom:hover {
+            background: #1e7e34;
+            transform: translateY(-2px);
+        }
+        
+        .btn-danger-custom {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .btn-danger-custom:hover {
+            background: #a71d2a;
+            transform: translateY(-2px);
+        }
+        
+        .btn-warning-custom {
+            background: #ffc107;
+            color: #333;
+        }
+        
+        .btn-warning-custom:hover {
+            background: #e0a800;
+            transform: translateY(-2px);
+        }
+        
+        .btn-info-custom {
+            background: #17a2b8;
+            color: white;
+        }
+        
+        .btn-info-custom:hover {
+            background: #0f6b7a;
+            transform: translateY(-2px);
+        }
+        
+        .stats-bar {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 15px;
+            padding: 20px;
+            color: white;
+            margin-bottom: 20px;
+        }
+        
+        .stats-bar .stat-item {
+            text-align: center;
+        }
+        
+        .stats-bar .stat-number {
+            font-size: 28px;
+            font-weight: bold;
+        }
+        
+        .students-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+        
+        .students-table th {
+            background: var(--primary-blue);
+            color: white;
+            padding: 12px;
+            text-align: left;
+        }
+        
+        .students-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .students-table tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .students-table .status-paid {
+            color: #28a745;
+            font-weight: bold;
+        }
+        
+        .students-table .status-unpaid {
+            color: #dc3545;
+            font-weight: bold;
+        }
+        
+        .table-responsive {
+            max-height: 600px;
+            overflow-y: auto;
+        }
+        
+        .btn-group-export {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .toast-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            min-width: 300px;
+        }
+        
+        .toast {
+            animation: slideInRight 0.3s ease-out;
+        }
+        
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        .badge-offline {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+        
+        .loading-spinner {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid var(--primary-blue);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 50px 20px;
+            color: #666;
+        }
+        
+        .empty-state i {
+            font-size: 64px;
+            color: #ccc;
+            margin-bottom: 20px;
+        }
+        
+        .info-text {
+            text-align: center;
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+            font-size: 13px;
+            color: #888;
+        }
+        
+        .info-text img {
+            border-radius: 30px;
+            width: 50px;
+        }
+        
+        .profile-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+        
+        .profile-modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 400px;
+            width: 90%;
+        }
+        
+        .select-all-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 5px 0;
+        }
+        
+        .select-all-container .form-check {
+            background: white;
+            padding: 5px 15px;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+        }
+        
+        .fiche-count-badge {
+            background: #003366;
+            color: white;
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            margin-left: 8px;
+        }
+        
+        .section-title {
+            font-weight: 600;
+            color: var(--primary-blue);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .fiches-concernees {
+            background: #f0f7ff;
+            border: 1px solid #003366;
+            border-radius: 10px;
+            padding: 12px 15px;
+            margin-bottom: 15px;
+        }
+        
+        .fiches-concernees .badge-fiche {
+            background: #003366;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 13px;
+            display: inline-block;
+            margin: 3px 5px 3px 0;
+        }
+        
+        .qr-code-container {
+            display: inline-block;
+            margin: 0 auto;
+            padding: 5px;
+            background: white;
+            border-radius: 5px;
+        }
+        
+        .qr-code-container img {
+            display: block;
+            width: 80px;
+            height: 80px;
+        }
+
+        .promotion-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .promotion-btn {
+            background: #f8f9fa;
+            border: 2px solid var(--primary-blue);
+            color: var(--primary-blue);
+            padding: 10px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+        
+        .promotion-btn:hover, .promotion-btn.active {
+            background: var(--primary-blue);
+            color: white;
+        }
+        
+        .etudiants-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .etudiants-table th {
+            background: var(--primary-blue);
+            color: white;
+            padding: 12px 15px;
+            text-align: left;
+        }
+        
+        .etudiants-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .etudiants-table tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .btn-voir-plus {
+            background: var(--accent-yellow);
+            color: var(--primary-blue);
+            border: none;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-voir-plus:hover {
+            background: #ff9800;
+            transform: scale(1.05);
+        }
+        
+        .historique-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 3000;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .historique-modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 900px;
+            width: 95%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+        
+        .historique-modal-content h4 {
+            color: var(--primary-blue);
+            border-bottom: 2px solid var(--accent-yellow);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .historique-modal-content .close-modal {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            float: right;
+        }
+        
+        .historique-modal-content .close-modal:hover {
+            background: #a71d2a;
+            transform: scale(1.05);
+        }
+        
+        .historique-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            margin-top: 15px;
+        }
+        
+        .historique-table th {
+            background: var(--primary-blue);
+            color: white;
+            padding: 10px;
+            text-align: left;
+        }
+        
+        .historique-table td {
+            padding: 10px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .historique-table tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .historique-total {
+            margin-top: 15px;
+            padding: 10px;
+            background: #e8f4fd;
+            border-radius: 10px;
+            text-align: right;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        
+        .historique-empty {
+            text-align: center;
+            padding: 40px;
+            color: #888;
+        }
+        
+        .historique-empty i {
+            font-size: 48px;
+            color: #ccc;
+            margin-bottom: 15px;
+        }
+        
+        .btn-print-historique {
+            background: #17a2b8;
+            color: white;
+            border: none;
+            padding: 5px 15px;
+            border-radius: 10px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-left: 10px;
+        }
+        
+        .btn-print-historique:hover {
+            background: #0f6b7a;
+            transform: scale(1.05);
+        }
+        
+        .paiement-fiche-tag {
+            background: #f0f4ff;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            border: 1px solid #d0d8ff;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            margin: 2px;
+        }
+        
+        .paiement-fiche-tag.paid {
+            background: #d4edda;
+            border-color: #c3e6cb;
+            color: #155724;
+        }
+        
+        .paiement-fiche-tag.partial {
+            background: #fff3cd;
+            border-color: #ffeaa7;
+            color: #856404;
+        }
+        
+        .duplicata-badge {
+            background: #ffc107;
+            color: #333;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: bold;
+            margin-left: 5px;
+        }
+        
+        .paiement-numero {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 2px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: bold;
+            font-family: monospace;
+        }
+        
+        .col-action, .col-action th, .col-action td {
+            display: table-cell;
+        }
+
+        /* ========== STYLES POUR L'IMPRESSION ========== */
+        @media print {
+            .no-print { display: none !important; }
+            .navbar-custom { display: none !important; }
+            .content-card { 
+                box-shadow: none !important; 
+                border: none !important; 
+                padding: 15px !important; 
+                margin: 0 !important; 
+                background: white !important;
+            }
+            
+            .table-responsive {
+                max-height: none !important;
+                overflow: visible !important;
+            }
+            
+            .students-table {
+                width: 100%;
+                border-collapse: collapse;
+                font-size: 13px !important;
+                page-break-inside: auto;
+            }
+            
+            .students-table thead {
+                display: table-header-group;
+            }
+            
+            .students-table tbody {
+                display: table-row-group;
+            }
+            
+            .students-table tbody tr {
+                page-break-inside: avoid;
+            }
+            
+            .students-table th { 
+                background: #003366 !important; 
+                color: white !important; 
+                border: 1px solid #003366 !important; 
+                padding: 8px 10px !important;
+                font-size: 13px !important;
+            }
+            
+            .students-table td { 
+                border: 1px solid #ccc !important; 
+                padding: 7px 10px !important;
+                font-size: 13px !important;
+            }
+            
+            .students-table .status-paid { color: #28a745 !important; }
+            .students-table .status-unpaid { color: #dc3545 !important; }
+            
+            .page-title-print { display: block !important; }
+            .print-footer { display: flex !important; }
+            .print-header { display: flex !important; }
+            .print-date { display: block !important; }
+            .fiches-concernees-print { display: block !important; }
+            
+            /* ===== EN-TÊTE AVEC LIGNE SÉPARATRICE ===== */
+            .print-header {
+                display: flex !important;
+                align-items: center;
+                justify-content: center;
+                margin-bottom: 12px;
+                padding: 10px 0 15px 0;
+                position: relative;
+                border-bottom: 4px solid #003366;
+            }
+            
+            .print-header .header-left {
+                flex: 1;
+                text-align: right;
+                padding-right: 20px;
+            }
+            
+            .print-header .header-left h1 {
+                font-size: 20px !important;
+                font-weight: bold;
+                color: #003366;
+                margin: 0;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                line-height: 1.3;
+            }
+            
+            .print-header .header-left h1 span {
+                display: block;
+            }
+            
+            .print-header .header-center {
+                flex: 0 0 auto;
+                text-align: center;
+                padding: 0 15px;
+            }
+            
+            .print-header .header-center img {
+                width: 80px;
+                height: 80px;
+                object-fit: contain;
+                display: block;
+            }
+            
+            .print-header .header-right {
+                flex: 1;
+                text-align: left;
+                padding-left: 20px;
+            }
+            
+            .print-header .header-right h2 {
+                font-size: 18px !important;
+                font-weight: bold;
+                color: #003366;
+                margin: 0;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                line-height: 1.3;
+            }
+            
+            .print-header .header-right h2 span {
+                display: block;
+            }
+            
+            .print-date {
+                text-align: right;
+                font-size: 12px !important;
+                color: #555;
+                margin-bottom: 10px;
+                font-weight: bold;
+                text-transform: uppercase;
+            }
+            
+            /* ===== PIED DE PAGE AVEC QR CODE ET SCEAU ===== */
+            .print-footer {
+                display: flex !important;
+                justify-content: space-between;
+                align-items: center;
+                margin-top: 25px;
+                padding-top: 12px;
+                border-top: 4px solid #003366;
+                font-size: 14px !important;
+                font-weight: bold;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
+            
+            .print-footer .footer-left { 
+                text-align: left; 
+                flex: 1;
+            }
+            
+            .print-footer .footer-center { 
+                text-align: center; 
+                flex: 1;
+            }
+            
+            .print-footer .footer-right { 
+                text-align: right; 
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                align-items: flex-end;
+            }
+            
+            .print-footer .footer-left p,
+            .print-footer .footer-center p {
+                margin: 0;
+                color: #003366;
+                font-size: 14px !important;
+            }
+            
+            .print-footer .footer-right .qr-code-container {
+                display: inline-block;
+                margin-top: 2px;
+                padding: 3px;
+                background: white;
+                border-radius: 4px;
+            }
+            
+            .print-footer .footer-right .qr-code-container img,
+            .print-footer .footer-right .qr-code-container canvas {
+                width: 70px;
+                height: 70px;
+                display: block;
+            }
+            
+            .print-footer .footer-right .qr-label {
+                font-size: 9px !important;
+                color: #666;
+                margin-top: 2px;
+                text-transform: lowercase;
+            }
+
+            /* ===== SCEAU ADMINISTRATIF ===== */
+            .print-footer .footer-left .sceau-container {
+                display: inline-block;
+                margin-top: 5px;
+            }
+            
+            .print-footer .footer-left .sceau-container img {
+                width: 120px;
+                height: 120px;
+                object-fit: contain;
+                display: block;
+            }
+
+            /* Version pour les onglets Détails Pay */
+            .footer-sceau-details {
+                display: flex !important;
+                justify-content: space-between;
+                align-items: center;
+                margin-top: 25px;
+                padding-top: 12px;
+                border-top: 4px solid #003366;
+                font-size: 14px !important;
+                font-weight: bold;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
+            
+            .footer-sceau-details .left { text-align: left; flex: 1; }
+            .footer-sceau-details .center { text-align: center; flex: 1; }
+            .footer-sceau-details .right { text-align: right; flex: 1; display: flex; flex-direction: column; align-items: flex-end; }
+            .footer-sceau-details p { margin: 0; color: #003366; font-size: 14px !important; }
+            .footer-sceau-details .qr-code-container { display: inline-block; margin-top: 2px; padding: 3px; background: white; border-radius: 4px; }
+            .footer-sceau-details .qr-code-container img { width: 60px; height: 60px; display: block; }
+            .footer-sceau-details .qr-label { font-size: 9px; color: #666; margin-top: 2px; text-transform: lowercase; }
+            .footer-sceau-details .left .sceau-container { display: inline-block; margin-top: 5px; }
+            .footer-sceau-details .left .sceau-container img { width: 120px; height: 120px; object-fit: contain; display: block; }
+            
+            .fiches-concernees-print {
+                display: block !important;
+                margin-bottom: 12px;
+                padding: 10px 15px;
+                background: #f0f7ff;
+                border: 1px solid #003366;
+                border-radius: 5px;
+            }
+            .fiches-concernees-print .badge-fiche {
+                background: #003366;
+                color: white;
+                padding: 4px 14px;
+                border-radius: 15px;
+                font-size: 12px !important;
+                display: inline-block;
+                margin: 2px 4px 2px 0;
+            }
+
+            /* ===== CADRE POUR L'ANNÉE ACADÉMIQUE ===== */
+            .print-annee-cadre {
+                display: block !important;
+                text-align: center;
+                margin: 8px 0 18px 0;
+                padding: 8px 0;
+                border: 2px solid #003366;
+                border-radius: 8px;
+                background: #f8f9fa;
+            }
+
+            .print-annee-cadre span {
+                font-size: 18px !important;
+                font-weight: bold;
+                color: #003366;
+                letter-spacing: 1px;
+            }
+
+            .print-annee-cadre .small-text {
+                font-size: 13px !important;
+                font-weight: normal;
+                color: #555;
+                display: block;
+                margin-top: 2px;
+            }
+        }
+        
+        .page-title-print { display: none; }
+        .print-footer { display: none; }
+        .print-header { display: none; }
+        .print-date { display: none; }
+        .fiches-concernees-print { display: none; }
+        .print-annee-cadre { display: none; }
+        
+        .stats-container-print {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 12px;
+            padding: 15px 20px;
+            color: white;
+        }
+        
+        .stats-container-print .stat-item {
+            text-align: center;
+        }
+        
+        .stats-container-print .stat-number {
+            font-size: 26px;
+            font-weight: bold;
+        }
+        
+        .stats-container-print .stat-label {
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        
+        @media (max-width: 768px) {
+            .content-card { padding: 20px; }
+            .checkbox-group .form-check { padding: 6px 12px; }
+            .btn-group-export .btn-action { flex: 1; min-width: 100px; }
+            .navbar-right { gap: 8px; }
+            .parallel-container .col-half { min-width: 100%; }
+            .stats-container-print {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .historique-modal-content { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Page principale (session partagée avec le Doyen) -->
+    <div id="rapportPage" class="rapport-page active">
+        <nav class="navbar navbar-custom">
+            <div class="container">
+                <a class="navbar-brand text-white" href="index.html" id="homeBrand"><i class="bi bi-file-earmark-text-fill"></i> Rapport de Paiement</a>
+                <div class="navbar-right">
+                    <button class="btn btn-outline-light" onclick="window.location.href='index.html'">
+                        <i class="bi bi-arrow-left"></i> Dashboard
+                    </button>
+                    <div class="profile-photo" id="profileBtn"><i class="bi bi-person-circle"></i></div>
+                    <button class="btn btn-outline-light" id="logoutBtn"><i class="bi bi-box-arrow-right"></i></button>
+                </div>
+            </div>
+        </nav>
+        
+        <div class="container">
+            <div class="content-card">
+                <!-- ===== BOUTONS DE NAVIGATION ===== -->
+                <div class="nav-tabs-custom no-print">
+                    <button class="tab-btn active" data-tab="tab-rapport">
+                        <i class="bi bi-file-earmark-text"></i> Rapport
+                    </button>
+                    <button class="tab-btn" data-tab="tab-details">
+                        <i class="bi bi-person-lines-fill"></i> Détails Pay
+                    </button>
+                </div>
+                
+                <!-- ===== TAB 1 : RAPPORT ===== -->
+                <div id="tab-rapport" class="tab-content active">
+                    <!-- ========== EN-TÊTE POUR L'IMPRESSION AVEC LIGNE SÉPARATRICE ========== -->
+                    <div class="page-title-print">
+                        <div class="print-header">
+                            <div class="header-left">
+                                <h1>
+                                    <span>UNIVERSITE DE</span>
+                                    <span>LUBUMBASHI</span>
+                                </h1>
+                            </div>
+                            <div class="header-center">
+                                <img src="fsa.png" alt="Logo" onerror="this.style.display='none'">
+                            </div>
+                            <div class="header-right">
+                                <h2>
+                                    <span>FACULTE DES SCIENCES</span>
+                                    <span>AGRONOMIQUES</span>
+                                </h2>
+                            </div>
+                        </div>
+                        <div class="print-date">
+                            DATE: <span id="printDate"></span>
+                        </div>
+                        <!-- ===== CADRE POUR L'ANNÉE ACADÉMIQUE ===== -->
+                        <div class="print-annee-cadre">
+                            <span id="printAnnee">ANNÉE ACADÉMIQUE</span>
+                            <span class="small-text">Rapport des paiements</span>
+                        </div>
+                    </div>
+                    
+                    <h4 class="mb-3 no-print"><i class="bi bi-funnel-fill"></i> Filtres de recherche</h4>
+                    
+                    <div class="filter-section no-print">
+                        <div class="mb-3">
+                            <label class="fw-bold"><i class="bi bi-calendar-week-fill"></i> Année Académique</label>
+                            <select id="anneeAcademiqueSelect" class="form-select" onchange="onAnneeChange()">
+                                <option value="">-- Sélectionner une année --</option>
+                            </select>
+                        </div>
+                        
+                        <div class="parallel-container">
+                            <div class="col-half">
+                                <div class="section-title"><i class="bi bi-trophy-fill"></i> Promotions</div>
+                                <div class="select-all-container">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="selectAllPromotions" onchange="toggleAll('promotions', this.checked)">
+                                        <label class="form-check-label" for="selectAllPromotions">Tout sélectionner</label>
+                                    </div>
+                                </div>
+                                <div id="promotionsCheckboxes" class="checkbox-group">
+                                    <div class="text-muted">Veuillez d'abord sélectionner une année</div>
+                                </div>
+                            </div>
+                            <div class="col-half">
+                                <div class="section-title"><i class="bi bi-file-text-fill"></i> Fiches</div>
+                                <div class="select-all-container">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="selectAllFiches" onchange="toggleAll('fiches', this.checked)">
+                                        <label class="form-check-label" for="selectAllFiches">Tout sélectionner</label>
+                                    </div>
+                                    <span id="fichesCountInfo" class="fiche-count-badge">0 fiches disponibles</span>
+                                </div>
+                                <div id="fichesCheckboxes" class="checkbox-group">
+                                    <div class="text-muted">Veuillez d'abord sélectionner une année</div>
+                                </div>
+                                <div id="noFichesMessage" style="display:none;" class="alert alert-warning mt-2">
+                                    <i class="bi bi-info-circle"></i> Aucune fiche disponible pour les promotions sélectionnées.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row mt-3">
+                            <div class="col-md-4">
+                                <label class="fw-bold"><i class="bi bi-filter-circle"></i> Statut</label>
+                                <select id="statutFilter" class="form-select">
+                                    <option value="all">Tous les étudiants</option>
+                                    <option value="en_ordre">En ordre de paiement</option>
+                                    <option value="non_ordre">Non en ordre de paiement</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4 d-flex align-items-end">
+                                <button class="btn-action btn-primary-custom w-100" id="genererRapportBtn">
+                                    <i class="bi bi-search"></i> Générer le rapport
+                                </button>
+                            </div>
+                            <div class="col-md-4 d-flex align-items-end">
+                                <button class="btn-action btn-warning-custom w-100" id="resetFiltersBtn">
+                                    <i class="bi bi-arrow-counterclockwise"></i> Réinitialiser
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- ===== STATISTIQUES ===== -->
+                    <div id="statsContainer" style="display:none;">
+                        <div class="stats-container-print no-print" style="background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 12px; padding: 15px 20px; color: white; margin-bottom: 15px;">
+                            <div class="stat-item">
+                                <div class="stat-number" id="statTotal">0</div>
+                                <div class="stat-label">Total étudiants</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-number text-success" id="statEnOrdre" style="color: #90EE90 !important;">0</div>
+                                <div class="stat-label">En ordre</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-number text-danger" id="statNonOrdre" style="color: #FF6B6B !important;">0</div>
+                                <div class="stat-label">Non en ordre</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-number" id="statTotalPaye">0</div>
+                                <div class="stat-label">Montant total payé</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- ===== BOUTONS D'EXPORT ===== -->
+                    <div id="exportContainer" style="display:none;" class="mb-3 no-print">
+                        <div class="btn-group-export">
+                            <button class="btn-action btn-success-custom" onclick="exporterExcel()">
+                                <i class="bi bi-file-excel"></i> Excel
+                            </button>
+                            <button class="btn-action btn-danger-custom" onclick="exporterPDF()">
+                                <i class="bi bi-file-pdf"></i> PDF
+                            </button>
+                            <button class="btn-action btn-info-custom" onclick="imprimerRapport()">
+                                <i class="bi bi-printer"></i> Imprimer
+                            </button>
+                            <button class="btn-action btn-warning-custom" onclick="telechargerCSV()">
+                                <i class="bi bi-file-earmark-text"></i> CSV
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- ===== AFFICHAGE DES FICHES CONCERNÉES ===== -->
+                    <div id="fichesConcerneesContainer" style="display:none;">
+                        <div class="fiches-concernees no-print">
+                            <strong><i class="bi bi-file-text-fill"></i> Fiches concernées :</strong>
+                            <div id="fichesConcerneesList" style="display:inline-block;"></div>
+                        </div>
+                        <div class="fiches-concernees-print">
+                            <strong>Fiches concernées :</strong>
+                            <div id="fichesConcerneesListPrint" style="display:inline-block;"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- ===== RÉSULTATS ===== -->
+                    <div id="resultsContainer" style="display:none;">
+                        <div class="table-responsive">
+                            <table class="students-table" id="studentsTable">
+                                <thead>
+                                    <tr>
+                                        <th style="width:5%;">N°</th>
+                                        <th style="width:15%;">Matricule</th>
+                                        <th style="width:40%;">Nom</th>
+                                        <th style="width:25%;">Promotion</th>
+                                        <th style="width:15%;">Statut</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="studentsTableBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <div id="emptyContainer" style="display:none;">
+                        <div class="empty-state">
+                            <i class="bi bi-inbox"></i>
+                            <h5>Aucun étudiant trouvé</h5>
+                            <p>Veuillez sélectionner une année, une promotion et une fiche pour générer le rapport.</p>
+                        </div>
+                    </div>
+                    
+                    <!-- ========== PIED DE PAGE POUR L'IMPRESSION AVEC QR CODE ET SCEAU ========== -->
+                    <div class="print-footer">
+                        <div class="footer-left">
+                            <p>SECRÉTAIRE ACADÉMIQUE</p>
+                        </div>
+                        <div class="footer-center">
+                            <p>COMPTABLE : NAWEJ NDUWA ARSENE</p>
+                        </div>
+                        <div class="footer-right">
+                            <p>DOYEN : MICHEL MULIMBI MPUNDU</p>
+                            <div class="qr-code-container" id="qrcode"></div>
+                            <span class="qr-label">Document certifié</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- ===== TAB 2 : DÉTAILS PAY ===== -->
+                <div id="tab-details" class="tab-content">
+                    <h4 class="mb-3"><i class="bi bi-person-lines-fill"></i> Détails des Paiements par Étudiant</h4>
+                    
+                    <div class="promotion-buttons" id="promotionButtonsDetails"></div>
+                    
+                    <div class="row g-2 mb-3 no-print">
+                        <div class="col-md-6">
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="rechercheEtudiantDetails" placeholder="Rechercher un étudiant...">
+                                <button class="btn btn-action btn-primary-custom" id="btnRechercherDetails"><i class="bi bi-search"></i> Rechercher</button>
+                            </div>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <button class="btn-action btn-warning-custom" id="btnImprimerEtudiantsDetails">
+                                <i class="bi bi-printer-fill"></i> Imprimer la liste
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div id="etudiantsListeDetails">
+                        <div class="text-center py-5">
+                            <div class="loading-spinner"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- ===== MODAL PROFIL ===== -->
+    <div id="profileModal" style="display:none;">
+        <div class="profile-modal">
+            <div class="profile-modal-content">
+                <div class="text-center">
+                    <i class="bi bi-person-circle" style="font-size:80px;color:#003366;"></i>
+                    <h4 id="profilNom" style="color:#003366;"></h4>
+                    <p id="profilMatricule" class="text-muted"></p>
+                    <p id="profilEmail" class="text-muted"></p>
+                    <hr>
+                    <h5>Changer mot de passe</h5>
+                    <input type="password" class="form-control mb-2" id="newPassword" placeholder="Nouveau mot de passe">
+                    <input type="password" class="form-control mb-2" id="confirmNewPassword" placeholder="Confirmer">
+                    <button class="btn-action btn-primary-custom" id="changePasswordBtn">Modifier</button>
+                    <button class="btn btn-secondary mt-2 w-100" onclick="closeProfileModal()">Fermer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- ===== MODAL HISTORIQUE PAIEMENTS ===== -->
+    <div id="historiqueModal" class="historique-modal" style="display:none;">
+        <div class="historique-modal-content">
+            <h4 id="historiqueTitre"></h4>
+            <button class="close-modal" onclick="fermerHistorique()">✕ Fermer</button>
+            <div id="historiqueContenu"></div>
+        </div>
+    </div>
+    
+    <!-- ===== TOAST CONTAINER ===== -->
+    <div id="toastContainer" class="toast-notification"></div>
+    
+    <!-- ===== INDICATEUR OFFLINE ===== -->
+    <div class="badge-offline" id="offlineIndicator" style="display: none;">
+        <span class="badge bg-warning text-dark">
+            <i class="bi bi-wifi-off"></i> Mode hors-ligne
+        </span>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script>
+        // Configuration Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyBb82N2-5ns7qKjQBAj5UvDW87s2PZ27F0",
+            authDomain: "fsa-unilu.firebaseapp.com",
+            projectId: "fsa-unilu",
+            storageBucket: "fsa-unilu.firebasestorage.app",
+            messagingSenderId: "36551990738",
+            appId: "1:36551990738:web:e91fdcb53f8aab5d1b7c0b"
+        };
+        
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        
+        db.enablePersistence({ synchronizeTabs: true })
+            .then(() => console.log('✅ Persistance Firestore activée'))
+            .catch((err) => console.warn('Persistance non activée:', err));
+        
+        // Variables globales
+        let allPromotions = [];
+        let allFiches = [];
+        let allEtudiants = [];
+        let allTransactions = [];
+        let allAnnees = [];
+        let currentUser = null;
+        let rapportData = [];
+        let selectedAnnee = '';
+        let selectedFichesData = [];
+        let qrCodeInstance = null;
+        
+        // Variables pour l'espace Détails
+        let currentSelectedPromotion = null;
+        let currentSearchTermDetails = '';
+        
+        // Sceau administratif (base64 à remplir si besoin)
+        const SCEAU_BASE64 = "";
+        
+        // === VÉRIFICATION DE SESSION PARTAGÉE AVEC LE DOYEN ===
+        function checkSession() {
+            const session = localStorage.getItem('session_doyen');
+            if (!session) {
+                window.location.href = 'login-doyen.html';
+                return false;
+            }
+            try {
+                const data = JSON.parse(session);
+                if (Date.now() > data.expires) {
+                    localStorage.removeItem('session_doyen');
+                    window.location.href = 'login-doyen.html';
+                    return false;
+                }
+                currentUser = data;
+                document.getElementById('rapportPage').classList.add('active');
+                chargerDonnees();
+                return true;
+            } catch (e) {
+                localStorage.removeItem('session_doyen');
+                window.location.href = 'login-doyen.html';
+                return false;
+            }
+        }
+        
+        // === TOAST ===
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const bgColor = type === 'success' ? '#28a745' : (type === 'warning' ? '#ffc107' : '#dc3545');
+            const textColor = type === 'warning' ? '#333' : 'white';
+            const icon = type === 'success' ? 'check-circle-fill' : (type === 'warning' ? 'exclamation-triangle-fill' : 'x-circle-fill');
+            
+            const toastHtml = `
+                <div class="toast" style="background: ${bgColor}; color: ${textColor}; border-radius: 10px; margin-bottom: 10px; padding: 12px 15px;">
+                    <i class="bi bi-${icon} me-2"></i> ${message}
+                </div>
+            `;
+            container.insertAdjacentHTML('afterbegin', toastHtml);
+            setTimeout(() => container.firstElementChild?.remove(), 4000);
+        }
+        
+        // === GESTION DES TABS ===
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                
+                document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+                const target = document.getElementById(this.dataset.tab);
+                if (target) target.classList.add('active');
+                
+                if (this.dataset.tab === 'tab-details') {
+                    afficherBoutonsPromotionsDetails();
+                }
+                
+                if (this.dataset.tab === 'tab-rapport') {
+                    mettreAJourQRCode();
+                }
+            });
+        });
+        
+        // === CHARGEMENT DES DONNÉES ===
+        function chargerDonnees() {
+            if (currentUser) {
+                document.getElementById('profilNom').textContent = currentUser.nomComplet || currentUser.matricule;
+                document.getElementById('profilMatricule').textContent = `Matricule: ${currentUser.matricule}`;
+                document.getElementById('profilEmail').textContent = `Email: ${currentUser.email || '-'}`;
+            }
+            
+            db.collection('anneesAcademiques').onSnapshot(snapshot => {
+                allAnnees = [];
+                snapshot.forEach(doc => {
+                    allAnnees.push({ id: doc.id, ...doc.data() });
+                });
+                remplirAnneeSelect();
+            });
+            
+            db.collection('promotions').onSnapshot(snapshot => {
+                allPromotions = [];
+                snapshot.forEach(doc => {
+                    allPromotions.push({ id: doc.id, ...doc.data() });
+                });
+                if (selectedAnnee) remplirPromotionsCheckboxes();
+                afficherBoutonsPromotionsDetails();
+            });
+            
+            db.collection('fiches').onSnapshot(snapshot => {
+                allFiches = [];
+                snapshot.forEach(doc => {
+                    allFiches.push({ id: doc.id, ...doc.data() });
+                });
+                if (selectedAnnee) remplirFichesCheckboxes();
+            });
+            
+            db.collection('etudiants').onSnapshot(snapshot => {
+                allEtudiants = [];
+                snapshot.forEach(doc => {
+                    allEtudiants.push({ id: doc.id, ...doc.data() });
+                });
+                if (currentSelectedPromotion) {
+                    afficherEtudiantsDetails(currentSelectedPromotion, currentSearchTermDetails);
+                }
+            });
+            
+            db.collection('transactions').onSnapshot(snapshot => {
+                allTransactions = [];
+                snapshot.forEach(doc => {
+                    allTransactions.push({ id: doc.id, ...doc.data() });
+                });
+            });
+            
+            genererQRCode();
+        }
+        
+        // === GÉNÉRER LE QR CODE ===
+        function genererQRCode() {
+            const qrContainer = document.getElementById('qrcode');
+            if (!qrContainer) return;
+            qrContainer.innerHTML = '';
+            
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('fr-FR');
+            const timeStr = now.toLocaleTimeString('fr-FR');
+            
+            const qrData = JSON.stringify({
+                document: 'Rapport de Paiement',
+                universite: 'UNIVERSITE DE LUBUMBASHI',
+                faculte: 'FACULTE DES SCIENCES AGRONOMIQUES',
+                date: dateStr,
+                heure: timeStr,
+                doyen: 'Michel Mulimbi Mpundu',
+                comptable: 'Nawej Nduwa Arsene',
+                total_etudiants: document.getElementById('statTotal')?.textContent || '0',
+                en_ordre: document.getElementById('statEnOrdre')?.textContent || '0',
+                non_ordre: document.getElementById('statNonOrdre')?.textContent || '0',
+                generated_by: 'HYBRILINK-TECH'
+            });
+            
+            try {
+                qrCodeInstance = new QRCode(qrContainer, {
+                    text: qrData,
+                    width: 80,
+                    height: 80,
+                    colorDark: "#003366",
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.H
+                });
+            } catch (e) {
+                console.warn('Erreur QR Code:', e);
+                qrContainer.innerHTML = '<span style="font-size:10px; color:#999;">QR</span>';
+            }
+        }
+        
+        function mettreAJourQRCode() {
+            genererQRCode();
+        }
+        
+        function remplirAnneeSelect() {
+            const select = document.getElementById('anneeAcademiqueSelect');
+            if (!select) return;
+            const currentVal = select.value;
+            select.innerHTML = '<option value="">-- Sélectionner une année --</option>';
+            allAnnees.forEach(annee => {
+                const nom = annee.annee || annee.nom || annee.id;
+                select.innerHTML += `<option value="${annee.id}">${escapeHtml(nom)}</option>`;
+            });
+            if (currentVal) select.value = currentVal;
+        }
+        
+        function onAnneeChange() {
+            const select = document.getElementById('anneeAcademiqueSelect');
+            selectedAnnee = select.value;
+            
+            if (selectedAnnee) {
+                remplirPromotionsCheckboxes();
+                remplirFichesCheckboxes();
+            } else {
+                document.getElementById('promotionsCheckboxes').innerHTML = '<div class="text-muted">Veuillez d\'abord sélectionner une année</div>';
+                document.getElementById('fichesCheckboxes').innerHTML = '<div class="text-muted">Veuillez d\'abord sélectionner une année</div>';
+                document.getElementById('noFichesMessage').style.display = 'none';
+                document.getElementById('selectAllPromotions').checked = false;
+                document.getElementById('selectAllFiches').checked = false;
+            }
+            
+            document.getElementById('resultsContainer').style.display = 'none';
+            document.getElementById('statsContainer').style.display = 'none';
+            document.getElementById('exportContainer').style.display = 'none';
+            document.getElementById('emptyContainer').style.display = 'none';
+            document.getElementById('fichesConcerneesContainer').style.display = 'none';
+            rapportData = [];
+            selectedFichesData = [];
+        }
+        window.onAnneeChange = onAnneeChange;
+        
+        function remplirPromotionsCheckboxes() {
+            const container = document.getElementById('promotionsCheckboxes');
+            container.innerHTML = '';
+            
+            if (!selectedAnnee) {
+                container.innerHTML = '<div class="text-muted">Veuillez d\'abord sélectionner une année</div>';
+                return;
+            }
+            
+            if (allPromotions.length === 0) {
+                container.innerHTML = '<div class="text-muted">Aucune promotion disponible</div>';
+                return;
+            }
+            
+            allPromotions.forEach(promo => {
+                container.innerHTML += `
+                    <div class="form-check">
+                        <input class="form-check-input promotion-checkbox" type="checkbox" id="promo_${promo.id}" value="${promo.id}" onchange="onPromotionChange()">
+                        <label class="form-check-label" for="promo_${promo.id}">${escapeHtml(promo.nom)}</label>
+                    </div>
+                `;
+            });
+        }
+        
+        function remplirFichesCheckboxes() {
+            const container = document.getElementById('fichesCheckboxes');
+            const noFichesMsg = document.getElementById('noFichesMessage');
+            const countInfo = document.getElementById('fichesCountInfo');
+            
+            if (!selectedAnnee) {
+                container.innerHTML = '<div class="text-muted">Veuillez d\'abord sélectionner une année</div>';
+                noFichesMsg.style.display = 'none';
+                countInfo.textContent = '0 fiche disponible';
+                return;
+            }
+            
+            const selectedPromoIds = [];
+            document.querySelectorAll('.promotion-checkbox:checked').forEach(cb => {
+                selectedPromoIds.push(cb.value);
+            });
+            
+            let fichesFiltrees = [];
+            if (selectedPromoIds.length > 0) {
+                fichesFiltrees = allFiches.filter(fiche => {
+                    if (fiche.promotions && Array.isArray(fiche.promotions)) {
+                        return fiche.promotions.some(promoId => selectedPromoIds.includes(promoId));
+                    }
+                    if (fiche.promotion) {
+                        return selectedPromoIds.includes(fiche.promotion);
+                    }
+                    return false;
+                });
+            }
+            
+            if (fichesFiltrees.length > 0) {
+                countInfo.textContent = `${fichesFiltrees.length} fiche(s) disponible(s)`;
+                countInfo.style.display = 'inline-block';
+                noFichesMsg.style.display = 'none';
+            } else {
+                countInfo.textContent = '0 fiche disponible';
+                countInfo.style.display = 'inline-block';
+                if (selectedPromoIds.length > 0) {
+                    noFichesMsg.style.display = 'block';
+                    noFichesMsg.innerHTML = '<i class="bi bi-info-circle"></i> Aucune fiche disponible pour les promotions sélectionnées.';
+                } else {
+                    noFichesMsg.style.display = 'block';
+                    noFichesMsg.innerHTML = '<i class="bi bi-info-circle"></i> Veuillez d\'abord sélectionner une ou plusieurs promotions.';
+                }
+            }
+            
+            container.innerHTML = '';
+            if (fichesFiltrees.length === 0) {
+                container.innerHTML = '<div class="text-muted">Aucune fiche disponible</div>';
+                return;
+            }
+            
+            fichesFiltrees.forEach(fiche => {
+                container.innerHTML += `
+                    <div class="form-check">
+                        <input class="form-check-input fiche-checkbox" type="checkbox" id="fiche_${fiche.id}" value="${fiche.id}">
+                        <label class="form-check-label" for="fiche_${fiche.id}">${escapeHtml(fiche.nom)} (${(fiche.montant || 0).toLocaleString()} FC)</label>
+                    </div>
+                `;
+            });
+        }
+        
+        function onPromotionChange() {
+            document.querySelectorAll('.fiche-checkbox').forEach(cb => cb.checked = false);
+            document.getElementById('selectAllFiches').checked = false;
+            remplirFichesCheckboxes();
+        }
+        window.onPromotionChange = onPromotionChange;
+        
+        function toggleAll(type, checked) {
+            const selector = type === 'promotions' ? '.promotion-checkbox' : '.fiche-checkbox';
+            document.querySelectorAll(selector).forEach(cb => cb.checked = checked);
+            if (type === 'promotions') onPromotionChange();
+        }
+        window.toggleAll = toggleAll;
+        
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        function formatMontant(montant) {
+            return `${montant.toLocaleString()} FC`;
+        }
+        
+        // === GÉNÉRER LE RAPPORT ===
+        document.getElementById('genererRapportBtn').addEventListener('click', function() {
+            genererRapport();
+        });
+        
+        function genererRapport() {
+            if (!selectedAnnee) {
+                showToast('Veuillez d\'abord sélectionner une année académique', 'warning');
+                return;
+            }
+            
+            const selectedPromotions = [];
+            document.querySelectorAll('.promotion-checkbox:checked').forEach(cb => {
+                selectedPromotions.push(cb.value);
+            });
+            
+            const selectedFiches = [];
+            document.querySelectorAll('.fiche-checkbox:checked').forEach(cb => {
+                selectedFiches.push(cb.value);
+            });
+            
+            const statut = document.getElementById('statutFilter').value;
+            
+            if (selectedPromotions.length === 0) {
+                showToast('Veuillez sélectionner au moins une promotion', 'warning');
+                return;
+            }
+            
+            if (selectedFiches.length === 0) {
+                showToast('Veuillez sélectionner au moins une fiche', 'warning');
+                return;
+            }
+            
+            selectedFichesData = allFiches.filter(f => selectedFiches.includes(f.id));
+            
+            let etudiants = allEtudiants.filter(e => selectedPromotions.includes(e.promotion));
+            
+            if (etudiants.length === 0) {
+                document.getElementById('resultsContainer').style.display = 'none';
+                document.getElementById('statsContainer').style.display = 'none';
+                document.getElementById('exportContainer').style.display = 'none';
+                document.getElementById('emptyContainer').style.display = 'block';
+                document.getElementById('fichesConcerneesContainer').style.display = 'none';
+                document.getElementById('emptyContainer').querySelector('p').textContent = 'Aucun étudiant trouvé dans les promotions sélectionnées.';
+                return;
+            }
+            
+            const anneeObj = allAnnees.find(a => a.id === selectedAnnee);
+            const anneeNom = anneeObj ? (anneeObj.annee || anneeObj.nom || anneeObj.id) : selectedAnnee;
+            document.getElementById('printAnnee').textContent = anneeNom;
+            
+            const resultats = etudiants.map(etudiant => {
+                const transactions = allTransactions.filter(t => 
+                    t.etudiantId === etudiant.id && 
+                    t.anneeAcademiqueId === selectedAnnee &&
+                    selectedFiches.some(fid => t.fiches && t.fiches.some(f => f.id === fid))
+                );
+                
+                const fichesPayees = [];
+                let totalPaye = 0;
+                
+                transactions.forEach(t => {
+                    if (t.fiches) {
+                        t.fiches.forEach(f => {
+                            if (selectedFiches.includes(f.id) && !fichesPayees.includes(f.id)) {
+                                fichesPayees.push(f.id);
+                                totalPaye += f.prix || 0;
+                            }
+                        });
+                    }
+                });
+                
+                const toutesFichesPayees = selectedFiches.every(fid => fichesPayees.includes(fid));
+                const statutEtudiant = toutesFichesPayees ? 'En ordre' : 'Non en ordre';
+                
+                return {
+                    etudiant: etudiant,
+                    fichesPayees: fichesPayees,
+                    totalPaye: totalPaye,
+                    statut: statutEtudiant,
+                    toutesPayees: toutesFichesPayees,
+                    promotionNom: allPromotions.find(p => p.id === etudiant.promotion)?.nom || '-'
+                };
+            });
+            
+            resultats.sort((a, b) => {
+                const nomA = a.etudiant.nom || '';
+                const nomB = b.etudiant.nom || '';
+                return nomA.localeCompare(nomB);
+            });
+            
+            rapportData = resultats;
+            
+            const total = resultats.length;
+            const enOrdre = resultats.filter(r => r.toutesPayees).length;
+            const nonOrdre = total - enOrdre;
+            const totalPaye = resultats.filter(r => r.toutesPayees).reduce((sum, r) => sum + r.totalPaye, 0);
+            
+            let resultatsAffiches = resultats;
+            if (statut === 'en_ordre') {
+                resultatsAffiches = resultats.filter(r => r.toutesPayees);
+            } else if (statut === 'non_ordre') {
+                resultatsAffiches = resultats.filter(r => !r.toutesPayees);
+            }
+            
+            if (resultatsAffiches.length === 0) {
+                document.getElementById('resultsContainer').style.display = 'none';
+                document.getElementById('statsContainer').style.display = 'none';
+                document.getElementById('exportContainer').style.display = 'none';
+                document.getElementById('emptyContainer').style.display = 'block';
+                document.getElementById('fichesConcerneesContainer').style.display = 'none';
+                const msg = statut === 'en_ordre' ? 'Aucun étudiant en ordre de paiement pour cette année.' : 
+                            statut === 'non_ordre' ? 'Tous les étudiants sont en ordre de paiement pour cette année.' : 
+                            'Aucun étudiant trouvé.';
+                document.getElementById('emptyContainer').querySelector('p').textContent = msg;
+                return;
+            }
+            
+            afficherFichesConcernees(selectedFichesData);
+            
+            document.getElementById('statTotal').textContent = total;
+            document.getElementById('statEnOrdre').textContent = enOrdre;
+            document.getElementById('statNonOrdre').textContent = nonOrdre;
+            document.getElementById('statTotalPaye').textContent = formatMontant(totalPaye);
+            
+            document.getElementById('statsContainer').style.display = 'block';
+            document.getElementById('exportContainer').style.display = 'block';
+            document.getElementById('emptyContainer').style.display = 'none';
+            
+            const tbody = document.getElementById('studentsTableBody');
+            tbody.innerHTML = '';
+            
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+            document.getElementById('printDate').textContent = dateStr;
+            
+            resultatsAffiches.forEach((r, index) => {
+                const statusClass = r.toutesPayees ? 'status-paid' : 'status-unpaid';
+                const statusText = r.toutesPayees ? 'En ordre' : 'Non en ordre';
+                
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td>${escapeHtml(r.etudiant.matricule || r.etudiant.id.substring(0, 8))}</td>
+                        <td><strong>${escapeHtml(r.etudiant.nom)}</strong></td>
+                        <td>${escapeHtml(r.promotionNom)}</td>
+                        <td class="${statusClass}">${statusText}</td>
+                    </tr>
+                `;
+            });
+            
+            document.getElementById('resultsContainer').style.display = 'block';
+            
+            mettreAJourQRCode();
+            
+            showToast(`${total} étudiant(s) trouvé(s) dans les promotions sélectionnées`, 'success');
+        }
+        
+        function afficherFichesConcernees(fiches) {
+            const container = document.getElementById('fichesConcerneesContainer');
+            const list = document.getElementById('fichesConcerneesList');
+            const listPrint = document.getElementById('fichesConcerneesListPrint');
+            
+            if (!fiches || fiches.length === 0) {
+                container.style.display = 'none';
+                return;
+            }
+            
+            let html = '';
+            fiches.forEach(f => {
+                html += `<span class="badge-fiche">${escapeHtml(f.nom)}</span> `;
+            });
+            
+            list.innerHTML = html;
+            listPrint.innerHTML = html;
+            container.style.display = 'block';
+        }
+        
+        // === RÉINITIALISER ===
+        document.getElementById('resetFiltersBtn').addEventListener('click', function() {
+            document.querySelectorAll('.promotion-checkbox').forEach(cb => cb.checked = false);
+            document.querySelectorAll('.fiche-checkbox').forEach(cb => cb.checked = false);
+            document.getElementById('selectAllPromotions').checked = false;
+            document.getElementById('selectAllFiches').checked = false;
+            document.getElementById('statutFilter').value = 'all';
+            document.getElementById('resultsContainer').style.display = 'none';
+            document.getElementById('statsContainer').style.display = 'none';
+            document.getElementById('exportContainer').style.display = 'none';
+            document.getElementById('emptyContainer').style.display = 'none';
+            document.getElementById('fichesConcerneesContainer').style.display = 'none';
+            rapportData = [];
+            selectedFichesData = [];
+            
+            if (selectedAnnee) remplirFichesCheckboxes();
+            showToast('Filtres réinitialisés', 'warning');
+        });
+        
+        // === EXPORTS ===
+        function exporterExcel() {
+            if (rapportData.length === 0) {
+                showToast('Aucune donnée à exporter', 'warning');
+                return;
+            }
+            
+            const data = rapportData.map((r, index) => ({
+                'N°': index + 1,
+                'Matricule': r.etudiant.matricule || r.etudiant.id.substring(0, 8),
+                'Nom': r.etudiant.nom,
+                'Promotion': r.promotionNom,
+                'Statut': r.toutesPayees ? 'En ordre' : 'Non en ordre'
+            }));
+            
+            const ws = XLSX.utils.json_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Rapport');
+            XLSX.writeFile(wb, `rapport_paiement_${new Date().toISOString().split('T')[0]}.xlsx`);
+            showToast('Export Excel réussi', 'success');
+        }
+        window.exporterExcel = exporterExcel;
+        
+        function exporterPDF() {
+            if (rapportData.length === 0) {
+                showToast('Aucune donnée à exporter', 'warning');
+                return;
+            }
+            
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({ orientation: 'portrait' });
+            
+            doc.setFontSize(18);
+            doc.setFont(undefined, 'bold');
+            doc.setTextColor(0, 51, 102);
+            doc.text('UNIVERSITE DE LUBUMBASHI', 14, 22);
+            doc.setFontSize(16);
+            doc.text('FACULTE DES SCIENCES AGRONOMIQUES', 14, 32);
+            doc.setFontSize(10);
+            doc.setTextColor(100, 100, 100);
+            doc.text(`Date: ${new Date().toLocaleDateString('fr-FR')}`, 14, 42);
+            
+            const anneeObj = allAnnees.find(a => a.id === selectedAnnee);
+            const anneeNom = anneeObj ? (anneeObj.annee || anneeObj.nom || anneeObj.id) : selectedAnnee;
+            
+            doc.setDrawColor(0, 51, 102);
+            doc.setLineWidth(0.5);
+            doc.rect(40, 48, 130, 18);
+            doc.setFontSize(14);
+            doc.setFont(undefined, 'bold');
+            doc.setTextColor(0, 51, 102);
+            doc.text(anneeNom, 105, 60, { align: 'center' });
+            
+            if (selectedFichesData.length > 0) {
+                doc.setFontSize(11);
+                doc.setTextColor(0, 51, 102);
+                doc.text('Fiches concernées:', 14, 75);
+                let yPos = 82;
+                let line = '';
+                selectedFichesData.forEach((f) => {
+                    if (line.length + f.nom.length + 2 > 70) {
+                        doc.text(line, 14, yPos);
+                        yPos += 6;
+                        line = '';
+                    }
+                    line += (line ? ', ' : '') + f.nom;
+                });
+                if (line) {
+                    doc.text(line, 14, yPos);
+                    yPos += 8;
+                }
+                const startY = Math.max(82, yPos + 4);
+                doc.setFontSize(10);
+                doc.setTextColor(100, 100, 100);
+                
+                const tableData = rapportData.map((r, index) => [
+                    (index + 1).toString(),
+                    r.etudiant.matricule || r.etudiant.id.substring(0, 8),
+                    r.etudiant.nom,
+                    r.promotionNom,
+                    r.toutesPayees ? 'En ordre' : 'Non en ordre'
+                ]);
+                
+                doc.autoTable({
+                    startY: startY + 5,
+                    head: [['N°', 'Matricule', 'Nom', 'Promotion', 'Statut']],
+                    body: tableData,
+                    theme: 'striped',
+                    styles: { fontSize: 10 },
+                    headStyles: { fillColor: [0, 51, 102], fontSize: 11, fontStyle: 'bold' },
+                    columnStyles: {
+                        0: { cellWidth: 15 },
+                        1: { cellWidth: 30 },
+                        2: { cellWidth: 55 },
+                        3: { cellWidth: 45 },
+                        4: { cellWidth: 35 }
+                    },
+                    pageBreak: 'auto',
+                    margin: { top: 10, bottom: 20 }
+                });
+            }
+            
+            const pageCount = doc.internal.getNumberOfPages();
+            for (let i = 1; i <= pageCount; i++) {
+                doc.setPage(i);
+                doc.setFontSize(12);
+                doc.setFont(undefined, 'bold');
+                doc.setTextColor(0, 51, 102);
+                doc.text('SECRETAIRE ACADEMIQUE', 14, doc.internal.pageSize.height - 10);
+                doc.text('COMPTABLE : NAWEJ NDUWA ARSENE', doc.internal.pageSize.width / 2 - 30, doc.internal.pageSize.height - 10);
+                doc.text('DOYEN : MICHEL MULIMBI MPUNDU', doc.internal.pageSize.width - 55, doc.internal.pageSize.height - 10);
+            }
+            
+            doc.save(`rapport_paiement_${new Date().toISOString().split('T')[0]}.pdf`);
+            showToast('Export PDF réussi', 'success');
+        }
+        window.exporterPDF = exporterPDF;
+        
+        function imprimerRapport() {
+            if (rapportData.length === 0) {
+                showToast('Aucune donnée à imprimer', 'warning');
+                return;
+            }
+            window.print();
+        }
+        window.imprimerRapport = imprimerRapport;
+        
+        function telechargerCSV() {
+            if (rapportData.length === 0) {
+                showToast('Aucune donnée à exporter', 'warning');
+                return;
+            }
+            
+            let csv = 'N°,Matricule,Nom,Promotion,Statut\n';
+            rapportData.forEach((r, index) => {
+                csv += `${index + 1},${r.etudiant.matricule || r.etudiant.id.substring(0, 8)},${r.etudiant.nom},${r.promotionNom},${r.toutesPayees ? 'En ordre' : 'Non en ordre'}\n`;
+            });
+            
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `rapport_paiement_${new Date().toISOString().split('T')[0]}.csv`;
+            link.click();
+            showToast('Export CSV réussi', 'success');
+        }
+        window.telechargerCSV = telechargerCSV;
+        
+        // ============================================================
+        // ===== ESPACE DÉTAILS PAY - GESTION DES ÉTUDIANTS =====
+        // ============================================================
+        
+        function afficherBoutonsPromotionsDetails() {
+            const container = document.getElementById('promotionButtonsDetails');
+            if (!container) return;
+            
+            if (allPromotions.length === 0) {
+                container.innerHTML = '<div class="text-muted">Chargement des promotions...</div>';
+                return;
+            }
+            
+            let html = '';
+            allPromotions.forEach(p => {
+                const nb = allEtudiants.filter(e => e.promotion === p.id).length;
+                const active = currentSelectedPromotion === p.id ? 'active' : '';
+                html += `<button class="promotion-btn ${active}" data-promo="${p.id}" onclick="selectionnerPromotionDetails('${p.id}')">
+                    📚 ${escapeHtml(p.nom)} <span class="badge bg-secondary">${nb}</span>
+                </button>`;
+            });
+            container.innerHTML = html;
+            
+            if (currentSelectedPromotion) {
+                afficherEtudiantsDetails(currentSelectedPromotion, currentSearchTermDetails);
+            } else if (allPromotions.length > 0) {
+                selectionnerPromotionDetails(allPromotions[0].id);
+            }
+        }
+        
+        function selectionnerPromotionDetails(promoId) {
+            currentSelectedPromotion = promoId;
+            
+            document.querySelectorAll('.promotion-btn').forEach(b => b.classList.remove('active'));
+            document.querySelector(`.promotion-btn[data-promo="${promoId}"]`)?.classList.add('active');
+            
+            document.getElementById('rechercheEtudiantDetails').value = '';
+            currentSearchTermDetails = '';
+            afficherEtudiantsDetails(promoId, '');
+        }
+        window.selectionnerPromotionDetails = selectionnerPromotionDetails;
+        
+        function afficherEtudiantsDetails(promoId, searchTerm = '') {
+            const container = document.getElementById('etudiantsListeDetails');
+            if (!promoId) {
+                container.innerHTML = '<div class="text-center"><h5>Sélectionnez une promotion</h5></div>';
+                return;
+            }
+            
+            let filtres = allEtudiants.filter(e => e.promotion === promoId);
+            
+            if (searchTerm) {
+                const term = searchTerm.toLowerCase().trim();
+                filtres = filtres.filter(e => 
+                    e.nom?.toLowerCase().includes(term) || 
+                    e.matricule?.toLowerCase().includes(term)
+                );
+            }
+            
+            const promoMap = {};
+            allPromotions.forEach(p => promoMap[p.id] = p.nom);
+            
+            if (filtres.length === 0) {
+                container.innerHTML = `<div class="alert alert-info">Aucun étudiant trouvé en ${escapeHtml(promoMap[promoId] || '')}</div>`;
+                return;
+            }
+            
+            let html = `<h5>Promotion: ${escapeHtml(promoMap[promoId])} (${filtres.length} étudiants)</h5>
+                <div class="table-responsive">
+                    <table class="etudiants-table" id="etudiantsTableDetails">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Matricule</th>
+                                <th>Nom</th>
+                                <th class="col-action">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>`;
+            
+            filtres.forEach((e, idx) => {
+                html += `
+                    <tr>
+                        <td>${idx + 1}</td>
+                        <td>${escapeHtml(e.matricule || e.id.substring(0, 8))}</td>
+                        <td><strong>${escapeHtml(e.nom)}</strong></td>
+                        <td class="col-action">
+                            <button class="btn-voir-plus" onclick="voirHistoriquePaiements('${e.id}', '${escapeHtml(e.nom)}')">
+                                <i class="bi bi-eye"></i> Voir plus
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            html += `</tbody></table></div>`;
+            container.innerHTML = html;
+        }
+        
+        // === RECHERCHE DANS DÉTAILS ===
+        document.getElementById('btnRechercherDetails')?.addEventListener('click', function() {
+            if (currentSelectedPromotion) {
+                currentSearchTermDetails = document.getElementById('rechercheEtudiantDetails').value;
+                afficherEtudiantsDetails(currentSelectedPromotion, currentSearchTermDetails);
+            } else {
+                showToast('Veuillez d\'abord sélectionner une promotion', 'warning');
+            }
+        });
+        
+        document.getElementById('rechercheEtudiantDetails')?.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                document.getElementById('btnRechercherDetails').click();
+            }
+        });
+        
+        document.getElementById('btnImprimerEtudiantsDetails')?.addEventListener('click', function() {
+            const table = document.getElementById('etudiantsTableDetails');
+            if (!table || table.querySelectorAll('tbody tr').length === 0) {
+                showToast('Aucune liste d\'étudiants à imprimer', 'warning');
+                return;
+            }
+            
+            const promoNom = document.querySelector('#etudiantsListeDetails h5')?.textContent || 'Liste des étudiants';
+            const now = new Date().toLocaleString('fr-FR');
+            
+            const printWindow = window.open('', '_blank', 'width=800,height=600');
+            printWindow.document.write(`
+                <html>
+                <head>
+                    <title>Liste des étudiants</title>
+                    <style>
+                        body { font-family: 'Segoe UI', sans-serif; padding: 20px; }
+                        .print-header { display: flex; align-items: center; justify-content: center; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 4px solid #003366; }
+                        .print-header .left { flex: 1; text-align: right; padding-right: 20px; }
+                        .print-header .center { flex: 0 0 auto; padding: 0 15px; }
+                        .print-header .right { flex: 1; text-align: left; padding-left: 20px; }
+                        .print-header h1 { font-size: 20px; font-weight: bold; color: #003366; margin: 0; text-transform: uppercase; }
+                        .print-header h2 { font-size: 18px; font-weight: bold; color: #003366; margin: 0; text-transform: uppercase; }
+                        .print-header img { width: 80px; height: 80px; object-fit: contain; }
+                        .print-date { text-align: right; font-size: 12px; color: #555; margin-bottom: 10px; font-weight: bold; text-transform: uppercase; }
+                        table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 10px; }
+                        th { background: #003366; color: white; padding: 10px; text-align: left; }
+                        td { padding: 8px 10px; border-bottom: 1px solid #ddd; }
+                        .footer { margin-top: 30px; text-align: center; font-size: 12px; color: #888; border-top: 1px solid #ddd; padding-top: 10px; }
+                        .footer-sceau-details { display: flex; justify-content: space-between; margin-top: 25px; padding-top: 12px; border-top: 4px solid #003366; font-size: 14px; font-weight: bold; text-transform: uppercase; }
+                        .footer-sceau-details .left { text-align: left; flex: 1; }
+                        .footer-sceau-details .center { text-align: center; flex: 1; }
+                        .footer-sceau-details .right { text-align: right; flex: 1; display: flex; flex-direction: column; align-items: flex-end; }
+                        .footer-sceau-details p { margin: 0; color: #003366; }
+                        .footer-sceau-details .qr-code-container { display: inline-block; margin-top: 2px; padding: 3px; background: white; border-radius: 4px; }
+                        .footer-sceau-details .qr-code-container img { width: 60px; height: 60px; display: block; }
+                        .footer-sceau-details .qr-label { font-size: 9px; color: #666; margin-top: 2px; text-transform: lowercase; }
+                        .footer-sceau-details .left .sceau-container { display: inline-block; margin-top: 5px; }
+                        .footer-sceau-details .left .sceau-container img { width: 120px; height: 120px; object-fit: contain; display: block; }
+                        .col-action { display: none !important; }
+                        .print-annee-cadre { display: block !important; text-align: center; margin: 8px 0 18px 0; padding: 8px 0; border: 2px solid #003366; border-radius: 8px; background: #f8f9fa; }
+                        .print-annee-cadre span { font-size: 18px !important; font-weight: bold; color: #003366; letter-spacing: 1px; }
+                        .print-annee-cadre .small-text { font-size: 13px !important; font-weight: normal; color: #555; display: block; margin-top: 2px; }
+                    </style>
+                </head>
+                <body>
+                    <div class="print-header">
+                        <div class="left">
+                            <h1>UNIVERSITE DE<br>LUBUMBASHI</h1>
+                        </div>
+                        <div class="center">
+                            <img src="fsa.png" alt="Logo" onerror="this.style.display='none'">
+                        </div>
+                        <div class="right">
+                            <h2>FACULTE DES SCIENCES<br>AGRONOMIQUES</h2>
+                        </div>
+                    </div>
+                    <div class="print-date">DATE: ${now}</div>
+                    <div class="print-annee-cadre">
+                        <span>DÉTAILS DES PAIEMENTS</span>
+                        <span class="small-text">Liste des étudiants par promotion</span>
+                    </div>
+                    <h2 style="text-align:center;color:#003366;font-size:18px;">${escapeHtml(promoNom)}</h2>
+                    <table>
+                        <thead><tr><th>#</th><th>Matricule</th><th>Nom</th></tr></thead>
+                        <tbody>
+                            ${table.querySelector('tbody').innerHTML.replace(/<td class="col-action">.*?<\/td>/g, '')}
+                        </tbody>
+                    </table>
+                    <div class="footer-sceau-details">
+                        <div class="left">
+                            <p>SECRÉTAIRE ACADÉMIQUE</p>
+                            <div class="sceau-container">
+                                <img src="data:image/png;base64,${SCEAU_BASE64}" alt="Sceau administratif" onerror="this.style.display='none'">
+                            </div>
+                        </div>
+                        <div class="center"><p>COMPTABLE : NAWEJ NDUWA ARSENE</p></div>
+                        <div class="right">
+                            <p>DOYEN : MICHEL MULIMBI MPUNDU</p>
+                            <div class="qr-code-container">
+                                <img src="https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent('Document certifié - Liste des étudiants')}&size=60x60&color=003366&bgcolor=ffffff" alt="QR Code">
+                            </div>
+                            <span class="qr-label">document certifié</span>
+                        </div>
+                    </div>
+                    <div class="footer">Document certifié - Imprimé le ${now}</div>
+                    <script>
+                        window.onload = function() {
+                            window.print();
+                            setTimeout(function(){ window.close(); }, 1000);
+                        };
+                    <\/script>
+                </body>
+                </html>
+            `);
+            printWindow.document.close();
+        });
+        
+        // ============================================================
+        // ===== HISTORIQUE DES PAIEMENTS (MODAL) =====
+        // ============================================================
+        
+        function voirHistoriquePaiements(etudiantId, etudiantNom) {
+            const transactions = allTransactions.filter(t => t.etudiantId === etudiantId);
+            transactions.sort((a,b) => (b.date?.toDate()||0) - (a.date?.toDate()||0));
+            
+            const modal = document.getElementById('historiqueModal');
+            const contenu = document.getElementById('historiqueContenu');
+            const titre = document.getElementById('historiqueTitre');
+            
+            titre.innerHTML = `<i class="bi bi-clock-history"></i> Relevé des paiements - ${escapeHtml(etudiantNom)} 
+                <button class="btn-print-historique" onclick="imprimerHistorique('${etudiantId}', '${escapeHtml(etudiantNom)}')">
+                    <i class="bi bi-printer-fill"></i> Imprimer
+                </button>`;
+            
+            if (transactions.length === 0) {
+                contenu.innerHTML = `
+                    <div class="historique-empty">
+                        <i class="bi bi-inbox"></i>
+                        <h5>Aucun paiement enregistré pour cet étudiant</h5>
+                        <p class="text-muted">Aucune transaction trouvée dans la comptabilité.</p>
+                    </div>
+                `;
+            } else {
+                let total = 0;
+                let html = `
+                    <table class="historique-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>N° Reçu</th>
+                                <th>Type</th>
+                                <th>Fiches</th>
+                                <th class="text-end">Montant</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+                
+                transactions.forEach(t => {
+                    const date = t.date ? new Date(t.date.toDate()).toLocaleString('fr-FR') : '-';
+                    const type = t.isDuplicata ? 'Duplicata' : 'Original';
+                    const montant = t.isDuplicata ? (t.dernierFraisDuplicata || t.duplicataFrais || 0) : (t.montantTotal || 0);
+                    total += montant;
+                    
+                    let fichesNoms = '';
+                    if (t.fiches && t.fiches.length > 0) {
+                        fichesNoms = t.fiches.map(f => {
+                            const ficheInfo = allFiches.find(fi => fi.id === f.id);
+                            const nom = ficheInfo ? ficheInfo.nom : (f.nom || 'Fiche');
+                            const prix = f.montant || (ficheInfo ? ficheInfo.montant : 0);
+                            let statutClass = 'paid';
+                            if (f.paye !== undefined && f.montant !== undefined) {
+                                statutClass = f.paye >= f.montant ? 'paid' : 'partial';
+                            }
+                            return `<span class="paiement-fiche-tag ${statutClass}">${escapeHtml(nom)}: ${formatMontant(prix)}</span>`;
+                        }).join(' ');
+                    } else {
+                        fichesNoms = '<span class="text-muted">-</span>';
+                    }
+                    
+                    const typeBadge = t.isDuplicata ? '<span class="duplicata-badge">DUPLICATA</span>' : '';
+                    
+                    html += `
+                        <tr>
+                            <td>${date}</td>
+                            <td><span class="paiement-numero">${escapeHtml(t.numeroRecu || t.id.substring(0,10))}</span> ${typeBadge}</td>
+                            <td>${type}</td>
+                            <td style="max-width:250px;">${fichesNoms}</td>
+                            <td class="text-end" style="font-weight:bold;color:${t.isDuplicata ? '#ff9800' : '#28a745'};">${formatMontant(montant)}</td>
+                        </tr>
+                    `;
+                });
+                
+                html += `
+                        </tbody>
+                    </table>
+                    <div class="historique-total">
+                        Total des paiements : ${formatMontant(total)}
+                    </div>
+                `;
+                
+                contenu.innerHTML = html;
+            }
+            
+            modal.style.display = 'flex';
+        }
+        window.voirHistoriquePaiements = voirHistoriquePaiements;
+        
+        function fermerHistorique() {
+            document.getElementById('historiqueModal').style.display = 'none';
+        }
+        window.fermerHistorique = fermerHistorique;
+        
+        document.getElementById('historiqueModal')?.addEventListener('click', function(e) {
+            if (e.target === this) {
+                fermerHistorique();
+            }
+        });
+        
+        // === IMPRIMER L'HISTORIQUE D'UN ÉTUDIANT ===
+        function imprimerHistorique(etudiantId, etudiantNom) {
+            const transactions = allTransactions.filter(t => t.etudiantId === etudiantId);
+            transactions.sort((a,b) => (b.date?.toDate()||0) - (a.date?.toDate()||0));
+            
+            if (transactions.length === 0) {
+                showToast('Aucun paiement à imprimer pour cet étudiant.', 'warning');
+                return;
+            }
+            
+            let total = 0;
+            let tableRows = '';
+            transactions.forEach(t => {
+                const date = t.date ? new Date(t.date.toDate()).toLocaleString('fr-FR') : '-';
+                const type = t.isDuplicata ? 'Duplicata' : 'Original';
+                const montant = t.isDuplicata ? (t.dernierFraisDuplicata || t.duplicataFrais || 0) : (t.montantTotal || 0);
+                total += montant;
+                
+                let fichesNoms = '';
+                if (t.fiches && t.fiches.length > 0) {
+                    fichesNoms = t.fiches.map(f => {
+                        const ficheInfo = allFiches.find(fi => fi.id === f.id);
+                        const nom = ficheInfo ? ficheInfo.nom : (f.nom || 'Fiche');
+                        const prix = f.montant || (ficheInfo ? ficheInfo.montant : 0);
+                        return `${nom}: ${prix.toLocaleString()} FC`;
+                    }).join('; ');
+                } else {
+                    fichesNoms = '-';
+                }
+                
+                tableRows += `
+                    <tr>
+                        <td>${date}</td>
+                        <td>${t.numeroRecu || t.id.substring(0,10)}</td>
+                        <td>${type}</td>
+                        <td>${fichesNoms}</td>
+                        <td style="text-align:right;font-weight:bold;">${montant.toLocaleString()} FC</td>
+                    </tr>
+                `;
+            });
+            
+            const now = new Date().toLocaleString('fr-FR');
+            
+            const printWindow = window.open('', '_blank', 'width=800,height=600');
+            printWindow.document.write(`
+                <html>
+                <head>
+                    <title>Relevé des paiements - ${etudiantNom}</title>
+                    <style>
+                        body { font-family: 'Segoe UI', sans-serif; padding: 20px; }
+                        .print-header { display: flex; align-items: center; justify-content: center; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 4px solid #003366; }
+                        .print-header .left { flex: 1; text-align: right; padding-right: 20px; }
+                        .print-header .center { flex: 0 0 auto; padding: 0 15px; }
+                        .print-header .right { flex: 1; text-align: left; padding-left: 20px; }
+                        .print-header h1 { font-size: 20px; font-weight: bold; color: #003366; margin: 0; text-transform: uppercase; }
+                        .print-header h2 { font-size: 18px; font-weight: bold; color: #003366; margin: 0; text-transform: uppercase; }
+                        .print-header img { width: 80px; height: 80px; object-fit: contain; }
+                        .print-date { text-align: right; font-size: 12px; color: #555; margin-bottom: 10px; font-weight: bold; text-transform: uppercase; }
+                        table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 10px; }
+                        th { background: #003366; color: white; padding: 10px; text-align: left; }
+                        td { padding: 8px 10px; border-bottom: 1px solid #ddd; }
+                        .text-end { text-align: right; }
+                        .total { margin-top: 15px; padding: 10px; background: #e8f4fd; border-radius: 8px; text-align: right; font-weight: bold; font-size: 16px; }
+                        .footer { margin-top: 30px; text-align: center; font-size: 12px; color: #888; border-top: 1px solid #ddd; padding-top: 10px; }
+                        .footer-sceau { display: flex; justify-content: space-between; margin-top: 25px; padding-top: 12px; border-top: 4px solid #003366; font-size: 14px; font-weight: bold; text-transform: uppercase; }
+                        .footer-sceau .left { text-align: left; flex: 1; }
+                        .footer-sceau .center { text-align: center; flex: 1; }
+                        .footer-sceau .right { text-align: right; flex: 1; display: flex; flex-direction: column; align-items: flex-end; }
+                        .footer-sceau p { margin: 0; color: #003366; }
+                        .footer-sceau .qr-code-container { display: inline-block; margin-top: 2px; padding: 3px; background: white; border-radius: 4px; }
+                        .footer-sceau .qr-code-container img { width: 60px; height: 60px; display: block; }
+                        .footer-sceau .qr-label { font-size: 9px; color: #666; margin-top: 2px; text-transform: lowercase; }
+                        .footer-sceau .left .sceau-container { display: inline-block; margin-top: 5px; }
+                        .footer-sceau .left .sceau-container img { width: 120px; height: 120px; object-fit: contain; display: block; }
+                    </style>
+                </head>
+                <body>
+                    <div class="print-header">
+                        <div class="left">
+                            <h1>UNIVERSITE DE<br>LUBUMBASHI</h1>
+                        </div>
+                        <div class="center">
+                            <img src="fsa.png" alt="Logo" onerror="this.style.display='none'">
+                        </div>
+                        <div class="right">
+                            <h2>FACULTE DES SCIENCES<br>AGRONOMIQUES</h2>
+                        </div>
+                    </div>
+                    <div class="print-date">DATE: ${now}</div>
+                    <h2 style="text-align:center;color:#003366;font-size:18px;">RELEVE DES PAIEMENTS DE : ${escapeHtml(etudiantNom)}</h2>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>N° Reçu</th>
+                                <th>Type</th>
+                                <th>Fiches</th>
+                                <th class="text-end">Montant</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${tableRows}
+                        </tbody>
+                    </table>
+                    <div class="total">Total des paiements : ${total.toLocaleString()} FC</div>
+                    <div class="footer-sceau">
+                        <div class="left">
+                            <p>SECRÉTAIRE ACADÉMIQUE</p>
+                            <div class="sceau-container">
+                                <img src="data:image/png;base64,${SCEAU_BASE64}" alt="Sceau administratif" onerror="this.style.display='none'">
+                            </div>
+                        </div>
+                        <div class="center"><p>COMPTABLE : NAWEJ NDUWA ARSENE</p></div>
+                        <div class="right">
+                            <p>DOYEN : MICHEL MULIMBI MPUNDU</p>
+                            <div class="qr-code-container">
+                                <img src="https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent('Historique des paiements - ' + etudiantNom)}&size=60x60&color=003366&bgcolor=ffffff" alt="QR Code">
+                            </div>
+                            <span class="qr-label">document certifié</span>
+                        </div>
+                    </div>
+                    <div class="footer">Document certifié - Imprimé le ${now}</div>
+                    <script>
+                        window.onload = function() {
+                            window.print();
+                            setTimeout(function(){ window.close(); }, 1000);
+                        };
+                    <\/script>
+                </body>
+                </html>
+            `);
+            printWindow.document.close();
+        }
+        window.imprimerHistorique = imprimerHistorique;
+        
+        // === PROFIL ===
+        document.getElementById('profileBtn').addEventListener('click', function() {
+            document.getElementById('profileModal').style.display = 'flex';
+        });
+        
+        function closeProfileModal() {
+            document.getElementById('profileModal').style.display = 'none';
+        }
+        window.closeProfileModal = closeProfileModal;
+        
+        document.getElementById('changePasswordBtn').addEventListener('click', async function() {
+            const newPwd = document.getElementById('newPassword').value;
+            const confirmPwd = document.getElementById('confirmNewPassword').value;
+            
+            if (newPwd !== confirmPwd) {
+                showToast('Les mots de passe ne correspondent pas', 'warning');
+                return;
+            }
+            if (newPwd.length < 4) {
+                showToast('Le mot de passe doit contenir au moins 4 caractères', 'warning');
+                return;
+            }
+            
+            try {
+                await db.collection('utilisateurs').doc(currentUser.matricule).update({
+                    motDePasse: newPwd
+                });
+                showToast('Mot de passe modifié avec succès', 'success');
+                closeProfileModal();
+                document.getElementById('newPassword').value = '';
+                document.getElementById('confirmNewPassword').value = '';
+            } catch (error) {
+                showToast('Erreur: ' + error.message, 'error');
+            }
+        });
+        
+        // === DÉCONNEXION ===
+        document.getElementById('logoutBtn')?.addEventListener('click', () => {
+            localStorage.removeItem('session_doyen');
+            window.location.href = 'login-doyen.html';
+        });
+        
+        // === INITIALISATION ===
+        checkSession();
+        
+        window.addEventListener('online', () => {
+            document.getElementById('offlineIndicator').style.display = 'none';
+        });
+        window.addEventListener('offline', () => {
+            document.getElementById('offlineIndicator').style.display = 'block';
+        });
+        
+        console.log('✅ Rapport de paiement - Doyen');
+        console.log('✅ Session partagée avec le Dashboard (session_doyen)');
+        console.log('✅ 2 boutons : Rapport et Détails Pay');
+        console.log('✅ Onglet Rapport : rapport complet avec filtres, stats et exports');
+        console.log('✅ Onglet Détails Pay : liste des étudiants avec historique des paiements');
+        console.log('✅ QR Code dans le pied de page des documents imprimés');
+        console.log('✅ Ligne séparatrice sous l\'en-tête des documents imprimés');
+        console.log('✅ Cadre pour l\'année académique');
+        console.log('✅ Sceau administratif en base64 - emplacement réservé');
+        console.log('✅ Version stable prête pour la production.');
+// ⭐ SESSION GLISSANTE : prolonge automatiquement la session
+function prolongerSession() {
+    const session = localStorage.getItem('session_doyen');
+    if (session) {
+        try {
+            const data = JSON.parse(session);
+            if (Date.now() < data.expires) {
+                // Prolonger de 24h à partir de maintenant
+                data.expires = Date.now() + (24 * 60 * 60 * 1000);
+                localStorage.setItem('session_doyen', JSON.stringify(data));
+            }
+        } catch (e) {}
+    }
+}
+
+// Prolonger à chaque interaction utilisateur (max 1 fois/minute pour éviter la surcharge)
+let lastProlongation = 0;
+function handleActivity() {
+    const now = Date.now();
+    if (now - lastProlongation > 60000) {  // 1 minute minimum entre 2 prolongations
+        lastProlongation = now;
+        prolongerSession();
+    }
+}
+
+document.addEventListener('click', handleActivity);
+document.addEventListener('keypress', handleActivity);
+document.addEventListener('touchstart', handleActivity);
+    </script>
+</body>
+</html>
